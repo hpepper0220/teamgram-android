@@ -1,0 +1,173 @@
+package org.telegram.ext;
+
+import static org.telegram.messenger.LocaleController.getString;
+
+import android.animation.AnimatorSet;
+import android.animation.ObjectAnimator;
+import android.app.Activity;
+import android.content.Context;
+import android.graphics.Color;
+import android.util.Log;
+import android.view.Gravity;
+import android.view.View;
+import android.view.animation.AccelerateDecelerateInterpolator;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.view.animation.LayoutAnimationController;
+import android.widget.LinearLayout;
+
+import androidx.appcompat.widget.AppCompatImageView;
+
+import com.skg.lib.utils.KeyboardWatcher;
+import com.skg.lib.widget.ClearEditText;
+import com.skg.lib.widget.InputTextManager;
+import com.skg.lib.widget.SubmitButton;
+
+import org.telegram.messenger.AndroidUtilities;
+import org.telegram.messenger.MessagesController;
+import org.telegram.messenger.R;
+import org.telegram.messenger.Utilities;
+import org.telegram.tgnet.ConnectionsManager;
+import org.telegram.ui.Components.LayoutHelper;
+
+import org.telegram.tgnet.TLRPC;
+
+import java.util.Objects;
+
+public class LoginView extends LinearLayout {
+
+    private final AppCompatImageView logoView;
+    private final ClearEditText usernameEt;
+    private final ClearEditText passwordEt;
+    private final SubmitButton button;
+    private final LinearLayout bodyLayout;
+
+    private final int mAnimTime = 300;
+    private final float mLogoScale = 0.8f;
+
+    private int currentAccount;
+
+    public LoginView(Context context) {
+        super(context);
+        this.setOrientation(LinearLayout.VERTICAL);
+
+        logoView = new AppCompatImageView(context);
+        logoView.setImageResource(R.mipmap.ic_launcher);
+        this.addView(logoView, LayoutHelper.createLinear(120, 120, Gravity.CENTER_HORIZONTAL, 36, 80, 36, 0));
+
+        bodyLayout = new LinearLayout(context);
+        bodyLayout.setOrientation(LinearLayout.VERTICAL);
+        this.addView(bodyLayout, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, Gravity.CENTER_HORIZONTAL, 0, 0, 0, 0));
+
+        usernameEt = new ClearEditText(context);
+        usernameEt.setTextSize(15);
+        usernameEt.setHint("请输入用户名");
+        usernameEt.setTextColor(Color.parseColor("#333333"));
+        usernameEt.setHintTextColor(Color.parseColor("#A4A4A4"));
+        usernameEt.setBackgroundResource(R.drawable.transparent);
+        bodyLayout.addView(usernameEt, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, Gravity.CENTER_HORIZONTAL, 36, 20, 36, 0));
+
+        View line1 = new View(context, null, R.style.HorizontalLineStyle);
+        line1.setBackgroundColor(Color.parseColor("#ECECEC"));
+        bodyLayout.addView(line1, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, 1, Gravity.CENTER_HORIZONTAL, 36, 0, 36, 10));
+
+        passwordEt = new ClearEditText(context);
+        passwordEt.setTextSize(15);
+        passwordEt.setHint("请输入密码");
+        passwordEt.setTextColor(Color.parseColor("#333333"));
+        passwordEt.setHintTextColor(Color.parseColor("#A4A4A4"));
+        passwordEt.setBackgroundResource(R.drawable.transparent);
+        bodyLayout.addView(passwordEt, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, Gravity.CENTER_HORIZONTAL, 36, 0, 36, 0));
+
+        View line2 = new View(context, null, R.style.HorizontalLineStyle);
+        line2.setBackgroundColor(Color.parseColor("#ECECEC"));
+        bodyLayout.addView(line2, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, 1, Gravity.CENTER_HORIZONTAL, 36, 0, 36, 0));
+
+        button = new SubmitButton(context);
+        button.setTextSize(14);
+        button.setGravity(Gravity.CENTER);
+        button.setText("注册");
+        button.setTextColor(Color.WHITE);
+        button.setBackgroundResource(R.drawable.button_circle_selector);
+        this.addView(button, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, 46, Gravity.CENTER_HORIZONTAL, 36, 40, 36, 0));
+
+        Animation animation = AnimationUtils.loadAnimation(context, R.anim.layout_from_bottom_item);
+        LayoutAnimationController controller = new LayoutAnimationController(animation);
+        controller.setDelay(0.15f);
+        controller.setOrder(LayoutAnimationController.ORDER_NORMAL);
+        setLayoutAnimation(controller);
+
+        button.setOnClickListener(view -> {
+            TLRPC.TL_ssgrams_signUp req = new TLRPC.TL_ssgrams_signUp();
+            req.account = Objects.requireNonNull(usernameEt.getText()).toString();
+            req.password = Objects.requireNonNull(passwordEt.getText()).toString();
+            req.first_name = "a12345";
+            req.last_name = "";
+            req.device = "a12345345245";
+            req.version = "100";
+            req.invite_code = "";
+            req.auto_register = false;
+
+            ConnectionsManager.getInstance(currentAccount).sendRequest(req, (response, error) -> AndroidUtilities.runOnUIThread(() -> {
+                Log.e("LoginView", "response --------> " + response);
+            }), ConnectionsManager.RequestFlagWithoutLogin | ConnectionsManager.RequestFlagFailOnServerErrors);
+        });
+    }
+
+    public void bindParentActivity(Activity parentActivity, int currentAccount) {
+        this.currentAccount = currentAccount;
+        InputTextManager.with(parentActivity)
+                .addView(usernameEt)
+                .addView(passwordEt)
+                .setMain(button)
+                .build();
+
+        KeyboardWatcher.with(parentActivity).setListener(new KeyboardWatcher.SoftKeyboardStateListener() {
+            @Override
+            public void onSoftKeyboardOpened(int keyboardHeight) {
+                // 执行位移动画
+                ObjectAnimator objectAnimator = ObjectAnimator.ofFloat(bodyLayout, "translationY", 0, -button.getHeight());
+                objectAnimator.setDuration(mAnimTime);
+                objectAnimator.setInterpolator(new AccelerateDecelerateInterpolator());
+                objectAnimator.start();
+
+                // 执行缩小动画
+                logoView.setPivotX(logoView.getWidth() / 2f);
+                logoView.setPivotY(logoView.getHeight());
+                AnimatorSet animatorSet = new AnimatorSet();
+                ObjectAnimator scaleX = ObjectAnimator.ofFloat(logoView, "scaleX", 1f, mLogoScale);
+                ObjectAnimator scaleY = ObjectAnimator.ofFloat(logoView, "scaleY", 1f, mLogoScale);
+                ObjectAnimator translationY = ObjectAnimator.ofFloat(logoView, "translationY", 0f, -button.getHeight());
+                animatorSet.play(translationY).with(scaleX).with(scaleY);
+                animatorSet.setDuration(mAnimTime);
+                animatorSet.start();
+            }
+
+            @Override
+            public void onSoftKeyboardClosed() {
+                // 执行位移动画
+                ObjectAnimator objectAnimator = ObjectAnimator.ofFloat(bodyLayout, "translationY", bodyLayout.getTranslationY(), 0f);
+                objectAnimator.setDuration(mAnimTime);
+                objectAnimator.setInterpolator(new AccelerateDecelerateInterpolator());
+                objectAnimator.start();
+
+                if (logoView.getTranslationY() == 0) {
+                    return;
+                }
+
+                // 执行放大动画
+                logoView.setPivotX(logoView.getWidth() / 2f);
+                logoView.setPivotY(logoView.getHeight());
+                AnimatorSet animatorSet = new AnimatorSet();
+                ObjectAnimator scaleX = ObjectAnimator.ofFloat(logoView, "scaleX", mLogoScale, 1f);
+                ObjectAnimator scaleY = ObjectAnimator.ofFloat(logoView, "scaleY", mLogoScale, 1f);
+                ObjectAnimator translationY = ObjectAnimator.ofFloat(logoView, "translationY", logoView.getTranslationY(), 0f);
+                animatorSet.play(translationY).with(scaleX).with(scaleY);
+                animatorSet.setDuration(mAnimTime);
+                animatorSet.start();
+            }
+        });
+    }
+
+
+}

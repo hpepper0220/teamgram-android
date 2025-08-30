@@ -8044,45 +8044,45 @@ public class LoginActivity extends BaseFragment implements NotificationCenter.No
                 return;
             }
             nextPressed = true;
-            TLRPC.TL_auth_signUp req = new TLRPC.TL_auth_signUp();
-            req.phone_code_hash = phoneHash;
-            req.phone_number = requestPhone;
-            req.first_name = firstNameField.getText().toString();
-            req.last_name = lastNameField.getText().toString();
-            needShowProgress(0);
-            ConnectionsManager.getInstance(currentAccount).sendRequest(req, (response, error) -> AndroidUtilities.runOnUIThread(() -> {
-                nextPressed = false;
-                if (response instanceof TLRPC.TL_auth_authorization) {
-                    hidePrivacyView();
-                    showDoneButton(false, true);
-                    postDelayed(() -> {
-                        needHideProgress(false, false);
-                        AndroidUtilities.hideKeyboard(fragmentView.findFocus());
-                        onAuthSuccess((TLRPC.TL_auth_authorization) response, true);
-                        if (avatarBig != null) {
-                            TLRPC.FileLocation avatar = avatarBig;
-                            Utilities.cacheClearQueue.postRunnable(()-> MessagesController.getInstance(currentAccount).uploadAndApplyUserAvatar(avatar));
-                        }
-                    }, 150);
-                } else {
-                    needHideProgress(false);
-                    if (error.text.contains("PHONE_NUMBER_INVALID")) {
-                        needShowAlert(getString(R.string.RestorePasswordNoEmailTitle), getString("InvalidPhoneNumber", R.string.InvalidPhoneNumber));
-                    } else if (error.text.contains("PHONE_CODE_EMPTY") || error.text.contains("PHONE_CODE_INVALID")) {
-                        needShowAlert(getString(R.string.RestorePasswordNoEmailTitle), getString("InvalidCode", R.string.InvalidCode));
-                    } else if (error.text.contains("PHONE_CODE_EXPIRED")) {
-                        onBackPressed(true);
-                        setPage(VIEW_PHONE_INPUT, true, null, true);
-                        needShowAlert(getString(R.string.RestorePasswordNoEmailTitle), getString("CodeExpired", R.string.CodeExpired));
-                    } else if (error.text.contains("FIRSTNAME_INVALID")) {
-                        needShowAlert(getString(R.string.RestorePasswordNoEmailTitle), getString("InvalidFirstName", R.string.InvalidFirstName));
-                    } else if (error.text.contains("LASTNAME_INVALID")) {
-                        needShowAlert(getString(R.string.RestorePasswordNoEmailTitle), getString("InvalidLastName", R.string.InvalidLastName));
-                    } else {
-                        needShowAlert(getString(R.string.RestorePasswordNoEmailTitle), error.text);
-                    }
-                }
-            }), ConnectionsManager.RequestFlagWithoutLogin | ConnectionsManager.RequestFlagFailOnServerErrors);
+//            TLRPC.TL_auth_signUp req = new TLRPC.TL_auth_signUp();
+//            req.phone_code_hash = phoneHash;
+//            req.phone_number = requestPhone;
+//            req.first_name = firstNameField.getText().toString();
+//            req.last_name = lastNameField.getText().toString();
+//            needShowProgress(0);
+//            ConnectionsManager.getInstance(currentAccount).sendRequest(req, (response, error) -> AndroidUtilities.runOnUIThread(() -> {
+//                nextPressed = false;
+//                if (response instanceof TLRPC.TL_auth_authorization) {
+//                    hidePrivacyView();
+//                    showDoneButton(false, true);
+//                    postDelayed(() -> {
+//                        needHideProgress(false, false);
+//                        AndroidUtilities.hideKeyboard(fragmentView.findFocus());
+//                        onAuthSuccess((TLRPC.TL_auth_authorization) response, true);
+//                        if (avatarBig != null) {
+//                            TLRPC.FileLocation avatar = avatarBig;
+//                            Utilities.cacheClearQueue.postRunnable(()-> MessagesController.getInstance(currentAccount).uploadAndApplyUserAvatar(avatar));
+//                        }
+//                    }, 150);
+//                } else {
+//                    needHideProgress(false);
+//                    if (error.text.contains("PHONE_NUMBER_INVALID")) {
+//                        needShowAlert(getString(R.string.RestorePasswordNoEmailTitle), getString("InvalidPhoneNumber", R.string.InvalidPhoneNumber));
+//                    } else if (error.text.contains("PHONE_CODE_EMPTY") || error.text.contains("PHONE_CODE_INVALID")) {
+//                        needShowAlert(getString(R.string.RestorePasswordNoEmailTitle), getString("InvalidCode", R.string.InvalidCode));
+//                    } else if (error.text.contains("PHONE_CODE_EXPIRED")) {
+//                        onBackPressed(true);
+//                        setPage(VIEW_PHONE_INPUT, true, null, true);
+//                        needShowAlert(getString(R.string.RestorePasswordNoEmailTitle), getString("CodeExpired", R.string.CodeExpired));
+//                    } else if (error.text.contains("FIRSTNAME_INVALID")) {
+//                        needShowAlert(getString(R.string.RestorePasswordNoEmailTitle), getString("InvalidFirstName", R.string.InvalidFirstName));
+//                    } else if (error.text.contains("LASTNAME_INVALID")) {
+//                        needShowAlert(getString(R.string.RestorePasswordNoEmailTitle), getString("InvalidLastName", R.string.InvalidLastName));
+//                    } else {
+//                        needShowAlert(getString(R.string.RestorePasswordNoEmailTitle), error.text);
+//                    }
+//                }
+//            }), ConnectionsManager.RequestFlagWithoutLogin | ConnectionsManager.RequestFlagFailOnServerErrors);
         }
 
         @Override

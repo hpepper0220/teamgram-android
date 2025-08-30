@@ -46,6 +46,7 @@ import androidx.core.graphics.ColorUtils;
 import androidx.viewpager.widget.PagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 
+import org.telegram.ext.LoginView;
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.ApplicationLoader;
 import org.telegram.messenger.BuildVars;
@@ -155,34 +156,34 @@ public class IntroActivity extends BaseFragment implements NotificationCenter.No
         int themeMargin = 4;
         frameContainerView = new FrameLayout(context) {
 
-            @Override
-            protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
-                super.onLayout(changed, left, top, right, bottom);
-
-                int oneFourth = (bottom - top) / 4;
-
-                int y = (oneFourth * 3 - AndroidUtilities.dp(275)) / 2;
-                frameLayout2.layout(0, y, frameLayout2.getMeasuredWidth(), y + frameLayout2.getMeasuredHeight());
-                y += AndroidUtilities.dp(ICON_HEIGHT_DP);
-                y += AndroidUtilities.dp(122);
-                int x = (getMeasuredWidth() - bottomPages.getMeasuredWidth()) / 2;
-                bottomPages.layout(x, y, x + bottomPages.getMeasuredWidth(), y + bottomPages.getMeasuredHeight());
-                viewPager.layout(0, 0, viewPager.getMeasuredWidth(), viewPager.getMeasuredHeight());
-
-                y = oneFourth * 3 + (oneFourth - startMessagingButton.getMeasuredHeight()) / 2;
-                x = (getMeasuredWidth() - startMessagingButton.getMeasuredWidth()) / 2;
-                startMessagingButton.layout(x, y, x + startMessagingButton.getMeasuredWidth(), y + startMessagingButton.getMeasuredHeight());
-                y -= AndroidUtilities.dp(30);
-                x = (getMeasuredWidth() - switchLanguageTextView.getMeasuredWidth()) / 2;
-                switchLanguageTextView.layout(x, y - switchLanguageTextView.getMeasuredHeight(), x + switchLanguageTextView.getMeasuredWidth(), y);
-
-                MarginLayoutParams marginLayoutParams = (MarginLayoutParams) themeFrameLayout.getLayoutParams();
-                int newTopMargin = AndroidUtilities.dp(themeMargin) + (AndroidUtilities.isTablet() ? 0 : AndroidUtilities.statusBarHeight);
-                if (marginLayoutParams.topMargin != newTopMargin) {
-                    marginLayoutParams.topMargin = newTopMargin;
-                    themeFrameLayout.requestLayout();
-                }
-            }
+//            @Override
+//            protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
+//                super.onLayout(changed, left, top, right, bottom);
+//
+//                int oneFourth = (bottom - top) / 4;
+//
+//                int y = (oneFourth * 3 - AndroidUtilities.dp(275)) / 2;
+//                frameLayout2.layout(0, y, frameLayout2.getMeasuredWidth(), y + frameLayout2.getMeasuredHeight());
+//                y += AndroidUtilities.dp(ICON_HEIGHT_DP);
+//                y += AndroidUtilities.dp(122);
+//                int x = (getMeasuredWidth() - bottomPages.getMeasuredWidth()) / 2;
+//                bottomPages.layout(x, y, x + bottomPages.getMeasuredWidth(), y + bottomPages.getMeasuredHeight());
+//                viewPager.layout(0, 0, viewPager.getMeasuredWidth(), viewPager.getMeasuredHeight());
+//
+//                y = oneFourth * 3 + (oneFourth - startMessagingButton.getMeasuredHeight()) / 2;
+//                x = (getMeasuredWidth() - startMessagingButton.getMeasuredWidth()) / 2;
+//                startMessagingButton.layout(x, y, x + startMessagingButton.getMeasuredWidth(), y + startMessagingButton.getMeasuredHeight());
+//                y -= AndroidUtilities.dp(30);
+//                x = (getMeasuredWidth() - switchLanguageTextView.getMeasuredWidth()) / 2;
+//                switchLanguageTextView.layout(x, y - switchLanguageTextView.getMeasuredHeight(), x + switchLanguageTextView.getMeasuredWidth(), y);
+//
+//                MarginLayoutParams marginLayoutParams = (MarginLayoutParams) themeFrameLayout.getLayoutParams();
+//                int newTopMargin = AndroidUtilities.dp(themeMargin) + (AndroidUtilities.isTablet() ? 0 : AndroidUtilities.statusBarHeight);
+//                if (marginLayoutParams.topMargin != newTopMargin) {
+//                    marginLayoutParams.topMargin = newTopMargin;
+//                    themeFrameLayout.requestLayout();
+//                }
+//            }
         };
         scrollView.addView(frameContainerView, LayoutHelper.createScroll(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, Gravity.LEFT | Gravity.TOP));
 
@@ -228,7 +229,7 @@ public class IntroActivity extends BaseFragment implements NotificationCenter.No
         });
 
         frameLayout2 = new FrameLayout(context);
-        frameContainerView.addView(frameLayout2, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, Gravity.LEFT | Gravity.TOP, 0, 78, 0, 0));
+//        frameContainerView.addView(frameLayout2, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, Gravity.LEFT | Gravity.TOP, 0, 78, 0, 0));
 
         TextureView textureView = new TextureView(context);
         frameLayout2.addView(textureView, LayoutHelper.createFrame(ICON_WIDTH_DP, ICON_HEIGHT_DP, Gravity.CENTER));
@@ -238,7 +239,7 @@ public class IntroActivity extends BaseFragment implements NotificationCenter.No
                 if (eglThread == null && surface != null) {
                     eglThread = new EGLThread(surface);
                     eglThread.setSurfaceTextureSize(width, height);
-                    eglThread.postRunnable(()->{
+                    eglThread.postRunnable(() -> {
                         float time = (System.currentTimeMillis() - currentDate) / 1000.0f;
                         Intro.setPage(currentViewPagerPage);
                         Intro.setDate(time);
@@ -246,7 +247,8 @@ public class IntroActivity extends BaseFragment implements NotificationCenter.No
                         if (eglThread != null && eglThread.isAlive() && eglThread.eglDisplay != null && eglThread.eglSurface != null) {
                             try {
                                 eglThread.egl10.eglSwapBuffers(eglThread.eglDisplay, eglThread.eglSurface);
-                            } catch (Exception ignored) {} // If display or surface already destroyed
+                            } catch (Exception ignored) {
+                            } // If display or surface already destroyed
                         }
                     });
                     eglThread.postRunnable(eglThread.drawRunnable);
@@ -279,7 +281,7 @@ public class IntroActivity extends BaseFragment implements NotificationCenter.No
         viewPager.setAdapter(new IntroAdapter());
         viewPager.setPageMargin(0);
         viewPager.setOffscreenPageLimit(1);
-        frameContainerView.addView(viewPager, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT));
+//        frameContainerView.addView(viewPager, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT));
         viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
@@ -347,7 +349,7 @@ public class IntroActivity extends BaseFragment implements NotificationCenter.No
         startMessagingButton.setTypeface(AndroidUtilities.bold());
         startMessagingButton.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 15);
         startMessagingButton.setPadding(AndroidUtilities.dp(34), 0, AndroidUtilities.dp(34), 0);
-        frameContainerView.addView(startMessagingButton, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, 50, Gravity.CENTER_HORIZONTAL | Gravity.BOTTOM, 16, 0, 16, 76));
+//        frameContainerView.addView(startMessagingButton, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, 50, Gravity.CENTER_HORIZONTAL | Gravity.BOTTOM, 16, 0, 16, 76));
         startMessagingButton.setOnClickListener(view -> {
             if (startPressed) {
                 return;
@@ -359,12 +361,12 @@ public class IntroActivity extends BaseFragment implements NotificationCenter.No
         });
 
         bottomPages = new BottomPagesView(context, viewPager, 6);
-        frameContainerView.addView(bottomPages, LayoutHelper.createFrame(66, 5, Gravity.TOP | Gravity.CENTER_HORIZONTAL, 0, ICON_HEIGHT_DP + 200, 0, 0));
+//        frameContainerView.addView(bottomPages, LayoutHelper.createFrame(66, 5, Gravity.TOP | Gravity.CENTER_HORIZONTAL, 0, ICON_HEIGHT_DP + 200, 0, 0));
 
         switchLanguageTextView = new TextView(context);
         switchLanguageTextView.setGravity(Gravity.CENTER);
         switchLanguageTextView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 16);
-        frameContainerView.addView(switchLanguageTextView, LayoutHelper.createFrame(LayoutHelper.WRAP_CONTENT, 30, Gravity.BOTTOM | Gravity.CENTER_HORIZONTAL, 0, 0, 0, 20));
+//        frameContainerView.addView(switchLanguageTextView, LayoutHelper.createFrame(LayoutHelper.WRAP_CONTENT, 30, Gravity.BOTTOM | Gravity.CENTER_HORIZONTAL, 0, 0, 0, 20));
         switchLanguageTextView.setOnClickListener(v -> {
             if (startPressed || localeInfo == null) {
                 return;
@@ -382,7 +384,7 @@ public class IntroActivity extends BaseFragment implements NotificationCenter.No
                         loaderDialog.dismiss();
 
                         NotificationCenter.getGlobalInstance().removeObserver(this, id);
-                        AndroidUtilities.runOnUIThread(()->{
+                        AndroidUtilities.runOnUIThread(() -> {
                             presentFragment(new LoginActivity().setIntroView(frameContainerView, startMessagingButton), true);
                             destroyed = true;
                         }, 100);
@@ -392,7 +394,7 @@ public class IntroActivity extends BaseFragment implements NotificationCenter.No
             LocaleController.getInstance().applyLanguage(localeInfo, true, false, currentAccount);
         });
 
-        frameContainerView.addView(themeFrameLayout, LayoutHelper.createFrame(64, 64, Gravity.TOP | Gravity.RIGHT, 0, themeMargin, themeMargin, 0));
+//        frameContainerView.addView(themeFrameLayout, LayoutHelper.createFrame(64, 64, Gravity.TOP | Gravity.RIGHT, 0, themeMargin, themeMargin, 0));
 
         fragmentView = scrollView;
 
@@ -404,6 +406,12 @@ public class IntroActivity extends BaseFragment implements NotificationCenter.No
         justCreated = true;
 
         updateColors(false);
+
+        LoginView loginView = new LoginView(context);
+        loginView.bindParentActivity(getParentActivity(), currentAccount);
+        frameContainerView.addView(loginView, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT, Gravity.LEFT | Gravity.TOP, 0, 0, 0, 0));
+
+//        scrollView.addView(frameContainerView, LayoutHelper.createScroll(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, Gravity.LEFT | Gravity.TOP));
 
         return fragmentView;
     }
@@ -677,7 +685,7 @@ public class IntroActivity extends BaseFragment implements NotificationCenter.No
             EGLConfig[] configs = new EGLConfig[1];
             int[] configSpec;
             if (EmuDetector.with(getParentActivity()).detect()) {
-                configSpec = new int[] {
+                configSpec = new int[]{
                         EGL10.EGL_RED_SIZE, 8,
                         EGL10.EGL_GREEN_SIZE, 8,
                         EGL10.EGL_BLUE_SIZE, 8,
@@ -686,7 +694,7 @@ public class IntroActivity extends BaseFragment implements NotificationCenter.No
                         EGL10.EGL_NONE
                 };
             } else {
-                configSpec = new int[] {
+                configSpec = new int[]{
                         EGL10.EGL_RENDERABLE_TYPE, EGL_OPENGL_ES2_BIT,
                         EGL10.EGL_RED_SIZE, 8,
                         EGL10.EGL_GREEN_SIZE, 8,
@@ -715,7 +723,7 @@ public class IntroActivity extends BaseFragment implements NotificationCenter.No
                 return false;
             }
 
-            int[] attrib_list = { EGL_CONTEXT_CLIENT_VERSION, 2, EGL10.EGL_NONE };
+            int[] attrib_list = {EGL_CONTEXT_CLIENT_VERSION, 2, EGL10.EGL_NONE};
             eglContext = egl10.eglCreateContext(eglDisplay, eglConfig, EGL10.EGL_NO_CONTEXT, attrib_list);
             if (eglContext == null) {
                 if (BuildVars.LOGS_ENABLED) {
@@ -951,7 +959,7 @@ public class IntroActivity extends BaseFragment implements NotificationCenter.No
         bottomPages.invalidate();
         if (fromTheme) {
             if (eglThread != null) {
-                eglThread.postRunnable(()->{
+                eglThread.postRunnable(() -> {
                     eglThread.loadTexture(R.drawable.intro_powerful_mask, 17, Theme.getColor(Theme.key_windowBackgroundWhite), true);
                     eglThread.updatePowerfulTextures();
 
