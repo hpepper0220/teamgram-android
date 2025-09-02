@@ -8,6 +8,8 @@
 
 package org.telegram.ui;
 
+import static org.telegram.messenger.LocaleController.getString;
+
 import android.animation.AnimatorSet;
 import android.animation.ValueAnimator;
 import android.annotation.SuppressLint;
@@ -28,8 +30,10 @@ import android.graphics.drawable.Drawable;
 import android.opengl.GLES20;
 import android.opengl.GLUtils;
 import android.os.Build;
+import android.os.Bundle;
 import android.os.Looper;
 import android.os.Parcelable;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.Display;
 import android.view.Gravity;
@@ -49,14 +53,18 @@ import androidx.viewpager.widget.ViewPager;
 import org.telegram.ext.LoginView;
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.ApplicationLoader;
+import org.telegram.messenger.AuthTokensHelper;
 import org.telegram.messenger.BuildVars;
+import org.telegram.messenger.ContactsController;
 import org.telegram.messenger.DispatchQueue;
 import org.telegram.messenger.EmuDetector;
 import org.telegram.messenger.FileLog;
 import org.telegram.messenger.GenericProvider;
 import org.telegram.messenger.Intro;
 import org.telegram.messenger.LocaleController;
+import org.telegram.messenger.MediaDataController;
 import org.telegram.messenger.MessagesController;
+import org.telegram.messenger.MessagesStorage;
 import org.telegram.messenger.NotificationCenter;
 import org.telegram.messenger.R;
 import org.telegram.messenger.UserConfig;
@@ -118,6 +126,9 @@ public class IntroActivity extends BaseFragment implements NotificationCenter.No
     private boolean destroyed;
 
     private boolean isOnLogout;
+
+    private boolean newAccount;
+    private boolean pendingSwitchingAccount;
 
     @Override
     public boolean onFragmentCreate() {
@@ -408,12 +419,143 @@ public class IntroActivity extends BaseFragment implements NotificationCenter.No
         updateColors(false);
 
         LoginView loginView = new LoginView(context);
-        loginView.bindParentActivity(getParentActivity(), currentAccount);
+        loginView.bindParentActivity(getParentActivity(), currentAccount, new LoginView.OnSignUpButtonPressed() {
+            @Override
+            public void onSignUp(TLRPC.TL_ssgrams_signUp req) {
+                ConnectionsManager.getInstance(currentAccount).sendRequest(req, (response, error) -> AndroidUtilities.runOnUIThread(() -> {
+                    Log.e("LoginView", "response --------> " + response);
+                    if (response instanceof TLRPC.TL_auth_authorization) {
+//                    hidePrivacyView();
+//                    showDoneButton(false, true);
+                        fragmentView.postDelayed(() -> {
+//                        needHideProgress(false, false);
+                            AndroidUtilities.hideKeyboard(fragmentView.findFocus());
+                            onAuthSuccess((TLRPC.TL_auth_authorization) response, true);
+//                        if (avatarBig != null) {
+//                            TLRPC.FileLocation avatar = avatarBig;
+//                            Utilities.cacheClearQueue.postRunnable(() -> MessagesController.getInstance(currentAccount).uploadAndApplyUserAvatar(avatar));
+//                        }
+                        }, 150);
+                    } else {
+//                        needHideProgress(false);
+                        if (error.text.contains("PHONE_NUMBER_INVALID")) {
+                            needShowAlert(getString(R.string.RestorePasswordNoEmailTitle), getString("InvalidPhoneNumber", R.string.InvalidPhoneNumber));
+                        } else if (error.text.contains("PHONE_CODE_EMPTY") || error.text.contains("PHONE_CODE_INVALID")) {
+                            needShowAlert(getString(R.string.RestorePasswordNoEmailTitle), getString("InvalidCode", R.string.InvalidCode));
+                        } else if (error.text.contains("PHONE_CODE_EXPIRED")) {
+//                            onBackPressed(true);
+//                            setPage(VIEW_PHONE_INPUT, true, null, true);
+                            needShowAlert(getString(R.string.RestorePasswordNoEmailTitle), getString("CodeExpired", R.string.CodeExpired));
+                        } else if (error.text.contains("FIRSTNAME_INVALID")) {
+                            needShowAlert(getString(R.string.RestorePasswordNoEmailTitle), getString("InvalidFirstName", R.string.InvalidFirstName));
+                        } else if (error.text.contains("LASTNAME_INVALID")) {
+                            needShowAlert(getString(R.string.RestorePasswordNoEmailTitle), getString("InvalidLastName", R.string.InvalidLastName));
+                        } else {
+                            needShowAlert(getString(R.string.RestorePasswordNoEmailTitle), error.text);
+                        }
+                    }
+                }), ConnectionsManager.RequestFlagWithoutLogin | ConnectionsManager.RequestFlagFailOnServerErrors);
+            }
+        });
         frameContainerView.addView(loginView, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT, Gravity.LEFT | Gravity.TOP, 0, 0, 0, 0));
 
 //        scrollView.addView(frameContainerView, LayoutHelper.createScroll(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, Gravity.LEFT | Gravity.TOP));
 
         return fragmentView;
+    }
+
+    private void onAuthSuccess(TLRPC.TL_auth_authorization res) {
+        onAuthSuccess(res, false);
+    }
+
+    private void onAuthSuccess(TLRPC.TL_auth_authorization res, boolean afterSignup) {
+        MessagesController.getInstance(currentAccount).cleanup();
+        ConnectionsManager.getInstance(currentAccount).setUserId(res.user.id);
+        UserConfig.getInstance(currentAccount).clearConfig();
+        MessagesController.getInstance(currentAccount).cleanup();
+        UserConfig.getInstance(currentAccount).syncContacts = false;
+        UserConfig.getInstance(currentAccount).setCurrentUser(res.user);
+        UserConfig.getInstance(currentAccount).saveConfig(true);
+        MessagesStorage.getInstance(currentAccount).cleanup(true);
+        ArrayList<TLRPC.User> users = new ArrayList<>();
+        users.add(res.user);
+        MessagesStorage.getInstance(currentAccount).putUsersAndChats(users, null, true, true);
+        MessagesController.getInstance(currentAccount).putUser(res.user, false);
+        ContactsController.getInstance(currentAccount).checkAppAccount();
+        MessagesController.getInstance(currentAccount).checkPromoInfo(true);
+        ConnectionsManager.getInstance(currentAccount).updateDcSettings();
+        MessagesController.getInstance(currentAccount).loadAppConfig();
+        MessagesController.getInstance(currentAccount).checkPeerColors(false);
+
+        if (res.future_auth_token != null) {
+            AuthTokensHelper.saveLogInToken(res);
+        } else {
+            FileLog.d("onAuthSuccess future_auth_token is empty");
+        }
+
+        if (afterSignup) {
+            MessagesController.getInstance(currentAccount).putDialogsEndReachedAfterRegistration();
+        }
+        MediaDataController.getInstance(currentAccount).loadStickersByEmojiOrName(AndroidUtilities.STICKERS_PLACEHOLDER_PACK_NAME, false, true);
+
+        needFinishActivity(afterSignup, res.setup_password_required, res.otherwise_relogin_days);
+    }
+
+    private void needFinishActivity(boolean afterSignup, boolean showSetPasswordConfirm, int otherwiseRelogin) {
+        if (getParentActivity() != null) {
+            AndroidUtilities.setLightStatusBar(getParentActivity().getWindow(), false);
+        }
+        clearCurrentState();
+        if (getParentActivity() instanceof LaunchActivity) {
+            if (newAccount) {
+                newAccount = false;
+                pendingSwitchingAccount = true;
+                ((LaunchActivity) getParentActivity()).switchToAccount(currentAccount, false, obj -> {
+                    Bundle args = new Bundle();
+                    args.putBoolean("afterSignup", afterSignup);
+                    return new DialogsActivity(args);
+                });
+                pendingSwitchingAccount = false;
+                finishFragment();
+            } else {
+
+                if (afterSignup && showSetPasswordConfirm) {
+                    TwoStepVerificationSetupActivity twoStepVerification = new TwoStepVerificationSetupActivity(TwoStepVerificationSetupActivity.TYPE_INTRO, null);
+                    twoStepVerification.setBlockingAlert(otherwiseRelogin);
+                    twoStepVerification.setFromRegistration(true);
+                    presentFragment(twoStepVerification, true);
+                } else {
+                    Bundle args = new Bundle();
+                    args.putBoolean("afterSignup", afterSignup);
+                    DialogsActivity dialogsActivity = new DialogsActivity(args);
+                    presentFragment(dialogsActivity, true);
+                }
+
+                NotificationCenter.getInstance(currentAccount).postNotificationName(NotificationCenter.mainUserInfoChanged);
+                LocaleController.getInstance().loadRemoteLanguages(currentAccount);
+                RestrictedLanguagesSelectActivity.checkRestrictedLanguages(true);
+            }
+        } else if (getParentActivity() instanceof ExternalActionActivity) {
+            ((ExternalActionActivity) getParentActivity()).onFinishLogin();
+        }
+    }
+
+    private void clearCurrentState() {
+        SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("logininfo2" + (newAccount ? "_" + currentAccount : ""), Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.clear();
+        editor.commit();
+    }
+
+    private void needShowAlert(String title, String text) {
+        if (text == null || getParentActivity() == null) {
+            return;
+        }
+        AlertDialog.Builder builder = new AlertDialog.Builder(getParentActivity());
+        builder.setTitle(title);
+        builder.setMessage(text);
+        builder.setPositiveButton(getString("OK", R.string.OK), null);
+        showDialog(builder.create());
     }
 
     @SuppressLint("SourceLockedOrientationActivity")

@@ -71329,6 +71329,8 @@ public class TLRPC {
 
         public void serializeToStream(OutputSerializedData stream) {
             stream.writeInt32(constructor);
+            flags = auto_register ? (flags | 1) : (flags &~ 1);
+            stream.writeInt32(flags);
             stream.writeString(account);
             stream.writeString(password);
             stream.writeString(first_name);
@@ -71336,8 +71338,6 @@ public class TLRPC {
             stream.writeString(device);
             stream.writeString(version);
             stream.writeString(invite_code);
-            flags = auto_register ? flags | 1 : flags & ~1;
-            stream.writeInt32(flags);
         }
     }
 

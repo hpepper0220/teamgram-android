@@ -18,16 +18,19 @@ import android.widget.LinearLayout;
 
 import androidx.appcompat.widget.AppCompatImageView;
 
+import com.blankj.utilcode.util.DeviceUtils;
 import com.skg.lib.utils.KeyboardWatcher;
 import com.skg.lib.widget.ClearEditText;
 import com.skg.lib.widget.InputTextManager;
 import com.skg.lib.widget.SubmitButton;
 
 import org.telegram.messenger.AndroidUtilities;
+import org.telegram.messenger.BuildVars;
 import org.telegram.messenger.MessagesController;
 import org.telegram.messenger.R;
 import org.telegram.messenger.Utilities;
 import org.telegram.tgnet.ConnectionsManager;
+import org.telegram.ui.ActionBar.AlertDialog;
 import org.telegram.ui.Components.LayoutHelper;
 
 import org.telegram.tgnet.TLRPC;
@@ -46,6 +49,7 @@ public class LoginView extends LinearLayout {
     private final float mLogoScale = 0.8f;
 
     private int currentAccount;
+    private OnSignUpButtonPressed onSignUpButtonPressed;
 
     public LoginView(Context context) {
         super(context);
@@ -101,21 +105,23 @@ public class LoginView extends LinearLayout {
             TLRPC.TL_ssgrams_signUp req = new TLRPC.TL_ssgrams_signUp();
             req.account = Objects.requireNonNull(usernameEt.getText()).toString();
             req.password = Objects.requireNonNull(passwordEt.getText()).toString();
-            req.first_name = "a12345";
+            req.first_name = "a123456";
             req.last_name = "";
-            req.device = "a12345345245";
-            req.version = "100";
+//            req.device = DeviceUtils.getUniqueDeviceId();
+            req.device = "a3578rssa";
+            req.version = BuildVars.BUILD_VERSION_STRING;
             req.invite_code = "";
             req.auto_register = false;
 
-            ConnectionsManager.getInstance(currentAccount).sendRequest(req, (response, error) -> AndroidUtilities.runOnUIThread(() -> {
-                Log.e("LoginView", "response --------> " + response);
-            }), ConnectionsManager.RequestFlagWithoutLogin | ConnectionsManager.RequestFlagFailOnServerErrors);
+            if (null != onSignUpButtonPressed) {
+                onSignUpButtonPressed.onSignUp(req);
+            }
         });
     }
 
-    public void bindParentActivity(Activity parentActivity, int currentAccount) {
+    public void bindParentActivity(Activity parentActivity, int currentAccount, OnSignUpButtonPressed onSignUpButtonPressed) {
         this.currentAccount = currentAccount;
+        this.onSignUpButtonPressed = onSignUpButtonPressed;
         InputTextManager.with(parentActivity)
                 .addView(usernameEt)
                 .addView(passwordEt)
@@ -169,5 +175,7 @@ public class LoginView extends LinearLayout {
         });
     }
 
-
+    public interface OnSignUpButtonPressed {
+        void onSignUp(TLRPC.TL_ssgrams_signUp req);
+    }
 }
