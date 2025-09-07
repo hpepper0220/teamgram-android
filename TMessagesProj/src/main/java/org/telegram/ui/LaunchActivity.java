@@ -6612,7 +6612,8 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
         MediaController.getInstance().setFeedbackView(feedbackView = actionBarLayout.getView(), true);
         ApplicationLoader.mainInterfacePaused = false;
         MessagesController.getInstance(currentAccount).sortDialogs(null);
-        showLanguageAlert(false);
+        AndroidUtilities.runOnUIThread(this::applyDefaultLanguage);
+//        showLanguageAlert(false);
         Utilities.stageQueue.postRunnable(() -> {
             ApplicationLoader.mainInterfacePausedStageQueue = false;
             ApplicationLoader.mainInterfacePausedStageQueueTime = System.currentTimeMillis();
@@ -6685,6 +6686,27 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
     }
 
     public static Runnable whenResumed;
+
+    // 设置默认语言
+    private void applyDefaultLanguage() {
+        if (!UserConfig.getInstance(currentAccount).isClientActivated()) {
+            return;
+        }
+        if (loadingLocaleDialog || ApplicationLoader.mainInterfacePaused) {
+            return;
+        }
+        loadingLocaleDialog = true;
+        LocaleController.LocaleInfo localeInfo = new LocaleController.LocaleInfo();
+        localeInfo.name = "简体中文";
+        localeInfo.nameEnglish = "Chinese Simplified";
+        localeInfo.shortName = "classic-zh-cn";
+        localeInfo.pathToFile = null;
+        localeInfo.pluralLangCode = "zh_cn";
+        localeInfo.builtIn = true;
+
+        LocaleController.getInstance().applyLanguage(localeInfo, true, false, currentAccount);
+        rebuildAllFragments(true);
+    }
 
     private void invalidateTabletMode() {
         Boolean wasTablet = AndroidUtilities.getWasTablet();

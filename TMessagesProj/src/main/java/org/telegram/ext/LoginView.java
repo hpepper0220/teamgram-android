@@ -1,13 +1,10 @@
 package org.telegram.ext;
 
-import static org.telegram.messenger.LocaleController.getString;
-
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Color;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.animation.AccelerateDecelerateInterpolator;
@@ -18,19 +15,14 @@ import android.widget.LinearLayout;
 
 import androidx.appcompat.widget.AppCompatImageView;
 
-import com.blankj.utilcode.util.DeviceUtils;
 import com.skg.lib.utils.KeyboardWatcher;
 import com.skg.lib.widget.ClearEditText;
 import com.skg.lib.widget.InputTextManager;
 import com.skg.lib.widget.SubmitButton;
 
-import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.BuildVars;
-import org.telegram.messenger.MessagesController;
+import org.telegram.messenger.LocaleController;
 import org.telegram.messenger.R;
-import org.telegram.messenger.Utilities;
-import org.telegram.tgnet.ConnectionsManager;
-import org.telegram.ui.ActionBar.AlertDialog;
 import org.telegram.ui.Components.LayoutHelper;
 
 import org.telegram.tgnet.TLRPC;
