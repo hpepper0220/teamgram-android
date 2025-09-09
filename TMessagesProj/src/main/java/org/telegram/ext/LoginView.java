@@ -21,7 +21,6 @@ import com.skg.lib.widget.InputTextManager;
 import com.skg.lib.widget.SubmitButton;
 
 import org.telegram.messenger.BuildVars;
-import org.telegram.messenger.LocaleController;
 import org.telegram.messenger.R;
 import org.telegram.ui.Components.LayoutHelper;
 
@@ -42,6 +41,7 @@ public class LoginView extends LinearLayout {
 
     private int currentAccount;
     private OnSignUpButtonPressed onSignUpButtonPressed;
+    private Activity parentActivity;
 
     public LoginView(Context context) {
         super(context);

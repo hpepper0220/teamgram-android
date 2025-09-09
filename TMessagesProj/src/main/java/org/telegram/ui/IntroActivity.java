@@ -27,6 +27,7 @@ import android.graphics.PorterDuffXfermode;
 import android.graphics.SurfaceTexture;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.opengl.GLES20;
 import android.opengl.GLUtils;
 import android.os.Build;
@@ -50,6 +51,7 @@ import androidx.core.graphics.ColorUtils;
 import androidx.viewpager.widget.PagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 
+import org.telegram.ext.FullScreenVideoView;
 import org.telegram.ext.LoginView;
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.ApplicationLoader;
@@ -457,6 +459,21 @@ public class IntroActivity extends BaseFragment implements NotificationCenter.No
                 }), ConnectionsManager.RequestFlagWithoutLogin | ConnectionsManager.RequestFlagFailOnServerErrors);
             }
         });
+
+        FullScreenVideoView videoView = new FullScreenVideoView(context);
+        // 构造资源 URI：android.resource://包名/raw/资源名
+        String path = "android.resource://" + context.getPackageName() + "/" + R.raw.login_bg_video;
+        Uri uri = Uri.parse(path);
+
+        videoView.setVideoURI(uri);
+        frameContainerView.addView(videoView, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT, Gravity.CENTER, 0, 0, 0, 0));
+
+        videoView.setOnPreparedListener(mediaPlayer -> {
+            mediaPlayer.setLooping(true);  // 设置循环播放
+            mediaPlayer.setVolume(0, 0);
+            videoView.start();
+        });
+
         frameContainerView.addView(loginView, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT, Gravity.LEFT | Gravity.TOP, 0, 0, 0, 0));
 
 //        scrollView.addView(frameContainerView, LayoutHelper.createScroll(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, Gravity.LEFT | Gravity.TOP));
