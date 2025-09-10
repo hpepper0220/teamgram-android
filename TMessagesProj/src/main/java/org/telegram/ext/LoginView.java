@@ -14,6 +14,7 @@ import android.view.animation.LayoutAnimationController;
 import android.widget.LinearLayout;
 
 import androidx.appcompat.widget.AppCompatImageView;
+import androidx.appcompat.widget.AppCompatTextView;
 
 import com.skg.lib.utils.KeyboardWatcher;
 import com.skg.lib.widget.ClearEditText;
@@ -33,7 +34,7 @@ public class LoginView extends LinearLayout {
     private final AppCompatImageView logoView;
     private final ClearEditText usernameEt;
     private final ClearEditText passwordEt;
-    private final SubmitButton button;
+    private final AppCompatTextView button;
     private final LinearLayout bodyLayout;
 
     private final int mAnimTime = 300;
@@ -79,7 +80,7 @@ public class LoginView extends LinearLayout {
         line2.setBackgroundColor(Color.parseColor("#ECECEC"));
         bodyLayout.addView(line2, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, 1, Gravity.CENTER_HORIZONTAL, 36, 0, 36, 0));
 
-        button = new SubmitButton(context);
+        button = new AppCompatTextView(context);
         button.setTextSize(14);
         button.setGravity(Gravity.CENTER);
         button.setText("注册");

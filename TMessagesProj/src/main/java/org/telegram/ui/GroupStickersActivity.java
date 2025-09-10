@@ -982,25 +982,25 @@ public class GroupStickersActivity extends BaseFragment implements NotificationC
                     return;
                 }
 
-                AndroidUtilities.runOnUIThread(lastCallback = () -> {
-                    lastQuery = query;
-                    final String q = query;
-                    TLRPC.TL_messages_getStickerSet req = new TLRPC.TL_messages_getStickerSet();
-                    req.stickerset = new TLRPC.TL_inputStickerSetShortName();
-                    ((TLRPC.TL_inputStickerSetShortName) req.stickerset).short_name = q;
-                    reqId = getConnectionsManager().sendRequest(req, (response, error) -> {
-                        if (!Objects.equals(lastQuery, q)) {
-                            return;
-                        }
-                        AndroidUtilities.runOnUIThread(() -> {
-                            if (response != null) {
-                                selectSetAfterSearch((TLRPC.TL_messages_stickerSet) response);
-                            } else {
-                                selectSetAfterSearch(null);
-                            }
-                        });
-                    }, ConnectionsManager.RequestFlagInvokeAfter | ConnectionsManager.RequestFlagFailOnServerErrors);
-                }, 300);
+//                AndroidUtilities.runOnUIThread(lastCallback = () -> {
+//                    lastQuery = query;
+//                    final String q = query;
+//                    TLRPC.TL_messages_getStickerSet req = new TLRPC.TL_messages_getStickerSet();
+//                    req.stickerset = new TLRPC.TL_inputStickerSetShortName();
+//                    ((TLRPC.TL_inputStickerSetShortName) req.stickerset).short_name = q;
+//                    reqId = getConnectionsManager().sendRequest(req, (response, error) -> {
+//                        if (!Objects.equals(lastQuery, q)) {
+//                            return;
+//                        }
+//                        AndroidUtilities.runOnUIThread(() -> {
+//                            if (response != null) {
+//                                selectSetAfterSearch((TLRPC.TL_messages_stickerSet) response);
+//                            } else {
+//                                selectSetAfterSearch(null);
+//                            }
+//                        });
+//                    }, ConnectionsManager.RequestFlagInvokeAfter | ConnectionsManager.RequestFlagFailOnServerErrors);
+//                }, 300);
             }
         };
 

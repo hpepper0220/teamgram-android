@@ -38465,34 +38465,34 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                     TLRPC.TL_messages_stickerSet set = MediaDataController.getInstance(currentAccount).getStickerSetByName(setname);
                     if (set == null) {
                         progressDialogCurrent.init();
-                        TLRPC.TL_messages_getStickerSet req = new TLRPC.TL_messages_getStickerSet();
-                        TLRPC.TL_inputStickerSetShortName input = new TLRPC.TL_inputStickerSetShortName();
-                        input.short_name = setname;
-                        req.stickerset = input;
-                        int reqId = ConnectionsManager.getInstance(currentAccount).sendRequest(req, (res, err) -> AndroidUtilities.runOnUIThread(() -> {
-                            progressDialogCurrent.end();
-                            if (res instanceof TLRPC.TL_messages_stickerSet) {
-                                MediaDataController.getInstance(currentAccount).putStickerSet((TLRPC.TL_messages_stickerSet) res, false);
-
-                                TLRPC.TL_inputStickerSetID inputStickerSet = new TLRPC.TL_inputStickerSetID();
-                                inputStickerSet.access_hash = ((TLRPC.TL_messages_stickerSet) res).set.access_hash;
-                                inputStickerSet.id = ((TLRPC.TL_messages_stickerSet) res).set.id;
-                                if (emoji) {
-                                    ArrayList<TLRPC.InputStickerSet> inputSets = new ArrayList<>(1);
-                                    inputSets.add(inputStickerSet);
-                                    EmojiPacksAlert alert = new EmojiPacksAlert(ChatActivity.this, getParentActivity(), themeDelegate, inputSets);
-                                    alert.setCalcMandatoryInsets(isKeyboardVisible());
-                                    showDialog(alert);
-                                } else {
-                                    StickersAlert alert = new StickersAlert(getParentActivity(), ChatActivity.this, inputStickerSet, null, chatActivityEnterView, themeDelegate, false);
-                                    alert.setCalcMandatoryInsets(isKeyboardVisible());
-                                    showDialog(alert);
-                                }
-                            } else {
-                                BulletinFactory.of(ChatActivity.this).createSimpleBulletin(R.raw.error, getString(emoji ? R.string.AddEmojiNotFound : R.string.AddStickersNotFound)).show(true);
-                            }
-                        }));
-                        progressDialogCurrent.onCancel(() -> ConnectionsManager.getInstance(currentAccount).cancelRequest(reqId, true));
+//                        TLRPC.TL_messages_getStickerSet req = new TLRPC.TL_messages_getStickerSet();
+//                        TLRPC.TL_inputStickerSetShortName input = new TLRPC.TL_inputStickerSetShortName();
+//                        input.short_name = setname;
+//                        req.stickerset = input;
+//                        int reqId = ConnectionsManager.getInstance(currentAccount).sendRequest(req, (res, err) -> AndroidUtilities.runOnUIThread(() -> {
+//                            progressDialogCurrent.end();
+//                            if (res instanceof TLRPC.TL_messages_stickerSet) {
+//                                MediaDataController.getInstance(currentAccount).putStickerSet((TLRPC.TL_messages_stickerSet) res, false);
+//
+//                                TLRPC.TL_inputStickerSetID inputStickerSet = new TLRPC.TL_inputStickerSetID();
+//                                inputStickerSet.access_hash = ((TLRPC.TL_messages_stickerSet) res).set.access_hash;
+//                                inputStickerSet.id = ((TLRPC.TL_messages_stickerSet) res).set.id;
+//                                if (emoji) {
+//                                    ArrayList<TLRPC.InputStickerSet> inputSets = new ArrayList<>(1);
+//                                    inputSets.add(inputStickerSet);
+//                                    EmojiPacksAlert alert = new EmojiPacksAlert(ChatActivity.this, getParentActivity(), themeDelegate, inputSets);
+//                                    alert.setCalcMandatoryInsets(isKeyboardVisible());
+//                                    showDialog(alert);
+//                                } else {
+//                                    StickersAlert alert = new StickersAlert(getParentActivity(), ChatActivity.this, inputStickerSet, null, chatActivityEnterView, themeDelegate, false);
+//                                    alert.setCalcMandatoryInsets(isKeyboardVisible());
+//                                    showDialog(alert);
+//                                }
+//                            } else {
+//                                BulletinFactory.of(ChatActivity.this).createSimpleBulletin(R.raw.error, getString(emoji ? R.string.AddEmojiNotFound : R.string.AddStickersNotFound)).show(true);
+//                            }
+//                        }));
+//                        progressDialogCurrent.onCancel(() -> ConnectionsManager.getInstance(currentAccount).cancelRequest(reqId, true));
                         return;
                     }
                 }

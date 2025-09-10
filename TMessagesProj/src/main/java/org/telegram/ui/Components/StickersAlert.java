@@ -592,69 +592,69 @@ public class StickersAlert extends BottomSheet implements NotificationCenter.Not
                 }
             }
             if (stickerSet == null) {
-                TLRPC.TL_messages_getStickerSet req = new TLRPC.TL_messages_getStickerSet();
-                req.stickerset = inputStickerSet;
-                ConnectionsManager.getInstance(currentAccount).sendRequest(req, (response, error) -> AndroidUtilities.runOnUIThread(() -> {
-                    reqId = 0;
-                    if (error == null) {
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-                            Transition addTarget = new Transition() {
-
-                                @Override
-                                public void captureStartValues(TransitionValues transitionValues) {
-                                    transitionValues.values.put("start", true);
-                                    transitionValues.values.put("offset", containerView.getTop() + scrollOffsetY);
-                                }
-
-                                @Override
-                                public void captureEndValues(TransitionValues transitionValues) {
-                                    transitionValues.values.put("start", false);
-                                    transitionValues.values.put("offset", containerView.getTop() + scrollOffsetY);
-                                }
-
-                                @Override
-                                public Animator createAnimator(ViewGroup sceneRoot, TransitionValues startValues, TransitionValues endValues) {
-                                    int scrollOffsetY = StickersAlert.this.scrollOffsetY;
-                                    int startValue = (int) startValues.values.get("offset") - (int) endValues.values.get("offset");
-                                    final ValueAnimator animator = ValueAnimator.ofFloat(0f, 1f);
-                                    animator.setDuration(250);
-                                    animator.addUpdateListener(a -> {
-                                        float fraction = a.getAnimatedFraction();
-                                        gridView.setAlpha(fraction);
-                                        titleTextView.setAlpha(fraction);
-                                        if (startValue != 0) {
-                                            int value = (int) (startValue * (1f - fraction));
-                                            setScrollOffsetY(scrollOffsetY + value);
-                                            gridView.setTranslationY(value);
-                                        }
-                                    });
-                                    return animator;
-                                }
-                            };
-                            addTarget.addTarget(containerView);
-                            TransitionManager.beginDelayedTransition(container, addTarget);
-                        }
-                        optionsButton.setVisibility(View.VISIBLE);
-                        stickerSet = (TLRPC.TL_messages_stickerSet) response;
-                        mediaDataController.putStickerSet(stickerSet, false);
-                        if (stickerSet != null && stickerSet.documents.isEmpty()) {
-                            dismiss();
-                            return;
-                        }
-                        showEmoji = stickerSet != null && stickerSet.set != null && !stickerSet.set.masks;
-                        checkPremiumStickers();
-                        mediaDataController.preloadStickerSetThumb(stickerSet);
-                        updateSendButton();
-                        updateFields();
-                        updateDescription();
-                        adapter.notifyDataSetChanged();
-                    } else {
-                        dismiss();
-                        if (parentFragment != null) {
-                            BulletinFactory.of(parentFragment).createErrorBulletin(LocaleController.getString(R.string.AddStickersNotFound)).show();
-                        }
-                    }
-                }));
+//                TLRPC.TL_messages_getStickerSet req = new TLRPC.TL_messages_getStickerSet();
+//                req.stickerset = inputStickerSet;
+//                ConnectionsManager.getInstance(currentAccount).sendRequest(req, (response, error) -> AndroidUtilities.runOnUIThread(() -> {
+//                    reqId = 0;
+//                    if (error == null) {
+//                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+//                            Transition addTarget = new Transition() {
+//
+//                                @Override
+//                                public void captureStartValues(TransitionValues transitionValues) {
+//                                    transitionValues.values.put("start", true);
+//                                    transitionValues.values.put("offset", containerView.getTop() + scrollOffsetY);
+//                                }
+//
+//                                @Override
+//                                public void captureEndValues(TransitionValues transitionValues) {
+//                                    transitionValues.values.put("start", false);
+//                                    transitionValues.values.put("offset", containerView.getTop() + scrollOffsetY);
+//                                }
+//
+//                                @Override
+//                                public Animator createAnimator(ViewGroup sceneRoot, TransitionValues startValues, TransitionValues endValues) {
+//                                    int scrollOffsetY = StickersAlert.this.scrollOffsetY;
+//                                    int startValue = (int) startValues.values.get("offset") - (int) endValues.values.get("offset");
+//                                    final ValueAnimator animator = ValueAnimator.ofFloat(0f, 1f);
+//                                    animator.setDuration(250);
+//                                    animator.addUpdateListener(a -> {
+//                                        float fraction = a.getAnimatedFraction();
+//                                        gridView.setAlpha(fraction);
+//                                        titleTextView.setAlpha(fraction);
+//                                        if (startValue != 0) {
+//                                            int value = (int) (startValue * (1f - fraction));
+//                                            setScrollOffsetY(scrollOffsetY + value);
+//                                            gridView.setTranslationY(value);
+//                                        }
+//                                    });
+//                                    return animator;
+//                                }
+//                            };
+//                            addTarget.addTarget(containerView);
+//                            TransitionManager.beginDelayedTransition(container, addTarget);
+//                        }
+//                        optionsButton.setVisibility(View.VISIBLE);
+//                        stickerSet = (TLRPC.TL_messages_stickerSet) response;
+//                        mediaDataController.putStickerSet(stickerSet, false);
+//                        if (stickerSet != null && stickerSet.documents.isEmpty()) {
+//                            dismiss();
+//                            return;
+//                        }
+//                        showEmoji = stickerSet != null && stickerSet.set != null && !stickerSet.set.masks;
+//                        checkPremiumStickers();
+//                        mediaDataController.preloadStickerSetThumb(stickerSet);
+//                        updateSendButton();
+//                        updateFields();
+//                        updateDescription();
+//                        adapter.notifyDataSetChanged();
+//                    } else {
+//                        dismiss();
+//                        if (parentFragment != null) {
+//                            BulletinFactory.of(parentFragment).createErrorBulletin(LocaleController.getString(R.string.AddStickersNotFound)).show();
+//                        }
+//                    }
+//                }));
             } else {
                 if (adapter != null) {
                     updateSendButton();

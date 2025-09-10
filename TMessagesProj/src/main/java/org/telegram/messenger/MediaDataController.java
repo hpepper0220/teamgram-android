@@ -1585,23 +1585,23 @@ public class MediaDataController extends BaseController {
             loadingStickerSets.put(key, loading = new ArrayList<>());
         }
         loading.add(onDone);
-        TLRPC.TL_messages_getStickerSet req = new TLRPC.TL_messages_getStickerSet();
-        req.stickerset = inputStickerSet;
-        getConnectionsManager().sendRequest(req, (response, error) -> {
-            AndroidUtilities.runOnUIThread(() -> {
-                ArrayList<Utilities.Callback2<Boolean, TLRPC.TL_messages_stickerSet>> loadingCallbacks = loadingStickerSets.get(key);
-                if (loadingCallbacks != null) {
-                    for (int i = 0; i < loadingCallbacks.size(); ++i) {
-                        if (response != null) {
-                            loadingCallbacks.get(i).run(true, (TLRPC.TL_messages_stickerSet) response);
-                        } else {
-                            loadingCallbacks.get(i).run(false, null);
-                        }
-                    }
-                }
-                loadingStickerSets.remove(key);
-            });
-        });
+//        TLRPC.TL_messages_getStickerSet req = new TLRPC.TL_messages_getStickerSet();
+//        req.stickerset = inputStickerSet;
+//        getConnectionsManager().sendRequest(req, (response, error) -> {
+//            AndroidUtilities.runOnUIThread(() -> {
+//                ArrayList<Utilities.Callback2<Boolean, TLRPC.TL_messages_stickerSet>> loadingCallbacks = loadingStickerSets.get(key);
+//                if (loadingCallbacks != null) {
+//                    for (int i = 0; i < loadingCallbacks.size(); ++i) {
+//                        if (response != null) {
+//                            loadingCallbacks.get(i).run(true, (TLRPC.TL_messages_stickerSet) response);
+//                        } else {
+//                            loadingCallbacks.get(i).run(false, null);
+//                        }
+//                    }
+//                }
+//                loadingStickerSets.remove(key);
+//            });
+//        });
     }
 
     private void loadGroupStickerSet(TLRPC.StickerSet stickerSet, boolean cache) {
@@ -1636,19 +1636,19 @@ public class MediaDataController extends BaseController {
                 }
             });
         } else {
-            TLRPC.TL_messages_getStickerSet req = new TLRPC.TL_messages_getStickerSet();
-            req.stickerset = new TLRPC.TL_inputStickerSetID();
-            req.stickerset.id = stickerSet.id;
-            req.stickerset.access_hash = stickerSet.access_hash;
-            getConnectionsManager().sendRequest(req, (response, error) -> {
-                if (response != null) {
-                    TLRPC.TL_messages_stickerSet set = (TLRPC.TL_messages_stickerSet) response;
-                    AndroidUtilities.runOnUIThread(() -> {
-                        groupStickerSets.put(set.set.id, set);
-                        getNotificationCenter().postNotificationName(NotificationCenter.groupStickersDidLoad, set.set.id, set);
-                    });
-                }
-            });
+//            TLRPC.TL_messages_getStickerSet req = new TLRPC.TL_messages_getStickerSet();
+//            req.stickerset = new TLRPC.TL_inputStickerSetID();
+//            req.stickerset.id = stickerSet.id;
+//            req.stickerset.access_hash = stickerSet.access_hash;
+//            getConnectionsManager().sendRequest(req, (response, error) -> {
+//                if (response != null) {
+//                    TLRPC.TL_messages_stickerSet set = (TLRPC.TL_messages_stickerSet) response;
+//                    AndroidUtilities.runOnUIThread(() -> {
+//                        groupStickerSets.put(set.set.id, set);
+//                        getNotificationCenter().postNotificationName(NotificationCenter.groupStickersDidLoad, set.set.id, set);
+//                    });
+//                }
+//            });
         }
     }
 
@@ -2520,35 +2520,35 @@ public class MediaDataController extends BaseController {
             verifyingMessages.put(name, messages);
         }
         messages.add(message);
-        TLRPC.TL_messages_getStickerSet req = new TLRPC.TL_messages_getStickerSet();
-        req.stickerset = MessageObject.getInputStickerSet(message);
-        getConnectionsManager().sendRequest(req, (response, error) -> AndroidUtilities.runOnUIThread(() -> {
-            ArrayList<TLRPC.Message> arrayList = verifyingMessages.get(name);
-            if (response != null) {
-                TLRPC.TL_messages_stickerSet set = (TLRPC.TL_messages_stickerSet) response;
-                storeTempStickerSet(set);
-                for (int b = 0, N2 = arrayList.size(); b < N2; b++) {
-                    TLRPC.Message m = arrayList.get(b);
-                    TLRPC.Document d = MessageObject.getDocument(m);
-                    for (int a = 0, N = set.documents.size(); a < N; a++) {
-                        TLRPC.Document sticker = set.documents.get(a);
-                        if (sticker.id == d.id && sticker.dc_id == d.dc_id) {
-                            m.stickerVerified = 1;
-                            break;
-                        }
-                    }
-                    if (m.stickerVerified == 0) {
-                        m.stickerVerified = 2;
-                    }
-                }
-            } else {
-                for (int b = 0, N2 = arrayList.size(); b < N2; b++) {
-                    arrayList.get(b).stickerVerified = 2;
-                }
-            }
-            getNotificationCenter().postNotificationName(NotificationCenter.didVerifyMessagesStickers, arrayList);
-            getMessagesStorage().updateMessageVerifyFlags(arrayList);
-        }));
+//        TLRPC.TL_messages_getStickerSet req = new TLRPC.TL_messages_getStickerSet();
+//        req.stickerset = MessageObject.getInputStickerSet(message);
+//        getConnectionsManager().sendRequest(req, (response, error) -> AndroidUtilities.runOnUIThread(() -> {
+//            ArrayList<TLRPC.Message> arrayList = verifyingMessages.get(name);
+//            if (response != null) {
+//                TLRPC.TL_messages_stickerSet set = (TLRPC.TL_messages_stickerSet) response;
+//                storeTempStickerSet(set);
+//                for (int b = 0, N2 = arrayList.size(); b < N2; b++) {
+//                    TLRPC.Message m = arrayList.get(b);
+//                    TLRPC.Document d = MessageObject.getDocument(m);
+//                    for (int a = 0, N = set.documents.size(); a < N; a++) {
+//                        TLRPC.Document sticker = set.documents.get(a);
+//                        if (sticker.id == d.id && sticker.dc_id == d.dc_id) {
+//                            m.stickerVerified = 1;
+//                            break;
+//                        }
+//                    }
+//                    if (m.stickerVerified == 0) {
+//                        m.stickerVerified = 2;
+//                    }
+//                }
+//            } else {
+//                for (int b = 0, N2 = arrayList.size(); b < N2; b++) {
+//                    arrayList.get(b).stickerVerified = 2;
+//                }
+//            }
+//            getNotificationCenter().postNotificationName(NotificationCenter.didVerifyMessagesStickers, arrayList);
+//            getMessagesStorage().updateMessageVerifyFlags(arrayList);
+//        }));
     }
 
     public void loadArchivedStickersCount(int type, boolean cache) {
@@ -2608,25 +2608,25 @@ public class MediaDataController extends BaseController {
                 newStickerArray.add(null);
                 int index = a;
 
-                TLRPC.TL_messages_getStickerSet req = new TLRPC.TL_messages_getStickerSet();
-                req.stickerset = new TLRPC.TL_inputStickerSetID();
-                req.stickerset.id = stickerSet.id;
-                req.stickerset.access_hash = stickerSet.access_hash;
-
-                getConnectionsManager().sendRequest(req, (response, error) -> AndroidUtilities.runOnUIThread(() -> {
-                    TLRPC.TL_messages_stickerSet res1 = (TLRPC.TL_messages_stickerSet) response;
-                    newStickerArray.set(index, res1);
-                    newStickerSets.put(stickerSet.id, res1);
-                    if (newStickerSets.size() == res.sets.size()) {
-                        for (int a1 = 0; a1 < newStickerArray.size(); a1++) {
-                            if (newStickerArray.get(a1) == null) {
-                                newStickerArray.remove(a1);
-                                a1--;
-                            }
-                        }
-                        processLoadedStickers(type, newStickerArray, false, (int) (System.currentTimeMillis() / 1000), res.hash2);
-                    }
-                }));
+//                TLRPC.TL_messages_getStickerSet req = new TLRPC.TL_messages_getStickerSet();
+//                req.stickerset = new TLRPC.TL_inputStickerSetID();
+//                req.stickerset.id = stickerSet.id;
+//                req.stickerset.access_hash = stickerSet.access_hash;
+//
+//                getConnectionsManager().sendRequest(req, (response, error) -> AndroidUtilities.runOnUIThread(() -> {
+//                    TLRPC.TL_messages_stickerSet res1 = (TLRPC.TL_messages_stickerSet) response;
+//                    newStickerArray.set(index, res1);
+//                    newStickerSets.put(stickerSet.id, res1);
+//                    if (newStickerSets.size() == res.sets.size()) {
+//                        for (int a1 = 0; a1 < newStickerArray.size(); a1++) {
+//                            if (newStickerArray.get(a1) == null) {
+//                                newStickerArray.remove(a1);
+//                                a1--;
+//                            }
+//                        }
+//                        processLoadedStickers(type, newStickerArray, false, (int) (System.currentTimeMillis() / 1000), res.hash2);
+//                    }
+//                }));
             }
             if (onDone != null) {
                 onDone.run();
@@ -2650,20 +2650,20 @@ public class MediaDataController extends BaseController {
         }
         loadingPremiumGiftStickers = true;
 
-        TLRPC.TL_messages_getStickerSet req = new TLRPC.TL_messages_getStickerSet();
-        req.stickerset = new TLRPC.TL_inputStickerSetPremiumGifts();
-        getConnectionsManager().sendRequest(req, (response, error) -> AndroidUtilities.runOnUIThread(() -> {
-            if (response instanceof TLRPC.TL_messages_stickerSet) {
-                TLRPC.TL_messages_stickerSet stickerSet = (TLRPC.TL_messages_stickerSet) response;
-                getUserConfig().premiumGiftsStickerPack = stickerSet.set.short_name;
-                getUserConfig().lastUpdatedPremiumGiftsStickerPack = System.currentTimeMillis();
-                getUserConfig().saveConfig(false);
-
-                processLoadedDiceStickers(getUserConfig().premiumGiftsStickerPack, false, stickerSet, false, (int) (System.currentTimeMillis() / 1000));
-
-                getNotificationCenter().postNotificationName(NotificationCenter.didUpdatePremiumGiftStickers);
-            }
-        }));
+//        TLRPC.TL_messages_getStickerSet req = new TLRPC.TL_messages_getStickerSet();
+//        req.stickerset = new TLRPC.TL_inputStickerSetPremiumGifts();
+//        getConnectionsManager().sendRequest(req, (response, error) -> AndroidUtilities.runOnUIThread(() -> {
+//            if (response instanceof TLRPC.TL_messages_stickerSet) {
+//                TLRPC.TL_messages_stickerSet stickerSet = (TLRPC.TL_messages_stickerSet) response;
+//                getUserConfig().premiumGiftsStickerPack = stickerSet.set.short_name;
+//                getUserConfig().lastUpdatedPremiumGiftsStickerPack = System.currentTimeMillis();
+//                getUserConfig().saveConfig(false);
+//
+//                processLoadedDiceStickers(getUserConfig().premiumGiftsStickerPack, false, stickerSet, false, (int) (System.currentTimeMillis() / 1000));
+//
+//                getNotificationCenter().postNotificationName(NotificationCenter.didUpdatePremiumGiftStickers);
+//            }
+//        }));
     }
 
     public void checkGenericAnimations() {
@@ -2682,23 +2682,23 @@ public class MediaDataController extends BaseController {
         }
         loadingGenericAnimations = true;
 
-        TLRPC.TL_messages_getStickerSet req = new TLRPC.TL_messages_getStickerSet();
-        req.stickerset = new TLRPC.TL_inputStickerSetEmojiGenericAnimations();
-        getConnectionsManager().sendRequest(req, (response, error) -> AndroidUtilities.runOnUIThread(() -> {
-            if (response instanceof TLRPC.TL_messages_stickerSet) {
-                TLRPC.TL_messages_stickerSet stickerSet = (TLRPC.TL_messages_stickerSet) response;
-                getUserConfig().genericAnimationsStickerPack = stickerSet.set.short_name;
-                getUserConfig().lastUpdatedGenericAnimations = System.currentTimeMillis();
-                getUserConfig().saveConfig(false);
-
-                processLoadedDiceStickers(getUserConfig().genericAnimationsStickerPack, false, stickerSet, false, (int) (System.currentTimeMillis() / 1000));
-                for (int i = 0; i < stickerSet.documents.size(); i++) {
-                    if (currentAccount == UserConfig.selectedAccount) {
-                        preloadImage(ImageLocation.getForDocument(stickerSet.documents.get(i)), FileLoader.PRIORITY_LOW);
-                    }
-                }
-            }
-        }));
+//        TLRPC.TL_messages_getStickerSet req = new TLRPC.TL_messages_getStickerSet();
+//        req.stickerset = new TLRPC.TL_inputStickerSetEmojiGenericAnimations();
+//        getConnectionsManager().sendRequest(req, (response, error) -> AndroidUtilities.runOnUIThread(() -> {
+//            if (response instanceof TLRPC.TL_messages_stickerSet) {
+//                TLRPC.TL_messages_stickerSet stickerSet = (TLRPC.TL_messages_stickerSet) response;
+//                getUserConfig().genericAnimationsStickerPack = stickerSet.set.short_name;
+//                getUserConfig().lastUpdatedGenericAnimations = System.currentTimeMillis();
+//                getUserConfig().saveConfig(false);
+//
+//                processLoadedDiceStickers(getUserConfig().genericAnimationsStickerPack, false, stickerSet, false, (int) (System.currentTimeMillis() / 1000));
+//                for (int i = 0; i < stickerSet.documents.size(); i++) {
+//                    if (currentAccount == UserConfig.selectedAccount) {
+//                        preloadImage(ImageLocation.getForDocument(stickerSet.documents.get(i)), FileLoader.PRIORITY_LOW);
+//                    }
+//                }
+//            }
+//        }));
     }
 
     public void checkDefaultTopicIcons() {
@@ -2717,18 +2717,18 @@ public class MediaDataController extends BaseController {
         }
         loadingDefaultTopicIcons = true;
 
-        TLRPC.TL_messages_getStickerSet req = new TLRPC.TL_messages_getStickerSet();
-        req.stickerset = new TLRPC.TL_inputStickerSetEmojiDefaultTopicIcons();
-        getConnectionsManager().sendRequest(req, (response, error) -> AndroidUtilities.runOnUIThread(() -> {
-            if (response instanceof TLRPC.TL_messages_stickerSet) {
-                TLRPC.TL_messages_stickerSet stickerSet = (TLRPC.TL_messages_stickerSet) response;
-                getUserConfig().defaultTopicIcons = stickerSet.set.short_name;
-                getUserConfig().lastUpdatedDefaultTopicIcons = System.currentTimeMillis();
-                getUserConfig().saveConfig(false);
-
-                processLoadedDiceStickers(getUserConfig().defaultTopicIcons, false, stickerSet, false, (int) (System.currentTimeMillis() / 1000));
-            }
-        }));
+//        TLRPC.TL_messages_getStickerSet req = new TLRPC.TL_messages_getStickerSet();
+//        req.stickerset = new TLRPC.TL_inputStickerSetEmojiDefaultTopicIcons();
+//        getConnectionsManager().sendRequest(req, (response, error) -> AndroidUtilities.runOnUIThread(() -> {
+//            if (response instanceof TLRPC.TL_messages_stickerSet) {
+//                TLRPC.TL_messages_stickerSet stickerSet = (TLRPC.TL_messages_stickerSet) response;
+//                getUserConfig().defaultTopicIcons = stickerSet.set.short_name;
+//                getUserConfig().lastUpdatedDefaultTopicIcons = System.currentTimeMillis();
+//                getUserConfig().saveConfig(false);
+//
+//                processLoadedDiceStickers(getUserConfig().defaultTopicIcons, false, stickerSet, false, (int) (System.currentTimeMillis() / 1000));
+//            }
+//        }));
     }
 
     public void loadStickersByEmojiOrName(String name, boolean isEmoji, boolean cache) {
@@ -2761,28 +2761,28 @@ public class MediaDataController extends BaseController {
                 processLoadedDiceStickers(name, isEmoji, stickerSet, true, date);
             });
         } else {
-            TLRPC.TL_messages_getStickerSet req = new TLRPC.TL_messages_getStickerSet();
-            if (Objects.equals(getUserConfig().premiumGiftsStickerPack, name)) {
-                req.stickerset = new TLRPC.TL_inputStickerSetPremiumGifts();
-            } else if (isEmoji) {
-                TLRPC.TL_inputStickerSetDice inputStickerSetDice = new TLRPC.TL_inputStickerSetDice();
-                inputStickerSetDice.emoticon = name;
-                req.stickerset = inputStickerSetDice;
-            } else {
-                TLRPC.TL_inputStickerSetShortName inputStickerSetShortName = new TLRPC.TL_inputStickerSetShortName();
-                inputStickerSetShortName.short_name = name;
-                req.stickerset = inputStickerSetShortName;
-            }
-            getConnectionsManager().sendRequest(req, (response, error) -> AndroidUtilities.runOnUIThread(() -> {
-                if (BuildConfig.DEBUG && error != null) { //supress test backend warning
-                    return;
-                }
-                if (response instanceof TLRPC.TL_messages_stickerSet) {
-                    processLoadedDiceStickers(name, isEmoji, (TLRPC.TL_messages_stickerSet) response, false, (int) (System.currentTimeMillis() / 1000));
-                } else {
-                    processLoadedDiceStickers(name, isEmoji, null, false, (int) (System.currentTimeMillis() / 1000));
-                }
-            }));
+//            TLRPC.TL_messages_getStickerSet req = new TLRPC.TL_messages_getStickerSet();
+//            if (Objects.equals(getUserConfig().premiumGiftsStickerPack, name)) {
+//                req.stickerset = new TLRPC.TL_inputStickerSetPremiumGifts();
+//            } else if (isEmoji) {
+//                TLRPC.TL_inputStickerSetDice inputStickerSetDice = new TLRPC.TL_inputStickerSetDice();
+//                inputStickerSetDice.emoticon = name;
+//                req.stickerset = inputStickerSetDice;
+//            } else {
+//                TLRPC.TL_inputStickerSetShortName inputStickerSetShortName = new TLRPC.TL_inputStickerSetShortName();
+//                inputStickerSetShortName.short_name = name;
+//                req.stickerset = inputStickerSetShortName;
+//            }
+//            getConnectionsManager().sendRequest(req, (response, error) -> AndroidUtilities.runOnUIThread(() -> {
+//                if (BuildConfig.DEBUG && error != null) { //supress test backend warning
+//                    return;
+//                }
+//                if (response instanceof TLRPC.TL_messages_stickerSet) {
+//                    processLoadedDiceStickers(name, isEmoji, (TLRPC.TL_messages_stickerSet) response, false, (int) (System.currentTimeMillis() / 1000));
+//                } else {
+//                    processLoadedDiceStickers(name, isEmoji, null, false, (int) (System.currentTimeMillis() / 1000));
+//                }
+//            }));
         }
     }
 
@@ -2945,26 +2945,26 @@ public class MediaDataController extends BaseController {
                     }
                 });
             } else if (type == TYPE_EMOJI) {
-                TLRPC.TL_messages_getStickerSet req = new TLRPC.TL_messages_getStickerSet();
-                req.stickerset = new TLRPC.TL_inputStickerSetAnimatedEmoji();
-
-                getConnectionsManager().sendRequest(req, (response, error) -> {
-                    if (response instanceof TLRPC.TL_messages_stickerSet) {
-                        ArrayList<TLRPC.TL_messages_stickerSet> newStickerArray = new ArrayList<>();
-                        newStickerArray.add((TLRPC.TL_messages_stickerSet) response);
-                        processLoadedStickers(type, newStickerArray, false, (int) (System.currentTimeMillis() / 1000), calcStickersHash(newStickerArray), () -> {
-                            if (onFinish != null) {
-                                onFinish.run(null);
-                            }
-                        });
-                    } else {
-                        processLoadedStickers(type, null, false, (int) (System.currentTimeMillis() / 1000), 0, () -> {
-                            if (onFinish != null) {
-                                onFinish.run(null);
-                            }
-                        });
-                    }
-                });
+//                TLRPC.TL_messages_getStickerSet req = new TLRPC.TL_messages_getStickerSet();
+//                req.stickerset = new TLRPC.TL_inputStickerSetAnimatedEmoji();
+//
+//                getConnectionsManager().sendRequest(req, (response, error) -> {
+//                    if (response instanceof TLRPC.TL_messages_stickerSet) {
+//                        ArrayList<TLRPC.TL_messages_stickerSet> newStickerArray = new ArrayList<>();
+//                        newStickerArray.add((TLRPC.TL_messages_stickerSet) response);
+//                        processLoadedStickers(type, newStickerArray, false, (int) (System.currentTimeMillis() / 1000), calcStickersHash(newStickerArray), () -> {
+//                            if (onFinish != null) {
+//                                onFinish.run(null);
+//                            }
+//                        });
+//                    } else {
+//                        processLoadedStickers(type, null, false, (int) (System.currentTimeMillis() / 1000), 0, () -> {
+//                            if (onFinish != null) {
+//                                onFinish.run(null);
+//                            }
+//                        });
+//                    }
+//                });
             } else {
                 TLObject req;
                 long hash;

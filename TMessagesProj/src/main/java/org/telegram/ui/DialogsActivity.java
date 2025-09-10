@@ -90,8 +90,12 @@ import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.LinearSmoothScrollerCustom;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.viewpager.widget.PagerAdapter;
 import androidx.viewpager.widget.ViewPager;
+import androidx.viewpager2.widget.ViewPager2;
 
+import org.checkerframework.common.subtyping.qual.Bottom;
+import org.telegram.ext.BottomItemView;
 import org.telegram.messenger.AccountInstance;
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.AnimationNotificationsLocker;
@@ -246,6 +250,10 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
+
+import me.majiajie.pagerbottomtabstrip.NavigationController;
+import me.majiajie.pagerbottomtabstrip.PageNavigationView;
+import me.majiajie.pagerbottomtabstrip.listener.OnTabItemSelectedListener;
 
 public class DialogsActivity extends BaseFragment implements NotificationCenter.NotificationCenterDelegate, FloatingDebugProvider {
 
@@ -653,6 +661,13 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
     private AnimatedEmojiDrawable.SwapAnimatedEmojiDrawable statusDrawable;
     private DrawerProfileCell.AnimatedStatusView animatedStatusView;
     public RightSlidingDialogContainer rightSlidingDialogContainer;
+
+    // 杭椒 会话列表
+    private ViewPager viewPager;
+    private int mCurrentPosition;
+    private ViewPage conversationListPage;
+    private PageNavigationView pageNavigationView;
+    private List<String> mTitleList = new ArrayList<>();
 
     public final Property<DialogsActivity, Float> SCROLL_Y = new AnimationProperties.FloatProperty<DialogsActivity>("animationValue") {
         @Override
@@ -3001,6 +3016,11 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
             @Override
             public void setTitleOverlayText(String title, int titleId, Runnable action) {
                 super.setTitleOverlayText(title, titleId, action);
+                if (null == title || TextUtils.isEmpty(title)) {
+                    updateActionBarTitle();
+                } else {
+                    super.setTitleOverlayText(title, titleId, action);
+                }
                 if (selectAnimatedEmojiDialog != null && selectAnimatedEmojiDialog.getContentView() instanceof SelectAnimatedEmojiDialog) {
                     SimpleTextView textView = getTitleTextView();
                     ((SelectAnimatedEmojiDialog) selectAnimatedEmojiDialog.getContentView()).setScrimDrawable(textView != null && textView.getRightDrawable() == statusDrawable ? statusDrawable : null, textView);
@@ -3032,6 +3052,12 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
             actionBar.setOccupyStatusBar(false);
         }
         return actionBar;
+    }
+
+    private void updateActionBarTitle() {
+        if (getConnectionsManager().getConnectionState() == ConnectionsManager.ConnectionStateConnected && !mTitleList.isEmpty()) {
+            actionBar.setTitle(mTitleList.get(mCurrentPosition));
+        }
     }
 
     @Override
@@ -3126,15 +3152,17 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                             searchViewPager.searchListView.show();
                         }
                     }
-                    if (!onlySelect) {
-                        floatingButtonContainer.setVisibility(View.GONE);
-                        if (floatingButton2Container != null) {
-                            floatingButton2Container.setVisibility(View.GONE);
-                        }
-                        if (storyHint != null) {
-                            storyHint.hide();
-                        }
-                    }
+                    floatingButtonContainer.setVisibility(View.VISIBLE);
+                    pageNavigationView.setVisibility(View.GONE);
+//                    if (!onlySelect) {
+//                        floatingButtonContainer.setVisibility(View.GONE);
+//                        if (floatingButton2Container != null) {
+//                            floatingButton2Container.setVisibility(View.GONE);
+//                        }
+//                        if (storyHint != null) {
+//                            storyHint.hide();
+//                        }
+//                    }
                 }
                 if (dialogStoriesCell != null && dialogStoriesCell.getPremiumHint() != null) {
                     dialogStoriesCell.getPremiumHint().hide();
@@ -3185,16 +3213,18 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                 searchWas = false;
                 if (viewPages[0] != null) {
                     viewPages[0].listView.setEmptyView(folderId == 0 ? viewPages[0].progressView : null);
-                    if (!onlySelect) {
-                        floatingButtonContainer.setVisibility(View.VISIBLE);
-                        if (floatingButton2Container != null) {
-                            floatingButton2Container.setVisibility(storiesEnabled ? View.VISIBLE : View.GONE);
-                        }
-                        floatingHidden = true;
-                        floatingButtonTranslation = dp(100);
-                        floatingButtonHideProgress = 1f;
-                        updateFloatingButtonOffset();
-                    }
+//                    if (!onlySelect) {
+//                        floatingButtonContainer.setVisibility(View.VISIBLE);
+//                        if (floatingButton2Container != null) {
+//                            floatingButton2Container.setVisibility(storiesEnabled ? View.VISIBLE : View.GONE);
+//                        }
+//                        floatingHidden = true;
+//                        floatingButtonTranslation = dp(100);
+//                        floatingButtonHideProgress = 1f;
+//                        updateFloatingButtonOffset();
+//                    }
+                    floatingButtonContainer.setVisibility(View.GONE);
+                    pageNavigationView.setVisibility(View.VISIBLE);
                     showSearch(false, false, true);
                 }
                 updateProxyButton(false, false);
@@ -3305,19 +3335,25 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
             if (searchString != null || folderId != 0) {
                 actionBar.setBackButtonDrawable(backDrawable = new BackDrawable(false));
             } else {
-                actionBar.setBackButtonDrawable(menuDrawable = new MenuDrawable());
-                menuDrawable.setRoundCap();
-                actionBar.setBackButtonContentDescription(getString(R.string.AccDescrOpenMenu));
+                // 杭椒 隐藏首页Actionbar
+//                actionBar.setBackButtonDrawable(menuDrawable = new MenuDrawable());
+//                menuDrawable.setRoundCap();
+//                actionBar.setBackButtonContentDescription(getString(R.string.AccDescrOpenMenu));
             }
             if (folderId != 0) {
                 actionBar.setTitle(getString(R.string.ArchivedChats));
             } else {
                 statusDrawable = new AnimatedEmojiDrawable.SwapAnimatedEmojiDrawable(null, dp(26));
                 statusDrawable.center = true;
-                if (BuildVars.DEBUG_VERSION) {
-                    actionBar.setTitle(getString(R.string.AppNameBeta), statusDrawable);
+//                if (BuildVars.DEBUG_VERSION) {
+//                    actionBar.setTitle(getString(R.string.AppNameBeta), statusDrawable);
+//                } else {
+//                    actionBar.setTitle(getString(R.string.AppName), statusDrawable);
+//                }
+                if (mTitleList.isEmpty()) {
+                    actionBar.setTitle("聊天");
                 } else {
-                    actionBar.setTitle(getString(R.string.AppName), statusDrawable);
+                    actionBar.setTitle(mTitleList.get(mCurrentPosition));
                 }
                 updateStatus(UserConfig.getInstance(currentAccount).getCurrentUser(), false);
             }
@@ -3853,7 +3889,18 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                     }
                 }
             };
-            contentView.addView(viewPage, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT));
+
+            LinearLayout mainViewContainer = new LinearLayout(context);
+            mainViewContainer.setOrientation(LinearLayout.VERTICAL);
+            LinearLayout.LayoutParams layoutParams = LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT);
+            mainViewContainer.setLayoutParams(layoutParams);
+
+            if (a == 0) {
+                contentView.addView(mainViewContainer, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT));
+            } else {
+                contentView.addView(viewPage, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT));
+            }
+
             viewPage.dialogsType = initialDialogsType;
             viewPages[a] = viewPage;
 
@@ -4158,6 +4205,119 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
             viewPage.listView.setLayoutManager(viewPage.layoutManager);
             viewPage.listView.setVerticalScrollbarPosition(LocaleController.isRTL ? RecyclerListView.SCROLLBAR_POSITION_LEFT : RecyclerListView.SCROLLBAR_POSITION_RIGHT);
             viewPage.addView(viewPage.listView, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT));
+
+            if (a == 0) {
+                LinearLayout viewPagerLayout = new LinearLayout(context);
+                LinearLayout.LayoutParams vpLayoutParams = new LinearLayout.LayoutParams(LayoutHelper.MATCH_PARENT, 0, 1);
+                viewPagerLayout.setLayoutParams(vpLayoutParams);
+
+                viewPager = new ViewPager(context);
+                viewPager.setId(R.id.main_view_pager);
+                viewPager.setLayoutParams(LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT));
+                viewPagerLayout.addView(viewPager);
+
+                conversationListPage = viewPage;
+
+                int topPadding = ActionBar.getCurrentActionBarHeight() + AndroidUtilities.statusBarHeight;
+                pageNavigationView = new PageNavigationView(context);
+                pageNavigationView.setId(R.id.main_bottom_navigation_bar);
+                PageNavigationView.CustomBuilder customBuilder = pageNavigationView.custom();
+                List<String> titleList = new ArrayList<>();
+                titleList.add("聊天");
+                titleList.add("通讯录");
+                titleList.add("发现");
+                titleList.add("设置");
+                mTitleList.clear();
+                mTitleList.addAll(titleList);
+
+                List<Integer> imageList = new ArrayList<>();
+                imageList.add(R.mipmap.sk_tab_message);
+                imageList.add(R.mipmap.sk_tab_contacts);
+                imageList.add(R.mipmap.sk_tab_discovery);
+                imageList.add(R.mipmap.sk_tab_settings);
+
+                for (int i = 0; i < titleList.size(); i++) {
+                    BottomItemView itemView = new BottomItemView(context);
+                    itemView.initialize(titleList.get(i), imageList.get(i));
+                    customBuilder.addItem(itemView);
+                }
+
+                List<FrameLayout> contentViewList = new ArrayList<>();
+                contentViewList.add(conversationListPage);
+                contentViewList.add(new FrameLayout(context));
+                contentViewList.add(new FrameLayout(context));
+                contentViewList.add(new FrameLayout(context));
+
+                NavigationController navigationController = customBuilder.build();
+                navigationController.addTabItemSelectedListener(new OnTabItemSelectedListener() {
+                    @Override
+                    public void onSelected(int index, int old) {
+                        mCurrentPosition = index;
+                        updateActionBarTitle();
+                        viewPager.setCurrentItem(index);
+                        if (index == 0) {
+                            mainViewContainer.setPadding(0, topPadding, 0, 0);
+                            actionBar.setVisibility(View.VISIBLE);
+                        } else if (index == 1) {
+                            mainViewContainer.setPadding(0, topPadding, 0, 0);
+                            actionBar.setVisibility(View.VISIBLE);
+                        } else if (index == 2) {
+                            mainViewContainer.setPadding(0, topPadding, 0, 0);
+                            actionBar.setVisibility(View.VISIBLE);
+                        } else {
+                            mainViewContainer.setPadding(0, 0, 0, 0);
+                            actionBar.setVisibility(View.GONE);
+                            mainViewContainer.setBackgroundColor(Color.WHITE);
+                        }
+                    }
+
+                    @Override
+                    public void onRepeat(int index) {
+
+                    }
+                });
+
+                navigationController.setupWithViewPager(viewPager);
+
+                viewPager.setCurrentItem(0);
+                viewPager.setOffscreenPageLimit(4);
+                viewPager.setAdapter(new PagerAdapter() {
+                    @Override
+                    public int getCount() {
+                        return contentViewList.size();
+                    }
+
+                    @NonNull
+                    @Override
+                    public Object instantiateItem(@NonNull ViewGroup container, int position) {
+                        FrameLayout frameLayout = contentViewList.get(position);
+                        container.addView(frameLayout);
+                        return frameLayout;
+                    }
+
+                    @Override
+                    public void destroyItem(@NonNull ViewGroup container, int position, @NonNull Object object) {
+                        container.removeView((View) object);
+                    }
+
+                    @Override
+                    public boolean isViewFromObject(@NonNull View view, @NonNull Object object) {
+                        return view == object;
+                    }
+                });
+
+                mainViewContainer.addView(viewPagerLayout);
+                mainViewContainer.addView(pageNavigationView, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, 48, Gravity.BOTTOM, 2, 0, 2, 2));
+                // 选择对话
+                if (initialDialogsType == 3) {
+                    pageNavigationView.setVisibility(View.GONE);
+                    mainViewContainer.setPadding(0, 0, 0, 0);
+                } else {
+                    pageNavigationView.setVisibility(View.VISIBLE);
+                    mainViewContainer.setPadding(0, topPadding, 0, 0);
+                }
+            }
+
             viewPage.listView.setOnItemClickListener((view, position, x, y) -> {
                 if (view instanceof GraySectionCell)
                     return;
@@ -4498,7 +4658,9 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
 
         if (initialDialogsType != DIALOGS_TYPE_WIDGET) {
             floatingButton2Container = new FrameLayout(context);
-            floatingButton2Container.setVisibility(onlySelect && initialDialogsType != 10 || folderId != 0 || !storiesEnabled ? View.GONE : View.VISIBLE);
+            // 杭椒 隐藏floatingButton2Container
+            floatingButton2Container.setVisibility(View.GONE);
+//            floatingButton2Container.setVisibility(onlySelect && initialDialogsType != 10 || folderId != 0 || !storiesEnabled ? View.GONE : View.VISIBLE);
             contentView.addView(floatingButton2Container, LayoutHelper.createFrame((Build.VERSION.SDK_INT >= 21 ? 36 : 40), (Build.VERSION.SDK_INT >= 21 ? 36 : 40), (LocaleController.isRTL ? Gravity.LEFT : Gravity.RIGHT) | Gravity.BOTTOM, LocaleController.isRTL ? 24 : 0, 0, LocaleController.isRTL ? 0 : 24, 14 + 60 + 8));
             floatingButton2Container.setOnClickListener(v -> {
                 if (parentLayout != null && parentLayout.isInPreviewMode()) {
@@ -4546,7 +4708,8 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         }
 
         floatingButtonContainer = new FrameLayout(context);
-        floatingButtonContainer.setVisibility(onlySelect && initialDialogsType != 10 || folderId != 0 ? View.GONE : View.VISIBLE);
+        floatingButtonContainer.setVisibility(View.GONE);
+//        floatingButtonContainer.setVisibility(onlySelect && initialDialogsType != 10 || folderId != 0 ? View.GONE : View.VISIBLE);
         contentView.addView(floatingButtonContainer, LayoutHelper.createFrame((Build.VERSION.SDK_INT >= 21 ? 56 : 60), (Build.VERSION.SDK_INT >= 21 ? 56 : 60), (LocaleController.isRTL ? Gravity.LEFT : Gravity.RIGHT) | Gravity.BOTTOM, LocaleController.isRTL ? 14 : 0, 0, LocaleController.isRTL ? 0 : 14, 14));
         floatingButtonContainer.setOnClickListener(v -> {
             if (parentLayout != null && parentLayout.isInPreviewMode()) {
@@ -5222,7 +5385,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
             FilesMigrationService.checkBottomSheet(this);
         }
         updateMenuButton(false);
-        actionBar.setDrawBlurBackground(contentView);
+//        actionBar.setDrawBlurBackground(contentView);
 
         rightSlidingDialogContainer = new RightSlidingDialogContainer(context) {
 
@@ -5411,6 +5574,11 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         contentView.addView(rightSlidingDialogContainer, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT));
         contentView.addView(dialogStoriesCell, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, DialogStoriesCell.HEIGHT_IN_DP));
         updateStoriesVisibility(false);
+
+        actionBar.setBackgroundColor(Color.WHITE);
+        actionBar.setTitleColor(Color.BLACK);
+        AndroidUtilities.setLightStatusBar(((Activity) getContext()).getWindow(), true);
+
         return fragmentView;
     }
 
@@ -6136,6 +6304,8 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
             avatarDrawable.setCustomIcon(drawable);
             avatarDrawable.setIconTranslation(dp(1), 0);
             dialogsHintCell.imageView.setImageDrawable(avatarDrawable);
+            // 杭椒 隐藏 Help your friends spot you easily.
+            dialogsHintCell.setVisibility(View.GONE);
             dialogsHintCell.setText(
                 Emoji.replaceWithRestrictedEmoji(LocaleController.getString(R.string.HintAddYourPhoto), dialogsHintCell.titleView, this::updateDialogsHint),
                 getString(R.string.HintAddYourPhotoText)

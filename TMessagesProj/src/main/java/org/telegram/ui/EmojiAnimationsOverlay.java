@@ -646,11 +646,11 @@ public class EmojiAnimationsOverlay implements NotificationCenter.NotificationCe
                         stickerSet = MediaDataController.getInstance(currentAccount).getStickerSetById(inputStickerSet.id);
                     }
                     if (stickerSet == null) {
-                        TLRPC.TL_messages_getStickerSet req = new TLRPC.TL_messages_getStickerSet();
-                        req.stickerset = inputStickerSet;
-                        ConnectionsManager.getInstance(currentAccount).sendRequest(req, (response, error) -> AndroidUtilities.runOnUIThread(() -> {
-                            showStickerSetBulletin((TLRPC.TL_messages_stickerSet) response, messageObject);
-                        }));
+//                        TLRPC.TL_messages_getStickerSet req = new TLRPC.TL_messages_getStickerSet();
+//                        req.stickerset = inputStickerSet;
+//                        ConnectionsManager.getInstance(currentAccount).sendRequest(req, (response, error) -> AndroidUtilities.runOnUIThread(() -> {
+//                            showStickerSetBulletin((TLRPC.TL_messages_stickerSet) response, messageObject);
+//                        }));
                     } else {
                         showStickerSetBulletin(stickerSet, messageObject);
                     }

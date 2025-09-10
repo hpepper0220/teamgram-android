@@ -5985,30 +5985,30 @@ public class SendMessagesHelper extends BaseController implements NotificationCe
             }
             sendReadyToSendGroup(message, add, true);
         } else if (message.type == 5) {
-            String key = "stickerset_" + message.obj.getId();
-            TLRPC.TL_messages_getStickerSet req = new TLRPC.TL_messages_getStickerSet();
-            req.stickerset = (TLRPC.InputStickerSet) message.parentObject;
-            getConnectionsManager().sendRequest(req, (response, error) -> {
-                AndroidUtilities.runOnUIThread(() -> {
-                    boolean found = false;
-                    if (response != null) {
-                        TLRPC.TL_messages_stickerSet set = (TLRPC.TL_messages_stickerSet) response;
-                        getMediaDataController().storeTempStickerSet(set);
-                        TLRPC.TL_documentAttributeSticker_layer55 attributeSticker = (TLRPC.TL_documentAttributeSticker_layer55) message.locationParent;
-                        attributeSticker.stickerset = new TLRPC.TL_inputStickerSetShortName();
-                        attributeSticker.stickerset.short_name = set.set.short_name;
-                        found = true;
-                    }
-                    ArrayList<DelayedMessage> arrayList = delayedMessages.remove(key);
-                    if (arrayList != null && !arrayList.isEmpty()) {
-                        if (found) {
-                            getMessagesStorage().replaceMessageIfExists(arrayList.get(0).obj.messageOwner, null, null, false);
-                        }
-                        getSecretChatHelper().performSendEncryptedRequest((TLRPC.DecryptedMessage) message.sendEncryptedRequest, message.obj.messageOwner, message.encryptedChat, null, null, message.obj);
-                    }
-                });
-            });
-            putToDelayedMessages(key, message);
+//            String key = "stickerset_" + message.obj.getId();
+//            TLRPC.TL_messages_getStickerSet req = new TLRPC.TL_messages_getStickerSet();
+//            req.stickerset = (TLRPC.InputStickerSet) message.parentObject;
+//            getConnectionsManager().sendRequest(req, (response, error) -> {
+//                AndroidUtilities.runOnUIThread(() -> {
+//                    boolean found = false;
+//                    if (response != null) {
+//                        TLRPC.TL_messages_stickerSet set = (TLRPC.TL_messages_stickerSet) response;
+//                        getMediaDataController().storeTempStickerSet(set);
+//                        TLRPC.TL_documentAttributeSticker_layer55 attributeSticker = (TLRPC.TL_documentAttributeSticker_layer55) message.locationParent;
+//                        attributeSticker.stickerset = new TLRPC.TL_inputStickerSetShortName();
+//                        attributeSticker.stickerset.short_name = set.set.short_name;
+//                        found = true;
+//                    }
+//                    ArrayList<DelayedMessage> arrayList = delayedMessages.remove(key);
+//                    if (arrayList != null && !arrayList.isEmpty()) {
+//                        if (found) {
+//                            getMessagesStorage().replaceMessageIfExists(arrayList.get(0).obj.messageOwner, null, null, false);
+//                        }
+//                        getSecretChatHelper().performSendEncryptedRequest((TLRPC.DecryptedMessage) message.sendEncryptedRequest, message.obj.messageOwner, message.encryptedChat, null, null, message.obj);
+//                    }
+//                });
+//            });
+//            putToDelayedMessages(key, message);
         }
     }
 

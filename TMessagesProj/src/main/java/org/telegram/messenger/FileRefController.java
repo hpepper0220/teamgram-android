@@ -614,23 +614,23 @@ public class FileRefController extends BaseController {
                 sendErrorToObject(args, 0);
             }
         } else if (parentObject instanceof TLRPC.TL_messages_stickerSet) {
-            TLRPC.TL_messages_stickerSet stickerSet = (TLRPC.TL_messages_stickerSet) parentObject;
-            TLRPC.TL_messages_getStickerSet req = new TLRPC.TL_messages_getStickerSet();
-            req.stickerset = new TLRPC.TL_inputStickerSetID();
-            req.stickerset.id = stickerSet.set.id;
-            req.stickerset.access_hash = stickerSet.set.access_hash;
-            getConnectionsManager().sendRequest(req, (response, error) -> onRequestComplete(locationKey, parentKey, response, error, true, false));
+//            TLRPC.TL_messages_stickerSet stickerSet = (TLRPC.TL_messages_stickerSet) parentObject;
+//            TLRPC.TL_messages_getStickerSet req = new TLRPC.TL_messages_getStickerSet();
+//            req.stickerset = new TLRPC.TL_inputStickerSetID();
+//            req.stickerset.id = stickerSet.set.id;
+//            req.stickerset.access_hash = stickerSet.set.access_hash;
+//            getConnectionsManager().sendRequest(req, (response, error) -> onRequestComplete(locationKey, parentKey, response, error, true, false));
         } else if (parentObject instanceof TLRPC.StickerSetCovered) {
-            TLRPC.StickerSetCovered stickerSet = (TLRPC.StickerSetCovered) parentObject;
-            TLRPC.TL_messages_getStickerSet req = new TLRPC.TL_messages_getStickerSet();
-            req.stickerset = new TLRPC.TL_inputStickerSetID();
-            req.stickerset.id = stickerSet.set.id;
-            req.stickerset.access_hash = stickerSet.set.access_hash;
-            getConnectionsManager().sendRequest(req, (response, error) -> onRequestComplete(locationKey, parentKey, response, error, true, false));
+//            TLRPC.StickerSetCovered stickerSet = (TLRPC.StickerSetCovered) parentObject;
+//            TLRPC.TL_messages_getStickerSet req = new TLRPC.TL_messages_getStickerSet();
+//            req.stickerset = new TLRPC.TL_inputStickerSetID();
+//            req.stickerset.id = stickerSet.set.id;
+//            req.stickerset.access_hash = stickerSet.set.access_hash;
+//            getConnectionsManager().sendRequest(req, (response, error) -> onRequestComplete(locationKey, parentKey, response, error, true, false));
         } else if (parentObject instanceof TLRPC.InputStickerSet) {
-            TLRPC.TL_messages_getStickerSet req = new TLRPC.TL_messages_getStickerSet();
-            req.stickerset = (TLRPC.InputStickerSet) parentObject;
-            getConnectionsManager().sendRequest(req, (response, error) -> onRequestComplete(locationKey, parentKey, response, error, true, false));
+//            TLRPC.TL_messages_getStickerSet req = new TLRPC.TL_messages_getStickerSet();
+//            req.stickerset = (TLRPC.InputStickerSet) parentObject;
+//            getConnectionsManager().sendRequest(req, (response, error) -> onRequestComplete(locationKey, parentKey, response, error, true, false));
         } else {
             sendErrorToObject(args, 0);
         }

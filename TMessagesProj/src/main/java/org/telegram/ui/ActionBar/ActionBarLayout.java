@@ -509,11 +509,12 @@ public class ActionBarLayout extends FrameLayout implements INavigationLayout, F
         parentActivity = (Activity) context;
         this.main = main;
 
-        if (layerShadowDrawable == null) {
-            layerShadowDrawable = getResources().getDrawable(R.drawable.layer_shadow);
-            headerShadowDrawable = getResources().getDrawable(R.drawable.header_shadow).mutate();
-            scrimPaint = new Paint();
-        }
+        // 杭椒 取消阴影绘制
+//        if (layerShadowDrawable == null) {
+//            layerShadowDrawable = getResources().getDrawable(R.drawable.layer_shadow);
+//            headerShadowDrawable = getResources().getDrawable(R.drawable.header_shadow).mutate();
+//            scrimPaint = new Paint();
+//        }
     }
 
     @Override
