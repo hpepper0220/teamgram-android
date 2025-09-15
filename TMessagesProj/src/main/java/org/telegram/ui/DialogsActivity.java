@@ -96,6 +96,7 @@ import androidx.viewpager2.widget.ViewPager2;
 
 import org.checkerframework.common.subtyping.qual.Bottom;
 import org.telegram.ext.BottomItemView;
+import org.telegram.ext.SkMineFragment;
 import org.telegram.messenger.AccountInstance;
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.AnimationNotificationsLocker;
@@ -311,6 +312,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         private RecyclerItemsEnterAnimator recyclerItemsEnterAnimator;
 
         private boolean isLocked;
+        private View contentView;
         public boolean animateStoriesView;
 
         private RecyclerListView animationSupportListView;
@@ -668,6 +670,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
     private ViewPage conversationListPage;
     private PageNavigationView pageNavigationView;
     private List<String> mTitleList = new ArrayList<>();
+    private SkMineFragment mineFragment;
 
     public final Property<DialogsActivity, Float> SCROLL_Y = new AnimationProperties.FloatProperty<DialogsActivity>("animationValue") {
         @Override
@@ -2914,6 +2917,9 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
     @Override
     public void onFragmentDestroy() {
         super.onFragmentDestroy();
+        if (null != mineFragment) {
+            mineFragment.onFragmentDestroy();
+        }
         if (searchString == null) {
             getNotificationCenter().removeObserver(this, NotificationCenter.dialogsNeedReload);
             NotificationCenter.getGlobalInstance().removeObserver(this, NotificationCenter.emojiLoaded);
@@ -3044,6 +3050,8 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
             }
         };
         actionBar.setUseContainerForTitles();
+        actionBar.setBackButtonImage(R.drawable.ic_ab_back);
+        actionBar.getBackButton().setVisibility(View.GONE);
         actionBar.setItemsBackgroundColor(Theme.getColor(Theme.key_actionBarDefaultSelector), false);
         actionBar.setItemsBackgroundColor(Theme.getColor(Theme.key_actionBarActionModeDefaultSelector), true);
         actionBar.setItemsColor(Theme.getColor(Theme.key_actionBarDefaultIcon), false);
@@ -3134,6 +3142,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
 
             @Override
             public void onSearchExpand() {
+                actionBar.getBackButton().setVisibility(View.VISIBLE);
                 searching = true;
                 if (switchItem != null) {
                     switchItem.setVisibility(View.GONE);
@@ -3209,6 +3218,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
 
             @Override
             public void onSearchCollapse() {
+                actionBar.getBackButton().setVisibility(View.GONE);
                 searching = false;
                 searchWas = false;
                 if (viewPages[0] != null) {
@@ -3275,6 +3285,9 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                 return !actionBar.isActionModeShowed() && databaseMigrationHint == null;// && !rightSlidingDialogContainer.hasFragment();
             }
         });
+        searchItem.getSearchField().setTextColor(Color.BLACK);
+        searchItem.getSearchField().setHintTextColor(Color.BLACK);
+        searchItem.getSearchField().setCursorColor(Color.BLACK);
         if (initialDialogsType == DIALOGS_TYPE_ADD_USERS_TO || isArchive() && getDialogsArray(currentAccount, initialDialogsType, folderId, false).isEmpty()) {
             searchItem.setVisibility(View.GONE);
         }
@@ -4246,7 +4259,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                 contentViewList.add(conversationListPage);
                 contentViewList.add(new FrameLayout(context));
                 contentViewList.add(new FrameLayout(context));
-                contentViewList.add(new FrameLayout(context));
+                contentViewList.add(createMineFragment(context));
 
                 NavigationController navigationController = customBuilder.build();
                 navigationController.addTabItemSelectedListener(new OnTabItemSelectedListener() {
@@ -4268,6 +4281,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                             mainViewContainer.setPadding(0, 0, 0, 0);
                             actionBar.setVisibility(View.GONE);
                             mainViewContainer.setBackgroundColor(Color.WHITE);
+                            mineFragment.onResume();
                         }
                     }
 
@@ -5577,9 +5591,20 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
 
         actionBar.setBackgroundColor(Color.WHITE);
         actionBar.setTitleColor(Color.BLACK);
-        AndroidUtilities.setLightStatusBar(((Activity) getContext()).getWindow(), true);
+//        AndroidUtilities.setLightStatusBar(((Activity) getContext()).getWindow(), true);
 
         return fragmentView;
+    }
+
+    private FrameLayout createMineFragment(Context context) {
+        FrameLayout viewPage = new FrameLayout(context);
+        mineFragment = new SkMineFragment();
+        mineFragment.onFragmentCreate();
+        if (getParentActivity() instanceof LaunchActivity) {
+            mineFragment.setParentActivity((LaunchActivity) getParentActivity());
+        }
+        viewPage.addView(mineFragment.createView(getParentActivity()), LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT));
+        return viewPage;
     }
 
     private void setStoriesOvercroll(ViewPage viewPage, float storiesOverscroll) {
@@ -6016,7 +6041,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
             updateAuthHintCellVisibility(true);
         } else if (getMessagesController().isFrozen()) {
             dialogsHintCellVisible = true;
-            dialogsHintCell.setVisibility(View.VISIBLE);
+            dialogsHintCell.setVisibility(View.GONE);
             dialogsHintCell.setCompact(true);
             dialogsHintCell.setOnClickListener(v -> {
                 AccountFrozenAlert.show(getContext(), currentAccount, getResourceProvider());
@@ -6030,7 +6055,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
             updateAuthHintCellVisibility(false);
         } else if (folderId == 0 && getMessagesController().pendingSuggestions.contains("PREMIUM_GRACE")) {
             dialogsHintCellVisible = true;
-            dialogsHintCell.setVisibility(View.VISIBLE);
+            dialogsHintCell.setVisibility(View.GONE);
             dialogsHintCell.setCompact(true);
             dialogsHintCell.setOnClickListener(v -> {
                 Browser.openUrl(getContext(), getMessagesController().premiumManageSubscriptionUrl);
@@ -6047,7 +6072,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         } else if (isStarsSubscriptionHintVisible()) {
             StarsController c = StarsController.getInstance(currentAccount);
             dialogsHintCellVisible = true;
-            dialogsHintCell.setVisibility(View.VISIBLE);
+            dialogsHintCell.setVisibility(View.GONE);
             dialogsHintCell.setCompact(true);
             StringBuilder s = new StringBuilder();
             long starsNeeded = 0;
@@ -6089,7 +6114,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
             BirthdayController.BirthdayState state = BirthdayController.getInstance(currentAccount).getState();
             ArrayList<TLRPC.User> users = state.today;
             dialogsHintCellVisible = true;
-            dialogsHintCell.setVisibility(View.VISIBLE);
+            dialogsHintCell.setVisibility(View.GONE);
             dialogsHintCell.setCompact(true);
             dialogsHintCell.setOnClickListener(v -> {
                 if (state != null && state.today.size() == 1) {
@@ -6131,7 +6156,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         ) {
             ContactsController.getInstance(currentAccount).loadPrivacySettings();
             dialogsHintCellVisible = true;
-            dialogsHintCell.setVisibility(View.VISIBLE);
+            dialogsHintCell.setVisibility(View.GONE);
             dialogsHintCell.setCompact(true);
             dialogsHintCell.setOnClickListener(v -> {
                 showDialog(AlertsCreator.createBirthdayPickerDialog(getContext(), getString(R.string.EditProfileBirthdayTitle), getString(R.string.EditProfileBirthdayButton), null, birthday -> {
@@ -6206,7 +6231,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
             updateAuthHintCellVisibility(false);
         } else if (isPremiumChristmasHintVisible()) {
             dialogsHintCellVisible = true;
-            dialogsHintCell.setVisibility(View.VISIBLE);
+            dialogsHintCell.setVisibility(View.GONE);
             dialogsHintCell.setCompact(false);
             dialogsHintCell.setOnClickListener(v -> UserSelectorBottomSheet.open());
             dialogsHintCell.setText(Emoji.replaceEmoji(AndroidUtilities.replaceSingleTag(
@@ -6229,7 +6254,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
             updateAuthHintCellVisibility(false);
         } else if (isPremiumRestoreHintVisible()) {
             dialogsHintCellVisible = true;
-            dialogsHintCell.setVisibility(View.VISIBLE);
+            dialogsHintCell.setVisibility(View.GONE);
             dialogsHintCell.setCompact(false);
             dialogsHintCell.setOnClickListener(v -> {
                 presentFragment(new PremiumPreviewFragment("dialogs_hint").setSelectAnnualByDefault());
@@ -6250,7 +6275,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
             updateAuthHintCellVisibility(false);
         } else if (isPremiumHintVisible()) {
             dialogsHintCellVisible = true;
-            dialogsHintCell.setVisibility(View.VISIBLE);
+            dialogsHintCell.setVisibility(View.GONE);
             dialogsHintCell.setCompact(false);
             dialogsHintCell.setOnClickListener(v -> {
                 presentFragment(new PremiumPreviewFragment("dialogs_hint").setSelectAnnualByDefault());
@@ -6271,7 +6296,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
             updateAuthHintCellVisibility(false);
         } else if (isCacheHintVisible()) {
             dialogsHintCellVisible = true;
-            dialogsHintCell.setVisibility(View.VISIBLE);
+            dialogsHintCell.setVisibility(View.GONE);
             dialogsHintCell.setCompact(false);
             dialogsHintCell.setOnClickListener(v -> {
                 presentFragment(new CacheControlActivity());
@@ -6292,7 +6317,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
             updateAuthHintCellVisibility(false);
         } else if (folderId == 0 && getUserConfig().getCurrentUser() != null && (getUserConfig().getCurrentUser().photo == null || getUserConfig().getCurrentUser().photo instanceof TLRPC.TL_userProfilePhotoEmpty) && (BuildVars.DEBUG_PRIVATE_VERSION || MessagesController.getInstance(currentAccount).pendingSuggestions.contains("USERPIC_SETUP"))) {
             dialogsHintCellVisible = true;
-            dialogsHintCell.setVisibility(View.VISIBLE);
+            dialogsHintCell.setVisibility(View.GONE);
             dialogsHintCell.setOnClickListener(v -> {
                 openSetAvatar();
             });
@@ -6339,7 +6364,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
             if (found) {
                 final String finalSuggestion = foundSuggestion;
                 dialogsHintCellVisible = true;
-                dialogsHintCell.setVisibility(View.VISIBLE);
+                dialogsHintCell.setVisibility(View.GONE);
                 dialogsHintCell.setCompact(false);
                 dialogsHintCell.setOnClickListener(v -> {
                     if (ApplicationLoader.applicationLoaderInstance != null) {
@@ -7250,6 +7275,9 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                 }
             }
         }
+        if (null != mineFragment) {
+            mineFragment.onResume();
+        }
     }
 
     @Override
@@ -7551,15 +7579,18 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
             }
 
             EditTextBoldCursor editText = searchItem.getSearchField();
-            if (whiteActionBar) {
-                editText.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteBlackText));
-                editText.setHintTextColor(Theme.getColor(Theme.key_player_time));
-                editText.setCursorColor(Theme.getColor(Theme.key_chat_messagePanelCursor));
-            } else {
-                editText.setCursorColor(Theme.getColor(Theme.key_actionBarDefaultSearch));
-                editText.setHintTextColor(Theme.getColor(Theme.key_actionBarDefaultSearchPlaceholder));
-                editText.setTextColor(Theme.getColor(Theme.key_actionBarDefaultSearch));
-            }
+            editText.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteBlackText));
+            editText.setHintTextColor(Theme.getColor(Theme.key_player_time));
+            editText.setCursorColor(Theme.getColor(Theme.key_chat_messagePanelCursor));
+//            if (whiteActionBar) {
+//                editText.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteBlackText));
+//                editText.setHintTextColor(Theme.getColor(Theme.key_player_time));
+//                editText.setCursorColor(Theme.getColor(Theme.key_chat_messagePanelCursor));
+//            } else {
+//                editText.setCursorColor(Theme.getColor(Theme.key_actionBarDefaultSearch));
+//                editText.setHintTextColor(Theme.getColor(Theme.key_actionBarDefaultSearchPlaceholder));
+//                editText.setTextColor(Theme.getColor(Theme.key_actionBarDefaultSearch));
+//            }
             updateDrawerSwipeEnabled();
             if (searchViewPager != null) {
                 searchViewPager.setKeyboardHeight(((ContentView) fragmentView).getKeyboardHeight());
@@ -7930,9 +7961,9 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
             dialogsHintCell.setAlpha(1f - progress);
             if (dialogsHintCellVisible) {
                 if (dialogsHintCell.getAlpha() == 0) {
-                    dialogsHintCell.setVisibility(View.INVISIBLE);
+                    dialogsHintCell.setVisibility(View.GONE);
                 } else {
-                    dialogsHintCell.setVisibility(View.VISIBLE);
+                    dialogsHintCell.setVisibility(View.GONE);
                     ViewParent dialogsHintCellParent = dialogsHintCell.getParent();
                     if (dialogsHintCellParent != null) {
                         dialogsHintCellParent.requestLayout();
@@ -12103,15 +12134,18 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
             }
             if (searchItem != null) {
                 EditTextBoldCursor editText = searchItem.getSearchField();
-                if (whiteActionBar) {
-                    editText.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteBlackText));
-                    editText.setHintTextColor(Theme.getColor(Theme.key_player_time));
-                    editText.setCursorColor(Theme.getColor(Theme.key_chat_messagePanelCursor));
-                } else {
-                    editText.setCursorColor(Theme.getColor(Theme.key_actionBarDefaultSearch));
-                    editText.setHintTextColor(Theme.getColor(Theme.key_actionBarDefaultSearchPlaceholder));
-                    editText.setTextColor(Theme.getColor(Theme.key_actionBarDefaultSearch));
-                }
+                editText.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteBlackText));
+                editText.setHintTextColor(Theme.getColor(Theme.key_player_time));
+                editText.setCursorColor(Theme.getColor(Theme.key_chat_messagePanelCursor));
+//                if (whiteActionBar) {
+//                    editText.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteBlackText));
+//                    editText.setHintTextColor(Theme.getColor(Theme.key_player_time));
+//                    editText.setCursorColor(Theme.getColor(Theme.key_chat_messagePanelCursor));
+//                } else {
+//                    editText.setCursorColor(Theme.getColor(Theme.key_actionBarDefaultSearch));
+//                    editText.setHintTextColor(Theme.getColor(Theme.key_actionBarDefaultSearchPlaceholder));
+//                    editText.setTextColor(Theme.getColor(Theme.key_actionBarDefaultSearch));
+//                }
                 searchItem.updateColor();
             }
             updateFloatingButtonColor();

@@ -182,7 +182,8 @@ public class ThemeColors {
         defaultColors[key_avatar_nameInMessagePink] = 0xffC7508B;
 
         defaultColors[key_actionBarDefault] = 0xff527da3;
-        defaultColors[key_actionBarDefaultIcon] = 0xffffffff;
+//        defaultColors[key_actionBarDefaultIcon] = 0xffffffff;
+        defaultColors[key_actionBarDefaultIcon] = 0xff666666;
         defaultColors[key_actionBarActionModeDefault] = 0xffffffff;
         defaultColors[key_actionBarActionModeDefaultTop] = 0x10000000;
         defaultColors[key_actionBarActionModeDefaultIcon] = 0xff676a6f;

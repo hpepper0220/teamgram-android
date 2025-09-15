@@ -47,6 +47,7 @@ public class BottomItemView extends BaseTabItem {
         this.imgResId = resId;
         iconDrawable = ContextCompat.getDrawable(context, resId);
         setTitle(title);
+        icon.setImageDrawable(iconDrawable);
     }
 
     @Override

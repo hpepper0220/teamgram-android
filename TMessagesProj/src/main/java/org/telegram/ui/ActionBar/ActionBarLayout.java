@@ -900,12 +900,12 @@ public class ActionBarLayout extends FrameLayout implements INavigationLayout, F
 
         if (translationX != 0 || overrideWidthOffset != -1) {
             int widthOffset = overrideWidthOffset != -1 ? overrideWidthOffset : width - translationX;
-            if (child == containerView) {
+            if (child == containerView && null != layerShadowDrawable) {
                 float alpha = MathUtils.clamp(widthOffset / (float) dp(20), 0, 1f);
                 layerShadowDrawable.setBounds(translationX - layerShadowDrawable.getIntrinsicWidth(), child.getTop(), translationX, child.getBottom() - getBottomTabsHeight(true));
                 layerShadowDrawable.setAlpha((int) (0xff * alpha));
                 layerShadowDrawable.draw(canvas);
-            } else if (child == containerViewBack) {
+            } else if (child == containerViewBack && null != scrimPaint) {
                 float opacity = MathUtils.clamp(widthOffset / (float) width, 0, 0.8f);
                 scrimPaint.setColor(Color.argb((int)(0x99 * opacity), 0x00, 0x00, 0x00));
                 if (overrideWidthOffset != -1) {

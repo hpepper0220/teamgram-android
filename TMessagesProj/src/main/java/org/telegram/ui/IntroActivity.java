@@ -57,6 +57,7 @@ import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.ApplicationLoader;
 import org.telegram.messenger.AuthTokensHelper;
 import org.telegram.messenger.BuildVars;
+import org.telegram.messenger.CallReceiver;
 import org.telegram.messenger.ContactsController;
 import org.telegram.messenger.DispatchQueue;
 import org.telegram.messenger.EmuDetector;
@@ -70,14 +71,18 @@ import org.telegram.messenger.MessagesStorage;
 import org.telegram.messenger.NotificationCenter;
 import org.telegram.messenger.R;
 import org.telegram.messenger.UserConfig;
+import org.telegram.messenger.Utilities;
 import org.telegram.tgnet.ConnectionsManager;
+import org.telegram.tgnet.SerializedData;
 import org.telegram.tgnet.TLRPC;
 import org.telegram.tgnet.Vector;
+import org.telegram.tgnet.tl.TL_account;
 import org.telegram.ui.ActionBar.AlertDialog;
 import org.telegram.ui.ActionBar.BaseFragment;
 import org.telegram.ui.ActionBar.Theme;
 import org.telegram.ui.ActionBar.ThemeDescription;
 import org.telegram.ui.Cells.DrawerProfileCell;
+import org.telegram.ui.Components.AlertsCreator;
 import org.telegram.ui.Components.BottomPagesView;
 import org.telegram.ui.Components.LayoutHelper;
 import org.telegram.ui.Components.RLottieDrawable;
@@ -131,6 +136,8 @@ public class IntroActivity extends BaseFragment implements NotificationCenter.No
 
     private boolean newAccount;
     private boolean pendingSwitchingAccount;
+
+    private String lastError = "";
 
     @Override
     public boolean onFragmentCreate() {
@@ -424,29 +431,21 @@ public class IntroActivity extends BaseFragment implements NotificationCenter.No
         loginView.bindParentActivity(getParentActivity(), currentAccount, new LoginView.OnSignUpButtonPressed() {
             @Override
             public void onSignUp(TLRPC.TL_ssgrams_signUp req) {
+                loginView.signUpButton.showLoading();
                 ConnectionsManager.getInstance(currentAccount).sendRequest(req, (response, error) -> AndroidUtilities.runOnUIThread(() -> {
+                    loginView.signUpButton.hideLoading();
                     Log.e("LoginView", "response --------> " + response);
                     if (response instanceof TLRPC.TL_auth_authorization) {
-//                    hidePrivacyView();
-//                    showDoneButton(false, true);
                         fragmentView.postDelayed(() -> {
-//                        needHideProgress(false, false);
                             AndroidUtilities.hideKeyboard(fragmentView.findFocus());
                             onAuthSuccess((TLRPC.TL_auth_authorization) response, true);
-//                        if (avatarBig != null) {
-//                            TLRPC.FileLocation avatar = avatarBig;
-//                            Utilities.cacheClearQueue.postRunnable(() -> MessagesController.getInstance(currentAccount).uploadAndApplyUserAvatar(avatar));
-//                        }
                         }, 150);
                     } else {
-//                        needHideProgress(false);
                         if (error.text.contains("PHONE_NUMBER_INVALID")) {
                             needShowAlert(getString(R.string.RestorePasswordNoEmailTitle), getString("InvalidPhoneNumber", R.string.InvalidPhoneNumber));
                         } else if (error.text.contains("PHONE_CODE_EMPTY") || error.text.contains("PHONE_CODE_INVALID")) {
                             needShowAlert(getString(R.string.RestorePasswordNoEmailTitle), getString("InvalidCode", R.string.InvalidCode));
                         } else if (error.text.contains("PHONE_CODE_EXPIRED")) {
-//                            onBackPressed(true);
-//                            setPage(VIEW_PHONE_INPUT, true, null, true);
                             needShowAlert(getString(R.string.RestorePasswordNoEmailTitle), getString("CodeExpired", R.string.CodeExpired));
                         } else if (error.text.contains("FIRSTNAME_INVALID")) {
                             needShowAlert(getString(R.string.RestorePasswordNoEmailTitle), getString("InvalidFirstName", R.string.InvalidFirstName));
@@ -457,6 +456,22 @@ public class IntroActivity extends BaseFragment implements NotificationCenter.No
                         }
                     }
                 }), ConnectionsManager.RequestFlagWithoutLogin | ConnectionsManager.RequestFlagFailOnServerErrors);
+            }
+
+            @Override
+            public void onSignIn(TLRPC.TL_ssgrams_signIn req) {
+                loginView.signInButton.showLoading();
+                int reqId = ConnectionsManager.getInstance(currentAccount).sendRequest(req, (response, error) -> AndroidUtilities.runOnUIThread(() -> {
+                    loginView.signInButton.hideLoading();
+
+                    if (error == null) {
+                        if (response instanceof TLRPC.TL_auth_authorizationSignUpRequired) {} else {
+                            onAuthSuccess((TLRPC.TL_auth_authorization) response);
+                        }
+                    } else {
+                        lastError = error.text;
+                    }
+                }), ConnectionsManager.RequestFlagFailOnServerErrors | ConnectionsManager.RequestFlagWithoutLogin);
             }
         });
 

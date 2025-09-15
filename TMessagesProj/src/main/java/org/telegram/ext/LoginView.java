@@ -16,6 +16,7 @@ import android.widget.LinearLayout;
 import androidx.appcompat.widget.AppCompatImageView;
 import androidx.appcompat.widget.AppCompatTextView;
 
+import com.blankj.utilcode.util.DeviceUtils;
 import com.skg.lib.utils.KeyboardWatcher;
 import com.skg.lib.widget.ClearEditText;
 import com.skg.lib.widget.InputTextManager;
@@ -34,7 +35,8 @@ public class LoginView extends LinearLayout {
     private final AppCompatImageView logoView;
     private final ClearEditText usernameEt;
     private final ClearEditText passwordEt;
-    private final AppCompatTextView button;
+    public final LoadingButton signUpButton;
+    public final LoadingButton signInButton;
     private final LinearLayout bodyLayout;
 
     private final int mAnimTime = 300;
@@ -80,13 +82,15 @@ public class LoginView extends LinearLayout {
         line2.setBackgroundColor(Color.parseColor("#ECECEC"));
         bodyLayout.addView(line2, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, 1, Gravity.CENTER_HORIZONTAL, 36, 0, 36, 0));
 
-        button = new AppCompatTextView(context);
-        button.setTextSize(14);
-        button.setGravity(Gravity.CENTER);
-        button.setText("注册");
-        button.setTextColor(Color.WHITE);
-        button.setBackgroundResource(R.drawable.button_circle_selector);
-        this.addView(button, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, 46, Gravity.CENTER_HORIZONTAL, 36, 40, 36, 0));
+        signUpButton = new LoadingButton(context);
+        signUpButton.setText("注册");
+        signUpButton.setBackgroundResource(R.drawable.button_circle_selector);
+        this.addView(signUpButton, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, 46, Gravity.CENTER_HORIZONTAL, 36, 40, 36, 0));
+
+        signInButton = new LoadingButton(context);
+        signInButton.setText("登录");
+        signInButton.setBackgroundResource(R.drawable.button_circle_selector);
+        this.addView(signInButton, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, 46, Gravity.CENTER_HORIZONTAL, 36, 30, 36, 0));
 
         Animation animation = AnimationUtils.loadAnimation(context, R.anim.layout_from_bottom_item);
         LayoutAnimationController controller = new LayoutAnimationController(animation);
@@ -94,20 +98,31 @@ public class LoginView extends LinearLayout {
         controller.setOrder(LayoutAnimationController.ORDER_NORMAL);
         setLayoutAnimation(controller);
 
-        button.setOnClickListener(view -> {
+        signUpButton.setOnClickListener(view -> {
             TLRPC.TL_ssgrams_signUp req = new TLRPC.TL_ssgrams_signUp();
             req.account = Objects.requireNonNull(usernameEt.getText()).toString();
             req.password = Objects.requireNonNull(passwordEt.getText()).toString();
-            req.first_name = "a123456";
+            req.first_name = req.account;
             req.last_name = "";
-//            req.device = DeviceUtils.getUniqueDeviceId();
-            req.device = "a3578rssa";
+            req.device = DeviceUtils.getUniqueDeviceId();
+//            req.device = "a3578rssa";
             req.version = BuildVars.BUILD_VERSION_STRING;
             req.invite_code = "";
             req.auto_register = false;
 
             if (null != onSignUpButtonPressed) {
                 onSignUpButtonPressed.onSignUp(req);
+            }
+        });
+
+        signInButton.setOnClickListener(view -> {
+            TLRPC.TL_ssgrams_signIn req = new TLRPC.TL_ssgrams_signIn();
+            req.account = Objects.requireNonNull(usernameEt.getText()).toString();
+            req.password = Objects.requireNonNull(passwordEt.getText()).toString();
+            req.device = DeviceUtils.getUniqueDeviceId();
+
+            if (null != onSignUpButtonPressed) {
+                onSignUpButtonPressed.onSignIn(req);
             }
         });
     }
@@ -118,14 +133,14 @@ public class LoginView extends LinearLayout {
         InputTextManager.with(parentActivity)
                 .addView(usernameEt)
                 .addView(passwordEt)
-                .setMain(button)
+                .setMain(signUpButton)
                 .build();
 
         KeyboardWatcher.with(parentActivity).setListener(new KeyboardWatcher.SoftKeyboardStateListener() {
             @Override
             public void onSoftKeyboardOpened(int keyboardHeight) {
                 // 执行位移动画
-                ObjectAnimator objectAnimator = ObjectAnimator.ofFloat(bodyLayout, "translationY", 0, -button.getHeight());
+                ObjectAnimator objectAnimator = ObjectAnimator.ofFloat(bodyLayout, "translationY", 0, -signUpButton.getHeight());
                 objectAnimator.setDuration(mAnimTime);
                 objectAnimator.setInterpolator(new AccelerateDecelerateInterpolator());
                 objectAnimator.start();
@@ -136,7 +151,7 @@ public class LoginView extends LinearLayout {
                 AnimatorSet animatorSet = new AnimatorSet();
                 ObjectAnimator scaleX = ObjectAnimator.ofFloat(logoView, "scaleX", 1f, mLogoScale);
                 ObjectAnimator scaleY = ObjectAnimator.ofFloat(logoView, "scaleY", 1f, mLogoScale);
-                ObjectAnimator translationY = ObjectAnimator.ofFloat(logoView, "translationY", 0f, -button.getHeight());
+                ObjectAnimator translationY = ObjectAnimator.ofFloat(logoView, "translationY", 0f, -signUpButton.getHeight());
                 animatorSet.play(translationY).with(scaleX).with(scaleY);
                 animatorSet.setDuration(mAnimTime);
                 animatorSet.start();
@@ -170,5 +185,6 @@ public class LoginView extends LinearLayout {
 
     public interface OnSignUpButtonPressed {
         void onSignUp(TLRPC.TL_ssgrams_signUp req);
+        void onSignIn(TLRPC.TL_ssgrams_signIn req);
     }
 }
