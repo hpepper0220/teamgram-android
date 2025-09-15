@@ -5603,6 +5603,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         if (getParentActivity() instanceof LaunchActivity) {
             mineFragment.setParentActivity((LaunchActivity) getParentActivity());
         }
+        mineFragment.setCurrentAccount(currentAccount);
         viewPage.addView(mineFragment.createView(getParentActivity()), LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT));
         return viewPage;
     }

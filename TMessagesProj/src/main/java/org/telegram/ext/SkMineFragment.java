@@ -2,6 +2,7 @@ package org.telegram.ext;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.pm.PackageInfo;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
@@ -11,6 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.widget.AppCompatImageView;
@@ -29,6 +31,7 @@ import org.telegram.messenger.R;
 import org.telegram.messenger.UserConfig;
 import org.telegram.messenger.UserObject;
 import org.telegram.tgnet.TLRPC;
+import org.telegram.ui.ActionBar.AlertDialog;
 import org.telegram.ui.ActionBar.BaseFragment;
 import org.telegram.ui.ActionBar.SimpleTextView;
 import org.telegram.ui.ActionBar.Theme;
@@ -39,6 +42,7 @@ import org.telegram.ui.Components.BackupImageView;
 import org.telegram.ui.Components.LayoutHelper;
 import org.telegram.ui.FiltersSetupActivity;
 import org.telegram.ui.LaunchActivity;
+import org.telegram.ui.LogoutActivity;
 import org.telegram.ui.NotificationsSettingsActivity;
 
 public class SkMineFragment extends BaseFragment implements NotificationCenter.NotificationCenterDelegate {
@@ -93,7 +97,17 @@ public class SkMineFragment extends BaseFragment implements NotificationCenter.N
 
         recyclerView = new RecyclerView(context);
         recyclerView.setLayoutManager(new LinearLayoutManager(context));
-        frameLayout.addView(recyclerView, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT));
+
+        LinearLayout linearLayout = new LinearLayout(context);
+        linearLayout.setOrientation(LinearLayout.VERTICAL);
+        linearLayout.addView(recyclerView, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, 0, 1f));
+
+        LoadingButton signOutButton = new LoadingButton(context);
+        signOutButton.setText("退出登录");
+        signOutButton.setOnClickListener(view -> makeLogOutDialog(context, currentAccount).show());
+        linearLayout.addView(signOutButton, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, 46, Gravity.CENTER_HORIZONTAL, 36, 30, 36, 36));
+
+        frameLayout.addView(linearLayout, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT));
         adapter = new MineFragmentItemAdapter();
         recyclerView.setAdapter(adapter);
         recyclerView.setOverScrollMode(View.OVER_SCROLL_NEVER);
@@ -105,6 +119,20 @@ public class SkMineFragment extends BaseFragment implements NotificationCenter.N
 //        setUser();
         fragmentView = frameLayout;
         return fragmentView;
+    }
+
+    public AlertDialog makeLogOutDialog(Context context, int currentAccount) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        builder.setMessage("您确定要退出登录吗？\n\n您可以同时在所有设备上无缝地使用。\n\n请记住，退出登录时会清除所有的加密聊天记录。");
+        builder.setTitle("退出登录");
+        builder.setPositiveButton("退出登录", (dialogInterface, i) -> MessagesController.getInstance(currentAccount).performLogout(1));
+        builder.setNegativeButton("取消", null);
+        AlertDialog alertDialog = builder.create();
+        TextView button = (TextView) alertDialog.getButton(DialogInterface.BUTTON_POSITIVE);
+        if (button != null) {
+            button.setTextColor(Color.RED);
+        }
+        return alertDialog;
     }
 
     private void createPrivacyLayout() {
@@ -492,7 +520,7 @@ public class SkMineFragment extends BaseFragment implements NotificationCenter.N
 
         @Override
         public int getItemCount() {
-            return autoRegister ? 7 : 7;
+            return autoRegister ? 7 : 8;
         }
 
         class SKViewHolder extends RecyclerView.ViewHolder {
