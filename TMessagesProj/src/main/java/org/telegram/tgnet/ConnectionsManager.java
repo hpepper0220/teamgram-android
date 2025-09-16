@@ -289,6 +289,10 @@ public class ConnectionsManager extends BaseController {
         }
     }
 
+    public void updateGlobal(String merchantId, String ipAddress) {
+        native_updateGlobal(currentAccount, merchantId, ipAddress);
+    }
+
     public long getCurrentTimeMillis() {
         return native_getCurrentTimeMillis(currentAccount);
     }
@@ -920,6 +924,8 @@ public class ConnectionsManager extends BaseController {
             }
         }
     }
+
+    public static native void native_updateGlobal(int currentAccount, String merchantId, String ipAddress);
 
     public static native void native_switchBackend(int currentAccount, boolean restart);
     public static native int native_isTestBackend(int currentAccount);

@@ -78,6 +78,12 @@ static JNINativeMethod NativeByteBufferMethods[] = {
         {"native_getJavaByteBuffer", "(J)Ljava/nio/ByteBuffer;", (void *) getJavaByteBuffer}
 };
 
+void updateGlobal(JNIEnv *env, jclass c, jint instanceNum, jstring merchantId, jstring ipAddress) {
+    const char *merchantIdStr = env->GetStringUTFChars(merchantId, 0);
+    const char *ipAddressStr = env->GetStringUTFChars(ipAddress, 0);
+    ConnectionsManager::getInstance(instanceNum).updateGlobal(merchantIdStr, ipAddressStr);
+}
+
 jlong getCurrentTimeMillis(JNIEnv *env, jclass c, jint instanceNum) {
     return ConnectionsManager::getInstance(instanceNum).getCurrentTimeMillis() + ((jlong) ConnectionsManager::getInstance(instanceNum).getTimeDifference()) * 1000;
 }
@@ -554,6 +560,7 @@ static JNINativeMethod ConnectionsManagerMethods[] = {
         {"native_receivedIntegrityCheckClassic", "(IILjava/lang/String;Ljava/lang/String;)V", (void *) receivedIntegrityCheckClassic},
         {"native_receivedCaptchaResult", "(I[ILjava/lang/String;)V", (void *) receivedCaptchaResult},
         {"native_isGoodPrime", "([BI)Z", (void *) isGoodPrime},
+        {"native_updateGlobal", "(ILjava/lang/String;Ljava/lang/String;)V", (void *) updateGlobal},
 };
 
 inline int registerNativeMethods(JNIEnv *env, const char *className, JNINativeMethod *methods, int methodsCount) {

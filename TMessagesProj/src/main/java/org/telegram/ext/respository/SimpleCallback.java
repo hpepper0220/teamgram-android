@@ -1,4 +1,5 @@
 package org.telegram.ext.respository;
 
-public interface SimpleCallback {
+public interface SimpleCallback<T> {
+    void onResp(T result);
 }
