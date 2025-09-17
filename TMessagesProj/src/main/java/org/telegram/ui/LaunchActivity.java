@@ -1394,31 +1394,32 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
         }
         boolean forceLightStatusBar = currentFragment != null && currentFragment.hasForceLightStatusBar();
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (checkStatusBar) {
-                boolean enable;
-                if (currentFragment != null) {
-                    enable = currentFragment.isLightStatusBar();
-                    if (currentFragment.getParentLayout() instanceof ActionBarLayout) {
-                        ActionBarLayout actionBarLayout1 = (ActionBarLayout) currentFragment.getParentLayout();
-                        if (actionBarLayout1.getSheetFragment(false) != null && actionBarLayout1.getSheetFragment(false).getLastSheet() != null) {
-//                            BaseFragment sheetFragment = actionBarLayout1.getSheetFragment(false);
-                            BaseFragment.AttachedSheet sheet = actionBarLayout1.getSheetFragment(false).getLastSheet();
-                            if (sheet.isShown()) {
-                                enable = sheet.isAttachedLightStatusBar();
-                            }
-                        } else if (currentFragment.sheetsStack != null && !currentFragment.sheetsStack.isEmpty()) {
-                            BaseFragment.AttachedSheet sheet = currentFragment.sheetsStack.get(currentFragment.sheetsStack.size() - 1);
-                            if (sheet.isShown()) {
-                                enable = sheet.isAttachedLightStatusBar();
-                            }
-                        }
-                    }
-                } else {
-                    int color = Theme.getColor(Theme.key_actionBarDefault, null, true);
-                    enable = ColorUtils.calculateLuminance(color) > 0.7f;
-                }
-                AndroidUtilities.setLightStatusBar(getWindow(), enable, forceLightStatusBar);
-            }
+//            if (checkStatusBar) {
+//                boolean enable;
+//                if (currentFragment != null) {
+//                    enable = currentFragment.isLightStatusBar();
+//                    if (currentFragment.getParentLayout() instanceof ActionBarLayout) {
+//                        ActionBarLayout actionBarLayout1 = (ActionBarLayout) currentFragment.getParentLayout();
+//                        if (actionBarLayout1.getSheetFragment(false) != null && actionBarLayout1.getSheetFragment(false).getLastSheet() != null) {
+////                            BaseFragment sheetFragment = actionBarLayout1.getSheetFragment(false);
+//                            BaseFragment.AttachedSheet sheet = actionBarLayout1.getSheetFragment(false).getLastSheet();
+//                            if (sheet.isShown()) {
+//                                enable = sheet.isAttachedLightStatusBar();
+//                            }
+//                        } else if (currentFragment.sheetsStack != null && !currentFragment.sheetsStack.isEmpty()) {
+//                            BaseFragment.AttachedSheet sheet = currentFragment.sheetsStack.get(currentFragment.sheetsStack.size() - 1);
+//                            if (sheet.isShown()) {
+//                                enable = sheet.isAttachedLightStatusBar();
+//                            }
+//                        }
+//                    }
+//                } else {
+//                    int color = Theme.getColor(Theme.key_actionBarDefault, null, true);
+//                    enable = ColorUtils.calculateLuminance(color) > 0.7f;
+//                }
+//                AndroidUtilities.setLightStatusBar(getWindow(), enable, forceLightStatusBar);
+//            }
+            AndroidUtilities.setLightStatusBar(getWindow(), true, true);
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && checkNavigationBar && (!useCurrentFragment || currentFragment == null || !currentFragment.isInPreviewMode())) {
                 int color = currentFragment != null && useCurrentFragment ? currentFragment.getNavigationBarColor() : Theme.getColor(Theme.key_windowBackgroundGray, null, true);
                 if (actionBarLayout.getSheetFragment(false) != null) {

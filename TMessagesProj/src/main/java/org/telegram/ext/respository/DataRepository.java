@@ -2,12 +2,15 @@ package org.telegram.ext.respository;
 
 import android.util.Log;
 
+import androidx.annotation.NonNull;
+
 import com.google.gson.Gson;
 
 import org.telegram.ext.model.IpApiResponse;
 import org.telegram.messenger.AndroidUtilities;
 
 import java.io.IOException;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 import okhttp3.Call;
@@ -47,22 +50,18 @@ public class DataRepository {
         Request request = new Request.Builder().url(url).build();
         client.newCall(request).enqueue(new Callback() {
             @Override
-            public void onFailure(Call call, IOException e) {
+            public void onFailure(@NonNull Call call, @NonNull IOException e) {
                 Log.e("getIpAddress", "error  -------> " + e.toString());
-//                runOnUiThread(() -> textView.setText("网络失败: " + e.getMessage()));
             }
 
             @Override
-            public void onResponse(Call call, Response response) throws IOException {
-                String body = response.body().string();
+            public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
+                String body = Objects.requireNonNull(response.body()).string();
                 Gson gson = new Gson();
                 IpApiResponse info = gson.fromJson(body, IpApiResponse.class);
-                AndroidUtilities.runOnUIThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        Log.e("getIpAddress", "info  -------> " + info.toString());
-                        callback.onResp(info);
-                    }
+                AndroidUtilities.runOnUIThread(() -> {
+                    Log.e("getIpAddress", "info  -------> " + info.toString());
+                    callback.onResp(info);
                 });
             }
         });

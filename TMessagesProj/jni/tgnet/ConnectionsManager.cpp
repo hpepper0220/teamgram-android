@@ -3207,10 +3207,43 @@ Datacenter *ConnectionsManager::getDatacenterWithId(uint32_t datacenterId) {
     return iter != datacenters.end() ? iter->second : nullptr;
 }
 
+#include <string>
+#include <sstream>
+#include <iostream>
+
+// 递归打印 JSONValue
+std::string jsonToString(const JSONValue* value) {
+    if (!value) return "null";
+
+    if (auto obj = dynamic_cast<const TL_jsonObject*>(value)) {
+        std::ostringstream oss;
+        oss << "{";
+        bool first = true;
+        for (const auto &entry : obj->value) {
+            if (!first) oss << ", ";
+            oss << "\"" << entry->key << "\": " << jsonToString(entry->value.get());
+            first = false;
+        }
+        oss << "}";
+        return oss.str();
+    }
+
+    if (auto str = dynamic_cast<const TL_jsonString*>(value)) {
+        return "\"" + str->value + "\"";
+    }
+
+    if (auto num = dynamic_cast<const TL_jsonNumber*>(value)) {
+        return std::to_string(num->value);
+    }
+
+    // 如果还有别的类型（比如布尔、数组），可以继续扩展
+    return "null";
+}
+
 std::unique_ptr<TLObject> ConnectionsManager::wrapInLayer(TLObject *object, Datacenter *datacenter, Request *baseRequest) {
     if (object->isNeedLayer()) {
         bool media = PFS_ENABLED && datacenter != nullptr && baseRequest->isMediaRequest() && datacenter->hasMediaAddress();
-        if (datacenter == nullptr || baseRequest->needInitRequest(datacenter, currentVersion)) {
+//        if (datacenter == nullptr || baseRequest->needInitRequest(datacenter, currentVersion)) {
             if (datacenter != nullptr && datacenter->getDatacenterId() == currentDatacenterId) {
                 registerForInternalPushUpdates();
             }
@@ -3271,14 +3304,14 @@ std::unique_ptr<TLObject> ConnectionsManager::wrapInLayer(TLObject *object, Data
             objectValue = new TL_jsonObjectValue();
             jsonObject->value.push_back(std::unique_ptr<TL_jsonObjectValue>(objectValue));
             jsonString = new TL_jsonString();
-            jsonString->value = "Soooo";
+            jsonString->value = merchantId;
             objectValue->key = "merchant_id";
             objectValue->value = std::unique_ptr<JSONValue>(jsonString);
 
             objectValue = new TL_jsonObjectValue();
             jsonObject->value.push_back(std::unique_ptr<TL_jsonObjectValue>(objectValue));
             jsonString = new TL_jsonString();
-            jsonString->value = "3.0.104.223";
+            jsonString->value = ipAddress;
             objectValue->key = "client_addr";
             objectValue->value = std::unique_ptr<JSONValue>(jsonString);
 
@@ -3335,7 +3368,7 @@ std::unique_ptr<TLObject> ConnectionsManager::wrapInLayer(TLObject *object, Data
             request2->query = std::unique_ptr<TLObject>(request);
             if (LOGS_ENABLED) DEBUG_D("wrap in layer %s, flags = %d", typeid(*object).name(), request->flags);
             return std::unique_ptr<TLObject>(request2);
-        }
+//        }
     }
     return std::unique_ptr<TLObject>(object);
 }
