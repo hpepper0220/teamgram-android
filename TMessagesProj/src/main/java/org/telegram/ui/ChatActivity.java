@@ -3777,6 +3777,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                 openSearchWithText(isSupportedTags() ? "" : null);
             }
         };
+        avatarContainer.setTitleColors(Color.BLACK, Color.GRAY);
         avatarContainer.allowShorterStatus = true;
         avatarContainer.premiumIconHiddable = true;
         avatarContainer.allowDrawStories = dialog_id < 0 && !isTopic;
@@ -8599,6 +8600,8 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         }
 
         Timer.finish(t);
+
+        actionBar.setBackgroundColor(Color.WHITE);
 
         return fragmentView;
     }
@@ -36283,6 +36286,9 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
             searchingChatMessages = null;
             searchingHashtag = null;
 			searchItem.setSearchFieldHint(isSupportedTags() ? LocaleController.getString(R.string.SavedTagSearchHint) : LocaleController.getString(R.string.Search));
+            searchItem.getSearchField().setTextColor(Color.BLACK);
+            searchItem.getSearchField().setHintTextColor(Color.BLACK);
+            searchItem.getSearchField().setCursorColor(Color.BLACK);
             searchItem.setSearchFieldCaption(null);
             AndroidUtilities.updateViewVisibilityAnimated(avatarContainer, true, 0.95f, true);
             if (editTextItem != null && editTextItem.getTag() != null) {

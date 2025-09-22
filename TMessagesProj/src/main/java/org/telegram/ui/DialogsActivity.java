@@ -54,6 +54,7 @@ import android.text.TextPaint;
 import android.text.TextUtils;
 import android.transition.ChangeBounds;
 import android.transition.TransitionManager;
+import android.util.Log;
 import android.util.LongSparseArray;
 import android.util.Property;
 import android.util.StateSet;
@@ -94,9 +95,14 @@ import androidx.viewpager.widget.PagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 import androidx.viewpager2.widget.ViewPager2;
 
+import com.blankj.utilcode.util.ObjectUtils;
+
 import org.checkerframework.common.subtyping.qual.Bottom;
 import org.telegram.ext.BottomItemView;
+import org.telegram.ext.SkContactsFragment;
+import org.telegram.ext.SkDiscoveryFragment;
 import org.telegram.ext.SkMineFragment;
+import org.telegram.ext.respository.SkRepository;
 import org.telegram.messenger.AccountInstance;
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.AnimationNotificationsLocker;
@@ -372,11 +378,13 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
 
         @Override
         protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-            FrameLayout.LayoutParams lp = (LayoutParams) listView.getLayoutParams();
-            if (animateStoriesView) {
-                lp.bottomMargin = -dp(85);
-            } else {
-                lp.bottomMargin = 0;
+            if (null != listView && null != listView.getLayoutParams()) {
+                FrameLayout.LayoutParams lp = (LayoutParams) listView.getLayoutParams();
+                if (animateStoriesView) {
+                    lp.bottomMargin = -dp(85);
+                } else {
+                    lp.bottomMargin = 0;
+                }
             }
             super.onMeasure(widthMeasureSpec, heightMeasureSpec);
         }
@@ -670,6 +678,8 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
     private ViewPage conversationListPage;
     private PageNavigationView pageNavigationView;
     private List<String> mTitleList = new ArrayList<>();
+    private SkContactsFragment contactsFragment;
+    private SkDiscoveryFragment discoveryFragment;
     private SkMineFragment mineFragment;
 
     public final Property<DialogsActivity, Float> SCROLL_Y = new AnimationProperties.FloatProperty<DialogsActivity>("animationValue") {
@@ -4257,8 +4267,8 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
 
                 List<FrameLayout> contentViewList = new ArrayList<>();
                 contentViewList.add(conversationListPage);
-                contentViewList.add(new FrameLayout(context));
-                contentViewList.add(new FrameLayout(context));
+                contentViewList.add(createContactsFragment(context));
+                contentViewList.add(createDiscoveryFragment(context));
                 contentViewList.add(createMineFragment(context));
 
                 NavigationController navigationController = customBuilder.build();
@@ -4271,12 +4281,15 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                         if (index == 0) {
                             mainViewContainer.setPadding(0, topPadding, 0, 0);
                             actionBar.setVisibility(View.VISIBLE);
+                            searchItem.setVisibility(View.VISIBLE);
                         } else if (index == 1) {
                             mainViewContainer.setPadding(0, topPadding, 0, 0);
                             actionBar.setVisibility(View.VISIBLE);
+                            searchItem.setVisibility(View.GONE);
                         } else if (index == 2) {
                             mainViewContainer.setPadding(0, topPadding, 0, 0);
                             actionBar.setVisibility(View.VISIBLE);
+                            searchItem.setVisibility(View.GONE);
                         } else {
                             mainViewContainer.setPadding(0, 0, 0, 0);
                             actionBar.setVisibility(View.GONE);
@@ -5593,7 +5606,30 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         actionBar.setTitleColor(Color.BLACK);
 //        AndroidUtilities.setLightStatusBar(((Activity) getContext()).getWindow(), true);
 
+        AndroidUtilities.requestAdjustResize(getParentActivity(), classGuid);
+
         return fragmentView;
+    }
+
+    private ViewPage createContactsFragment(Context context) {
+        ViewPage viewPage = new ViewPage(context);
+        contactsFragment = new SkContactsFragment();
+        contactsFragment.onFragmentCreate();
+        if (getParentActivity() instanceof LaunchActivity) {
+            contactsFragment.setParentActivity((LaunchActivity) getParentActivity());
+        }
+        contactsFragment.setCurrentAccount(currentAccount);
+        viewPage.addView(contactsFragment.createView(getParentActivity()), LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT));
+        return viewPage;
+    }
+
+    private FrameLayout createDiscoveryFragment(Context context) {
+        FrameLayout viewPage = new FrameLayout(context);
+        discoveryFragment = new SkDiscoveryFragment();
+        discoveryFragment.onFragmentCreate();
+        discoveryFragment.setCurrentAccount(currentAccount);
+        viewPage.addView(discoveryFragment.createView(getParentActivity()), LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT));
+        return viewPage;
     }
 
     private FrameLayout createMineFragment(Context context) {

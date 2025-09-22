@@ -493,6 +493,8 @@ public class IntroActivity extends BaseFragment implements NotificationCenter.No
 
 //        scrollView.addView(frameContainerView, LayoutHelper.createScroll(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, Gravity.LEFT | Gravity.TOP));
 
+        AndroidUtilities.requestAdjustNothing(getParentActivity(), classGuid);
+
         return fragmentView;
     }
 

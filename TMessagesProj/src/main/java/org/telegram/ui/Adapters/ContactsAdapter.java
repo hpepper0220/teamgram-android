@@ -359,7 +359,7 @@ public class ContactsAdapter extends RecyclerListView.SectionsAdapter {
                 if (isAdmin) {
                     return 2;
                 } else if (needPhonebook) {
-                    return 2;
+                    return 1;
                 } else {
                     return 4;
                 }
@@ -383,9 +383,9 @@ public class ContactsAdapter extends RecyclerListView.SectionsAdapter {
                 }
             }
         }
-        if (needPhonebook) {
-            return ContactsController.getInstance(currentAccount).phoneBookContacts.size();
-        }
+//        if (needPhonebook) {
+//            return ContactsController.getInstance(currentAccount).phoneBookContacts.size();
+//        }
         return 0;
     }
 
@@ -564,7 +564,8 @@ public class ContactsAdapter extends RecyclerListView.SectionsAdapter {
                 if (section == 0) {
                     if (needPhonebook) {
                         if (position == 0) {
-                            textCell.setTextAndIcon(LocaleController.getString(R.string.InviteFriends), R.drawable.msg_invite, false);
+//                            textCell.setTextAndIcon(LocaleController.getString(R.string.InviteFriends), R.drawable.msg_invite, false);
+                            textCell.setTextAndIcon("添加好友", R.drawable.msg_invite, false);
                         }
                     } else if (isAdmin) {
                         if (isChannel) {

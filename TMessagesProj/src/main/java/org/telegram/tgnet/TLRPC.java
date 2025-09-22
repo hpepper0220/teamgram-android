@@ -71360,4 +71360,54 @@ public class TLRPC {
         }
     }
 
+    public static class TL_ssgrams_getDiscoverPage extends TLObject {
+        public static final int constructor = 0xa701f4d0;
+
+        public TLObject deserializeResponse(InputSerializedData stream, int constructor, boolean exception) {
+            return TL_discoverPage.TLdeserialize(stream, constructor, exception);
+        }
+
+        public void serializeToStream(OutputSerializedData stream) {
+            stream.writeInt32(constructor);
+        }
+    }
+
+    public static class TL_discoverPage extends TLObject {
+        public static final int constructor = 0xad5e2a8e;
+
+        public long id;
+        public String title;
+        public String logo;
+        public String url;
+
+        public static TL_discoverPage TLdeserialize(InputSerializedData stream, int constructor, boolean exception) {
+            TL_discoverPage result = null;
+            if (constructor == 0xad5e2a8e) {
+                result = new TL_discoverPage();
+            }
+            if (result == null && exception) {
+                throw new RuntimeException(String.format("can't parse magic %x in TL_discoverPage", constructor));
+            }
+            if (null != result) {
+                result.readParams(stream, exception);
+            }
+            return result;
+        }
+
+        public void readParams(AbstractSerializedData stream, boolean exception) {
+            id = stream.readInt64(exception);
+            title = stream.readString(exception);
+            logo = stream.readString(exception);
+            url = stream.readString(exception);
+        }
+
+        public void serializeToStream(AbstractSerializedData stream) {
+            stream.writeInt32(constructor);
+            stream.writeInt64(id);
+            stream.writeString(title);
+            stream.writeString(logo);
+            stream.writeString(url);
+        }
+    }
+
 }

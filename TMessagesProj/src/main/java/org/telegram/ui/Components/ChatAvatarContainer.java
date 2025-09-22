@@ -254,6 +254,7 @@ public class ChatAvatarContainer extends FrameLayout implements NotificationCent
 
         titleTextView = new SimpleTextConnectedView(context, titleTextLargerCopyView);
         titleTextView.setEllipsizeByGradient(true);
+//        titleTextView.setTextColor(getThemedColor(Theme.key_actionBarDefaultTitle));
         titleTextView.setTextColor(getThemedColor(Theme.key_actionBarDefaultTitle));
         titleTextView.setTextSize(18);
         titleTextView.setGravity(Gravity.LEFT);
@@ -1102,7 +1103,8 @@ public class ChatAvatarContainer extends FrameLayout implements NotificationCent
             useOnlineColor = true;
             setTypingAnimation(true);
         }
-        lastSubtitleColorKey = useOnlineColor ? Theme.key_chat_status : Theme.key_actionBarDefaultSubtitle;
+//        lastSubtitleColorKey = useOnlineColor ? Theme.key_chat_status : Theme.key_actionBarDefaultSubtitle;
+        lastSubtitleColorKey = useOnlineColor ? Theme.key_chat_status : Theme.key_dialogTextGray3;
         if (lastSubtitle == null) {
             if (subtitleTextView != null) {
                 subtitleTextView.setText(newSubtitle);
