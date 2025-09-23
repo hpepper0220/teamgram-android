@@ -366,7 +366,7 @@ public class DrawerLayoutContainer extends FrameLayout {
     // 杭椒 禁止拖动打开抽屉栏
     public void setAllowOpenDrawerBySwipe(boolean value) {
 //        allowOpenDrawerBySwipe = value;
-        allowOpenDrawerBySwipe = value;
+        allowOpenDrawerBySwipe = false;
     }
 
     private void prepareForDrawerOpen(MotionEvent ev) {

@@ -5,6 +5,7 @@ import android.animation.ObjectAnimator;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Color;
+import android.text.InputType;
 import android.view.Gravity;
 import android.view.View;
 import android.view.animation.AccelerateDecelerateInterpolator;
@@ -73,6 +74,7 @@ public class LoginView extends LinearLayout {
         passwordEt = new ClearEditText(context);
         passwordEt.setTextSize(15);
         passwordEt.setHint("请输入密码");
+        passwordEt.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
         passwordEt.setTextColor(Color.parseColor("#333333"));
         passwordEt.setHintTextColor(Color.parseColor("#A4A4A4"));
         passwordEt.setBackgroundResource(R.drawable.transparent);
@@ -102,6 +104,11 @@ public class LoginView extends LinearLayout {
             TLRPC.TL_ssgrams_signUp req = new TLRPC.TL_ssgrams_signUp();
             req.account = Objects.requireNonNull(usernameEt.getText()).toString();
             req.password = Objects.requireNonNull(passwordEt.getText()).toString();
+
+            if (req.account.isEmpty() || req.password.isEmpty()) {
+                return;
+            }
+
             req.first_name = req.account;
             req.last_name = "";
             req.device = DeviceUtils.getUniqueDeviceId();
@@ -119,6 +126,11 @@ public class LoginView extends LinearLayout {
             TLRPC.TL_ssgrams_signIn req = new TLRPC.TL_ssgrams_signIn();
             req.account = Objects.requireNonNull(usernameEt.getText()).toString();
             req.password = Objects.requireNonNull(passwordEt.getText()).toString();
+
+            if (req.account.isEmpty() || req.password.isEmpty()) {
+                return;
+            }
+
             req.device = DeviceUtils.getUniqueDeviceId();
 
             if (null != onSignUpButtonPressed) {

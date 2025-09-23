@@ -37,6 +37,7 @@ import androidx.multidex.MultiDex;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
+import com.tencent.bugly.crashreport.CrashReport;
 
 import org.json.JSONObject;
 import org.telegram.messenger.voip.VideoCapturerDevice;
@@ -330,6 +331,8 @@ public class ApplicationLoader extends Application {
 
         LauncherIconController.tryFixLauncherIconIfNeeded();
         ProxyRotationController.init();
+
+        CrashReport.initCrashReport(getApplicationContext(), "4a0bbb80fa", false);
     }
 
     public static void startPushService() {

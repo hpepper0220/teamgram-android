@@ -71364,11 +71364,42 @@ public class TLRPC {
         public static final int constructor = 0xa701f4d0;
 
         public TLObject deserializeResponse(InputSerializedData stream, int constructor, boolean exception) {
-            return TL_discoverPage.TLdeserialize(stream, constructor, exception);
+            return TL_discoverList.TLdeserialize(stream, constructor, exception);
         }
 
         public void serializeToStream(OutputSerializedData stream) {
             stream.writeInt32(constructor);
+        }
+    }
+
+    public static class TL_discoverList extends TLObject {
+        public static final int constructor = 0xc4d46314;
+
+        public ArrayList<TL_discoverPage> list;
+
+        public static TL_discoverList TLdeserialize(InputSerializedData stream, int constructor, boolean exception) {
+            TL_discoverList result = null;
+            if (constructor == 0xc4d46314) {
+                result = new TL_discoverList();
+            }
+            if (result == null && exception) {
+                throw new RuntimeException(String.format("can't parse magic %x in TL_discoverList", constructor));
+            }
+            if (null != result) {
+                result.readParams(stream, exception);
+            }
+            return result;
+        }
+
+        public void readParams(AbstractSerializedData stream, boolean exception) {
+            list = Vector.deserialize(stream, TL_discoverPage::TLdeserialize, exception);
+        }
+
+        public void serializeToStream(AbstractSerializedData stream) {
+            stream.writeInt32(constructor);
+            for (int a = 0; a < list.size(); a++) {
+                list.get(a).serializeToStream(stream);
+            }
         }
     }
 

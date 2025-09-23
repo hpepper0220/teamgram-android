@@ -51,4 +51,5 @@ dependencies {
     api "androidx.viewpager2:viewpager2:1.1.0"
     api "com.squareup.okhttp3:okhttp:4.11.0"
     api "com.google.code.gson:gson:2.10.1"
+    api 'com.tencent.bugly:crashreport:latest.release'
 }
