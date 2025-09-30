@@ -102,6 +102,8 @@ import org.telegram.ext.BottomItemView;
 import org.telegram.ext.SkContactsFragment;
 import org.telegram.ext.SkDiscoveryFragment;
 import org.telegram.ext.SkMineFragment;
+import org.telegram.ext.components.PopupCreator;
+import org.telegram.ext.config.SkMenuAction;
 import org.telegram.ext.respository.SkRepository;
 import org.telegram.messenger.AccountInstance;
 import org.telegram.messenger.AndroidUtilities;
@@ -681,6 +683,9 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
     private SkContactsFragment contactsFragment;
     private SkDiscoveryFragment discoveryFragment;
     private SkMineFragment mineFragment;
+
+    // 杭椒 menu菜单
+    private ActionBarMenuItem mPlusMenuItem;
 
     public final Property<DialogsActivity, Float> SCROLL_Y = new AnimationProperties.FloatProperty<DialogsActivity>("animationValue") {
         @Override
@@ -3124,7 +3129,8 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
             updatePasscodeButton();
             updateProxyButton(false, false);
         }
-        searchItem = menu.addItem(0, R.drawable.ic_ab_search).setIsSearchField(true, false).setActionBarMenuItemSearchListener(new ActionBarMenuItem.ActionBarMenuItemSearchListener() {
+        mPlusMenuItem = menu.addItem(SkMenuAction.plus, R.mipmap.ic_add_circle);
+        searchItem = menu.addItem(1000, R.drawable.ic_ab_search).setIsSearchField(true, false).setActionBarMenuItemSearchListener(new ActionBarMenuItem.ActionBarMenuItemSearchListener() {
             boolean isSpeedItemCreated = false;
 
             @Override
@@ -3295,6 +3301,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                 return !actionBar.isActionModeShowed() && databaseMigrationHint == null;// && !rightSlidingDialogContainer.hasFragment();
             }
         });
+        searchItem.setVisibility(View.GONE);
         searchItem.getSearchField().setTextColor(Color.BLACK);
         searchItem.getSearchField().setHintTextColor(Color.BLACK);
         searchItem.getSearchField().setCursorColor(Color.BLACK);
@@ -3729,7 +3736,9 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                     searchViewPager.onActionBarItemClick(id);
                     return;
                 }
-                if (id == -1) {
+                if (id == SkMenuAction.plus) {
+                    PopupCreator.createAddContactPopup(getParentActivity(), actionBar.getActionBarMenu(), v -> {});
+                } else if (id == -1) {
                     if (rightSlidingDialogContainer != null && rightSlidingDialogContainer.hasFragment()) {
                         if (actionBar.isActionModeShowed()) {
                             if (searchViewPager != null && searchViewPager.getVisibility() == View.VISIBLE && searchViewPager.actionModeShowing()) {
@@ -4279,9 +4288,13 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                         updateActionBarTitle();
                         viewPager.setCurrentItem(index);
                         if (index == 0) {
+                            mPlusMenuItem.setVisibility(View.VISIBLE);
+                        } else {
+                            mPlusMenuItem.setVisibility(View.GONE);
+                        }
+                        if (index == 0) {
                             mainViewContainer.setPadding(0, topPadding, 0, 0);
                             actionBar.setVisibility(View.VISIBLE);
-                            searchItem.setVisibility(View.VISIBLE);
                         } else if (index == 1) {
                             mainViewContainer.setPadding(0, topPadding, 0, 0);
                             actionBar.setVisibility(View.VISIBLE);
