@@ -14,6 +14,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.text.TextUtils;
+import android.util.Log;
 
 import androidx.annotation.Keep;
 import androidx.annotation.Nullable;
@@ -52616,7 +52617,7 @@ public class TLRPC {
     }
 
     public static class TL_contacts_addContact extends TLObject {
-        public static final int constructor = 0xe8f463d0;
+        public static final int constructor = 0x6d80f94;
 
         public int flags;
         public boolean add_phone_privacy_exception;
@@ -52624,6 +52625,7 @@ public class TLRPC {
         public String first_name;
         public String last_name;
         public String phone;
+        public String message;
 
         public TLObject deserializeResponse(InputSerializedData stream, int constructor, boolean exception) {
             return Updates.TLdeserialize(stream, constructor, exception);
@@ -52637,6 +52639,7 @@ public class TLRPC {
             stream.writeString(first_name);
             stream.writeString(last_name);
             stream.writeString(phone);
+            stream.writeString(message);
         }
     }
 
@@ -71361,9 +71364,10 @@ public class TLRPC {
     }
 
     public static class TL_ssgrams_getDiscoverPage extends TLObject {
-        public static final int constructor = 0xa701f4d0;
+        public static final int constructor = 0x16a56b7c;
 
         public TLObject deserializeResponse(InputSerializedData stream, int constructor, boolean exception) {
+            Log.e("DiscoverPage", "deserializeResponse111 ------- constructor: " + constructor);
             return TL_discoverList.TLdeserialize(stream, constructor, exception);
         }
 
@@ -71378,28 +71382,22 @@ public class TLRPC {
         public ArrayList<TL_discoverPage> list;
 
         public static TL_discoverList TLdeserialize(InputSerializedData stream, int constructor, boolean exception) {
-            TL_discoverList result = null;
-            if (constructor == 0xc4d46314) {
-                result = new TL_discoverList();
-            }
-            if (result == null && exception) {
-                throw new RuntimeException(String.format("can't parse magic %x in TL_discoverList", constructor));
-            }
-            if (null != result) {
-                result.readParams(stream, exception);
-            }
+            TL_discoverList result = new TL_discoverList();
+            result.readParams(stream, exception);
+            Log.e("DiscoverPage", "TLdeserialize ------- constructor: " + constructor);
             return result;
         }
 
-        public void readParams(AbstractSerializedData stream, boolean exception) {
+        @Override
+        public void readParams(InputSerializedData stream, boolean exception) {
+            Log.e("DiscoverPage", "readParams ------- ");
             list = Vector.deserialize(stream, TL_discoverPage::TLdeserialize, exception);
         }
 
-        public void serializeToStream(AbstractSerializedData stream) {
+        @Override
+        public void serializeToStream(OutputSerializedData stream) {
             stream.writeInt32(constructor);
-            for (int a = 0; a < list.size(); a++) {
-                list.get(a).serializeToStream(stream);
-            }
+            Vector.serialize(stream, list);
         }
     }
 
@@ -71425,14 +71423,16 @@ public class TLRPC {
             return result;
         }
 
-        public void readParams(AbstractSerializedData stream, boolean exception) {
+        @Override
+        public void readParams(InputSerializedData stream, boolean exception) {
             id = stream.readInt64(exception);
             title = stream.readString(exception);
             logo = stream.readString(exception);
             url = stream.readString(exception);
         }
 
-        public void serializeToStream(AbstractSerializedData stream) {
+        @Override
+        public void serializeToStream(OutputSerializedData stream) {
             stream.writeInt32(constructor);
             stream.writeInt64(id);
             stream.writeString(title);

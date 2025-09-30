@@ -4290,6 +4290,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                             mainViewContainer.setPadding(0, topPadding, 0, 0);
                             actionBar.setVisibility(View.VISIBLE);
                             searchItem.setVisibility(View.GONE);
+                            discoveryFragment.fetchData(currentAccount, classGuid, true, false);
                         } else {
                             mainViewContainer.setPadding(0, 0, 0, 0);
                             actionBar.setVisibility(View.GONE);

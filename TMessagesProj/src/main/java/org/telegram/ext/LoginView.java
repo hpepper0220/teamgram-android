@@ -33,7 +33,6 @@ import java.util.Objects;
 
 public class LoginView extends LinearLayout {
 
-    private final AppCompatImageView logoView;
     private final ClearEditText usernameEt;
     private final ClearEditText passwordEt;
     public final LoadingButton signUpButton;
@@ -51,9 +50,9 @@ public class LoginView extends LinearLayout {
         super(context);
         this.setOrientation(LinearLayout.VERTICAL);
 
-        logoView = new AppCompatImageView(context);
-        logoView.setImageResource(R.mipmap.ic_launcher);
-        this.addView(logoView, LayoutHelper.createLinear(120, 120, Gravity.CENTER_HORIZONTAL, 36, 80, 36, 0));
+//        logoView = new AppCompatImageView(context);
+//        logoView.setImageResource(R.mipmap.ic_launcher);
+//        this.addView(logoView, LayoutHelper.createLinear(120, 120, Gravity.CENTER_HORIZONTAL, 36, 80, 36, 0));
 
         bodyLayout = new LinearLayout(context);
         bodyLayout.setOrientation(LinearLayout.VERTICAL);
@@ -62,10 +61,11 @@ public class LoginView extends LinearLayout {
         usernameEt = new ClearEditText(context);
         usernameEt.setTextSize(15);
         usernameEt.setHint("请输入用户名");
-        usernameEt.setTextColor(Color.parseColor("#333333"));
-        usernameEt.setHintTextColor(Color.parseColor("#A4A4A4"));
+        usernameEt.setTextColor(Color.parseColor("#000000"));
+        usernameEt.setHintTextColor(Color.parseColor("#999999"));
         usernameEt.setBackgroundResource(R.drawable.transparent);
-        bodyLayout.addView(usernameEt, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, Gravity.CENTER_HORIZONTAL, 36, 20, 36, 0));
+        usernameEt.setInputType(InputType.TYPE_CLASS_TEXT);
+        bodyLayout.addView(usernameEt, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, Gravity.CENTER_HORIZONTAL, 36, 120, 36, 0));
 
         View line1 = new View(context, null, R.style.HorizontalLineStyle);
         line1.setBackgroundColor(Color.parseColor("#ECECEC"));
@@ -75,8 +75,8 @@ public class LoginView extends LinearLayout {
         passwordEt.setTextSize(15);
         passwordEt.setHint("请输入密码");
         passwordEt.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
-        passwordEt.setTextColor(Color.parseColor("#333333"));
-        passwordEt.setHintTextColor(Color.parseColor("#A4A4A4"));
+        passwordEt.setTextColor(Color.parseColor("#000000"));
+        passwordEt.setHintTextColor(Color.parseColor("#999999"));
         passwordEt.setBackgroundResource(R.drawable.transparent);
         bodyLayout.addView(passwordEt, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, Gravity.CENTER_HORIZONTAL, 36, 0, 36, 0));
 
@@ -148,51 +148,51 @@ public class LoginView extends LinearLayout {
                 .setMain(signUpButton)
                 .build();
 
-        KeyboardWatcher.with(parentActivity).setListener(new KeyboardWatcher.SoftKeyboardStateListener() {
-            @Override
-            public void onSoftKeyboardOpened(int keyboardHeight) {
-                // 执行位移动画
-                ObjectAnimator objectAnimator = ObjectAnimator.ofFloat(bodyLayout, "translationY", 0, -signUpButton.getHeight());
-                objectAnimator.setDuration(mAnimTime);
-                objectAnimator.setInterpolator(new AccelerateDecelerateInterpolator());
-                objectAnimator.start();
-
-                // 执行缩小动画
-                logoView.setPivotX(logoView.getWidth() / 2f);
-                logoView.setPivotY(logoView.getHeight());
-                AnimatorSet animatorSet = new AnimatorSet();
-                ObjectAnimator scaleX = ObjectAnimator.ofFloat(logoView, "scaleX", 1f, mLogoScale);
-                ObjectAnimator scaleY = ObjectAnimator.ofFloat(logoView, "scaleY", 1f, mLogoScale);
-                ObjectAnimator translationY = ObjectAnimator.ofFloat(logoView, "translationY", 0f, -signUpButton.getHeight());
-                animatorSet.play(translationY).with(scaleX).with(scaleY);
-                animatorSet.setDuration(mAnimTime);
-                animatorSet.start();
-            }
-
-            @Override
-            public void onSoftKeyboardClosed() {
-                // 执行位移动画
-                ObjectAnimator objectAnimator = ObjectAnimator.ofFloat(bodyLayout, "translationY", bodyLayout.getTranslationY(), 0f);
-                objectAnimator.setDuration(mAnimTime);
-                objectAnimator.setInterpolator(new AccelerateDecelerateInterpolator());
-                objectAnimator.start();
-
-                if (logoView.getTranslationY() == 0) {
-                    return;
-                }
-
-                // 执行放大动画
-                logoView.setPivotX(logoView.getWidth() / 2f);
-                logoView.setPivotY(logoView.getHeight());
-                AnimatorSet animatorSet = new AnimatorSet();
-                ObjectAnimator scaleX = ObjectAnimator.ofFloat(logoView, "scaleX", mLogoScale, 1f);
-                ObjectAnimator scaleY = ObjectAnimator.ofFloat(logoView, "scaleY", mLogoScale, 1f);
-                ObjectAnimator translationY = ObjectAnimator.ofFloat(logoView, "translationY", logoView.getTranslationY(), 0f);
-                animatorSet.play(translationY).with(scaleX).with(scaleY);
-                animatorSet.setDuration(mAnimTime);
-                animatorSet.start();
-            }
-        });
+//        KeyboardWatcher.with(parentActivity).setListener(new KeyboardWatcher.SoftKeyboardStateListener() {
+//            @Override
+//            public void onSoftKeyboardOpened(int keyboardHeight) {
+//                // 执行位移动画
+//                ObjectAnimator objectAnimator = ObjectAnimator.ofFloat(bodyLayout, "translationY", 0, -signUpButton.getHeight());
+//                objectAnimator.setDuration(mAnimTime);
+//                objectAnimator.setInterpolator(new AccelerateDecelerateInterpolator());
+//                objectAnimator.start();
+//
+//                // 执行缩小动画
+//                logoView.setPivotX(logoView.getWidth() / 2f);
+//                logoView.setPivotY(logoView.getHeight());
+//                AnimatorSet animatorSet = new AnimatorSet();
+//                ObjectAnimator scaleX = ObjectAnimator.ofFloat(logoView, "scaleX", 1f, mLogoScale);
+//                ObjectAnimator scaleY = ObjectAnimator.ofFloat(logoView, "scaleY", 1f, mLogoScale);
+//                ObjectAnimator translationY = ObjectAnimator.ofFloat(logoView, "translationY", 0f, -signUpButton.getHeight());
+//                animatorSet.play(translationY).with(scaleX).with(scaleY);
+//                animatorSet.setDuration(mAnimTime);
+//                animatorSet.start();
+//            }
+//
+//            @Override
+//            public void onSoftKeyboardClosed() {
+//                // 执行位移动画
+//                ObjectAnimator objectAnimator = ObjectAnimator.ofFloat(bodyLayout, "translationY", bodyLayout.getTranslationY(), 0f);
+//                objectAnimator.setDuration(mAnimTime);
+//                objectAnimator.setInterpolator(new AccelerateDecelerateInterpolator());
+//                objectAnimator.start();
+//
+//                if (logoView.getTranslationY() == 0) {
+//                    return;
+//                }
+//
+//                // 执行放大动画
+//                logoView.setPivotX(logoView.getWidth() / 2f);
+//                logoView.setPivotY(logoView.getHeight());
+//                AnimatorSet animatorSet = new AnimatorSet();
+//                ObjectAnimator scaleX = ObjectAnimator.ofFloat(logoView, "scaleX", mLogoScale, 1f);
+//                ObjectAnimator scaleY = ObjectAnimator.ofFloat(logoView, "scaleY", mLogoScale, 1f);
+//                ObjectAnimator translationY = ObjectAnimator.ofFloat(logoView, "translationY", logoView.getTranslationY(), 0f);
+//                animatorSet.play(translationY).with(scaleX).with(scaleY);
+//                animatorSet.setDuration(mAnimTime);
+//                animatorSet.start();
+//            }
+//        });
     }
 
     public interface OnSignUpButtonPressed {

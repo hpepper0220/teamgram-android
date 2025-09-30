@@ -7,6 +7,7 @@ import android.content.pm.PackageInfo;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
+import android.os.Bundle;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -44,6 +45,7 @@ import org.telegram.ui.FiltersSetupActivity;
 import org.telegram.ui.LaunchActivity;
 import org.telegram.ui.LogoutActivity;
 import org.telegram.ui.NotificationsSettingsActivity;
+import org.telegram.ui.ProfileActivity;
 
 public class SkMineFragment extends BaseFragment implements NotificationCenter.NotificationCenterDelegate {
 
@@ -216,7 +218,12 @@ public class SkMineFragment extends BaseFragment implements NotificationCenter.N
         subLinearLayout.setGravity(Gravity.CENTER_VERTICAL);
         subLinearLayout.setLayoutParams(LayoutHelper.createLinear(0, 64, 1, Gravity.LEFT | Gravity.BOTTOM, 0, 0, 0, bottomMargin));
         mHeaderInfoLayout.addView(subLinearLayout);
-//        subLinearLayout.setOnClickListener(v -> mParentActivity.presentFragment(new SKEditProfileActivity()));
+
+        subLinearLayout.setOnClickListener(view -> {
+            Bundle args = new Bundle();
+            args.putLong("user_id", UserConfig.getInstance(currentAccount).clientUserId);
+            mParentActivity.presentFragment(new ProfileActivity(args));
+        });
 
         LinearLayout nameOnlineLayout = new LinearLayout(context);
         nameOnlineLayout.setOrientation(LinearLayout.VERTICAL);
