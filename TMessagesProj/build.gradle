@@ -67,6 +67,12 @@ dependencies {
     coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:1.1.5'
 
     implementation project(':BaseLib')
+
+    // Room 运行时
+    implementation "androidx.room:room-runtime:2.6.1"
+
+    // Room 注解处理器（Java 用 annotationProcessor）
+    annotationProcessor "androidx.room:room-compiler:2.6.1"
 }
 
 def isWindows = String.valueOf(DefaultNativePlatform.currentOperatingSystem.toFamilyName() == OperatingSystemFamily.WINDOWS)

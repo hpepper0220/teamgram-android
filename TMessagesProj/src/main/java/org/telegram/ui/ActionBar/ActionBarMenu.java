@@ -136,6 +136,7 @@ public class ActionBarMenu extends LinearLayout {
                     item.toggleSubMenu();
                 }
             } else if (item.isSearchField()) {
+                // 杭椒 首页搜索入口
                 parentActionBar.onSearchFieldVisibilityChanged(item.toggleSearch(true));
             } else {
                 onItemClick((Integer) view.getTag());

@@ -123,3 +123,10 @@
   **[] $VALUES;
   public *;
 }
+
+# 保留使用到的注解（Room 用反射处理）
+-keepattributes *Annotation*
+
+# 保留 Room 实体类（Entity）、字段、Dao 接口
+-keep class androidx.room.** { *; }
+-keep class * extends androidx.room.RoomDatabase
