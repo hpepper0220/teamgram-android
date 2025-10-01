@@ -98,6 +98,7 @@ import androidx.viewpager2.widget.ViewPager2;
 import com.blankj.utilcode.util.ObjectUtils;
 
 import org.checkerframework.common.subtyping.qual.Bottom;
+import org.telegram.ext.AddFriendFragment;
 import org.telegram.ext.BottomItemView;
 import org.telegram.ext.SkContactsFragment;
 import org.telegram.ext.SkDiscoveryFragment;
@@ -3737,7 +3738,9 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                     return;
                 }
                 if (id == SkMenuAction.plus) {
-                    PopupCreator.createAddContactPopup(getParentActivity(), actionBar.getActionBarMenu(), v -> {});
+                    PopupCreator.createAddContactPopup(getParentActivity(), actionBar.getActionBarMenu(), v -> {
+                        presentFragment(new AddFriendFragment());
+                    });
                 } else if (id == -1) {
                     if (rightSlidingDialogContainer != null && rightSlidingDialogContainer.hasFragment()) {
                         if (actionBar.isActionModeShowed()) {
