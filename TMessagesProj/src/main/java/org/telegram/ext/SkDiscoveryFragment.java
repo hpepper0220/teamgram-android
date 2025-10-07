@@ -207,6 +207,11 @@ public class SkDiscoveryFragment extends BaseFragment {
             return dataList.size();
         }
 
+        @Override
+        public int getItemViewType(int position) {
+            return dataList.get(position).getItemType();
+        }
+
         class ViewHolder extends RecyclerView.ViewHolder {
             RelativeLayout containerView;
             AppCompatTextView atvContent;

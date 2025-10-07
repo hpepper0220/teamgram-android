@@ -3302,7 +3302,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                 return !actionBar.isActionModeShowed() && databaseMigrationHint == null;// && !rightSlidingDialogContainer.hasFragment();
             }
         });
-        searchItem.setVisibility(View.GONE);
+//        searchItem.setVisibility(View.GONE);
         searchItem.getSearchField().setTextColor(Color.BLACK);
         searchItem.getSearchField().setHintTextColor(Color.BLACK);
         searchItem.getSearchField().setCursorColor(Color.BLACK);
@@ -3739,7 +3739,11 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                 }
                 if (id == SkMenuAction.plus) {
                     PopupCreator.createAddContactPopup(getParentActivity(), actionBar.getActionBarMenu(), v -> {
-                        presentFragment(new AddFriendFragment());
+                        AddFriendFragment addFriendFragment = new AddFriendFragment();
+                        if (getParentActivity() instanceof LaunchActivity) {
+                            addFriendFragment.setParentActivity((LaunchActivity) getParentActivity());
+                        }
+                        presentFragment(addFriendFragment);
                     });
                 } else if (id == -1) {
                     if (rightSlidingDialogContainer != null && rightSlidingDialogContainer.hasFragment()) {
@@ -4302,6 +4306,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                             mainViewContainer.setPadding(0, topPadding, 0, 0);
                             actionBar.setVisibility(View.VISIBLE);
                             searchItem.setVisibility(View.GONE);
+                            ContactsController.getInstance(currentAccount).loadContacts(false, 0);
                         } else if (index == 2) {
                             mainViewContainer.setPadding(0, topPadding, 0, 0);
                             actionBar.setVisibility(View.VISIBLE);

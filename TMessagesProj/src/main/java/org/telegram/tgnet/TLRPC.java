@@ -31505,6 +31505,9 @@ public class TLRPC {
                 case TL_updateSentPhoneCode.constructor:
                     result = new TL_updateSentPhoneCode();
                     break;
+                case TL_updateRequestFriend.constructor:
+                    result = new TL_updateRequestFriend();
+                    break;
             }
             if (result == null && ApplicationLoader.applicationLoaderInstance != null) {
                 result = ApplicationLoader.applicationLoaderInstance.parseTLUpdate(constructor);
@@ -50147,6 +50150,21 @@ public class TLRPC {
 
     public static class TL_updatesTooLong extends Updates {
         public static final int constructor = 0xe317af7e;
+    }
+
+    public static class TL_updateRequestFriend extends Update {
+        public static final int constructor = 0xb6f50b9f;
+
+        public int count;
+
+        public void readParams(InputSerializedData stream, boolean exception) {
+            count = stream.readInt32(exception);
+        }
+
+        public void serializeToStream(OutputSerializedData stream) {
+            stream.writeInt32(constructor);
+            stream.writeInt32(count);
+        }
     }
 
     public static abstract class WallPaper extends TLObject {
@@ -71360,6 +71378,92 @@ public class TLRPC {
             stream.writeString(account);
             stream.writeString(password);
             stream.writeString(device);
+        }
+    }
+
+    public static class TL_ssgrams_requestFriendList extends TLObject {
+        public static final int constructor = 0x823847b3;
+        public int offset;
+        public int limit;
+
+        public TLObject deserializeResponse(InputSerializedData stream, int constructor, boolean exception) {
+            return TL_contacts_requestFriendContacts.TLdeserialize(stream, constructor, exception);
+        }
+
+        public void serializeToStream(OutputSerializedData stream) {
+            stream.writeInt32(constructor);
+            stream.writeInt32(offset);
+            stream.writeInt32(limit);
+        }
+    }
+
+    public static class TL_contacts_requestFriendContacts extends TLObject {
+        public static final int constructor = 0xd76ccbff;
+        public ArrayList<TL_friendContact> list;
+        public int count;
+        public ArrayList<TLRPC.User> users;
+
+        public static TL_contacts_requestFriendContacts TLdeserialize(InputSerializedData stream, int constructor, boolean exception) {
+            TL_contacts_requestFriendContacts result = new TL_contacts_requestFriendContacts();
+            result.readParams(stream, exception);
+            Log.e("TL_contacts_requestFriendContacts", "TLdeserialize ------- constructor: " + constructor);
+            return result;
+        }
+
+        @Override
+        public void readParams(InputSerializedData stream, boolean exception) {
+            Log.e("TL_contacts_requestFriendContacts", "readParams ------- ");
+            list = Vector.deserialize(stream, TL_friendContact::TLdeserialize, exception);
+            count = stream.readInt32(exception);
+            users = Vector.deserialize(stream, TL_user::TLdeserialize, exception);
+        }
+
+        @Override
+        public void serializeToStream(OutputSerializedData stream) {
+            stream.writeInt32(constructor);
+            Vector.serialize(stream, list);
+            stream.writeInt32(count);
+            Vector.serialize(stream, users);
+        }
+    }
+
+    public static class TL_friendContact extends TLObject {
+        public static final int constructor = 0xb1b81c2f;
+
+        public long user_id;
+        public boolean mutual;
+        public String message;
+        public boolean is_request;
+
+        public static TL_friendContact TLdeserialize(InputSerializedData stream, int constructor, boolean exception) {
+            TL_friendContact result = null;
+            if (constructor == 0xb1b81c2f) {
+                result = new TL_friendContact();
+            }
+            if (result == null && exception) {
+                throw new RuntimeException(String.format("can't parse magic %x in TL_friendContact", constructor));
+            }
+            if (null != result) {
+                result.readParams(stream, exception);
+            }
+            return result;
+        }
+
+        @Override
+        public void readParams(InputSerializedData stream, boolean exception) {
+            user_id = stream.readInt64(exception);
+            mutual = stream.readBool(exception);
+            message = stream.readString(exception);
+            is_request = stream.readBool(exception);
+        }
+
+        @Override
+        public void serializeToStream(OutputSerializedData stream) {
+            stream.writeInt32(constructor);
+            stream.writeInt64(user_id);
+            stream.writeBool(mutual);
+            stream.writeString(message);
+            stream.writeBool(is_request);
         }
     }
 

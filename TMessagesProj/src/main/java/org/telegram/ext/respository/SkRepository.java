@@ -36,4 +36,17 @@ public class SkRepository {
         ConnectionsManager.getInstance(currentAccount).bindRequestToGuid(reqId, classGuid);
     }
 
+    public void getApplyList(int currentAccount, int classGuid, SimpleCallback<TLRPC.TL_contacts_requestFriendContacts> callback) {
+        TLRPC.TL_ssgrams_requestFriendList req = new TLRPC.TL_ssgrams_requestFriendList();
+        req.offset = 1;
+        req.limit = 10;
+        int reqId = ConnectionsManager.getInstance(currentAccount).sendRequest(req, (response, error) -> {
+            if (response instanceof TLRPC.TL_contacts_requestFriendContacts) {
+                callback.onResp((TLRPC.TL_contacts_requestFriendContacts) response);
+                Log.e("SkRepo", "TL_contacts_requestFriendContacts --------> ");
+            }
+        }, ConnectionsManager.RequestFlagFailOnServerErrors);
+        ConnectionsManager.getInstance(currentAccount).bindRequestToGuid(reqId, classGuid);
+    }
+
 }
