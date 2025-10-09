@@ -56,4 +56,7 @@
 
     <item name="main_view_pager" type="id" />
     <item name="main_bottom_navigation_bar" type="id" />
+
+    <item name="popup_add_contact" type="id" />
+    <item name="popup_create_group" type="id" />
 </resources>

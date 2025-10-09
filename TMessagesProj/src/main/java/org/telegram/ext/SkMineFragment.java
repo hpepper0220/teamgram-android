@@ -450,17 +450,17 @@ public class SkMineFragment extends BaseFragment implements NotificationCenter.N
                         dividerView1.setBackgroundColor(getThemedColor(Theme.key_windowBackgroundGray));
                         view = dividerView1;
                         break;
+//                    case 3:
+//                        modifyPasswordRow = new TextCell(context);
+//                        modifyPasswordRow.setEnabled(true);
+//                        modifyPasswordRow.setColors(Theme.key_windowBackgroundWhiteGrayIcon, Theme.key_windowBackgroundWhiteBlackText);
+//                        modifyPasswordRow.setTextAndIcon("修改密码", R.drawable.msg_permissions, true);
+////                    menuItemsLayout.addView(notificationRow);
+//                        modifyPasswordRow.setBackground(ContextCompat.getDrawable(context, isDark ? R.drawable.sk_ripple_dark : R.drawable.sk_ripple));
+////                        modifyPasswordRow.setOnClickListener(v -> mParentActivity.presentFragment(new ModifyPasswordFragment()));
+//                        view = modifyPasswordRow;
+//                        break;
                     case 3:
-                        modifyPasswordRow = new TextCell(context);
-                        modifyPasswordRow.setEnabled(true);
-                        modifyPasswordRow.setColors(Theme.key_windowBackgroundWhiteGrayIcon, Theme.key_windowBackgroundWhiteBlackText);
-                        modifyPasswordRow.setTextAndIcon("修改密码", R.drawable.msg_permissions, true);
-//                    menuItemsLayout.addView(notificationRow);
-                        modifyPasswordRow.setBackground(ContextCompat.getDrawable(context, isDark ? R.drawable.sk_ripple_dark : R.drawable.sk_ripple));
-//                        modifyPasswordRow.setOnClickListener(v -> mParentActivity.presentFragment(new ModifyPasswordFragment()));
-                        view = modifyPasswordRow;
-                        break;
-                    case 4:
                         notificationRow = new TextCell(context);
                         notificationRow.setEnabled(true);
                         notificationRow.setColors(Theme.key_windowBackgroundWhiteGrayIcon, Theme.key_windowBackgroundWhiteBlackText);
@@ -470,7 +470,7 @@ public class SkMineFragment extends BaseFragment implements NotificationCenter.N
                         notificationRow.setOnClickListener(v -> mParentActivity.presentFragment(new NotificationsSettingsActivity()));
                         view = notificationRow;
                         break;
-                    case 5:
+                    case 4:
                         filtersRow = new TextCell(context);
                         filtersRow.setEnabled(true);
                         filtersRow.setColors(Theme.key_windowBackgroundWhiteGrayIcon, Theme.key_windowBackgroundWhiteBlackText);
@@ -489,7 +489,7 @@ public class SkMineFragment extends BaseFragment implements NotificationCenter.N
 //                        walletRow.setOnClickListener(v -> mParentActivity.presentFragment(new MyWalletActivity()));
 //                        view = walletRow;
 //                        break;
-                    case 6:
+                    case 5:
                         FrameLayout frameLayout = new FrameLayout(context) {
                             @Override
                             protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
@@ -528,7 +528,7 @@ public class SkMineFragment extends BaseFragment implements NotificationCenter.N
 
         @Override
         public int getItemCount() {
-            return autoRegister ? 7 : 8;
+            return autoRegister ? 7 : 6;
         }
 
         class SKViewHolder extends RecyclerView.ViewHolder {

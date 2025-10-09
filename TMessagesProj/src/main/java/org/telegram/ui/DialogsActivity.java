@@ -3743,11 +3743,17 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                 }
                 if (id == SkMenuAction.plus) {
                     PopupCreator.createAddContactPopup(getParentActivity(), actionBar.getActionBarMenu(), v -> {
-                        AddFriendFragment addFriendFragment = new AddFriendFragment();
-                        if (getParentActivity() instanceof LaunchActivity) {
-                            addFriendFragment.setParentActivity((LaunchActivity) getParentActivity());
+                        if (v.getId() == R.id.popup_add_contact) {
+                            AddFriendFragment addFriendFragment = new AddFriendFragment();
+                            if (getParentActivity() instanceof LaunchActivity) {
+                                addFriendFragment.setParentActivity((LaunchActivity) getParentActivity());
+                            }
+                            presentFragment(addFriendFragment);
+                        } else if (v.getId() == R.id.popup_create_group) {
+                            Bundle args = new Bundle();
+                            args.putInt("step", 0);
+                            presentFragment(new ChannelCreateActivity(args));
                         }
-                        presentFragment(addFriendFragment);
                     });
                 } else if (id == -1) {
                     if (rightSlidingDialogContainer != null && rightSlidingDialogContainer.hasFragment()) {
