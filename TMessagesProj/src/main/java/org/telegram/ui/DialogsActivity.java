@@ -105,6 +105,7 @@ import org.telegram.ext.SkDiscoveryFragment;
 import org.telegram.ext.SkMineFragment;
 import org.telegram.ext.components.PopupCreator;
 import org.telegram.ext.config.SkMenuAction;
+import org.telegram.ext.respository.SimpleCallback;
 import org.telegram.ext.respository.SkRepository;
 import org.telegram.messenger.AccountInstance;
 import org.telegram.messenger.AndroidUtilities;
@@ -382,7 +383,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         @Override
         protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
             if (null != listView && null != listView.getLayoutParams()) {
-                FrameLayout.LayoutParams lp = (LayoutParams) listView.getLayoutParams();
+                LayoutParams lp = (LayoutParams) listView.getLayoutParams();
                 if (animateStoriesView) {
                     lp.bottomMargin = -dp(85);
                 } else {
@@ -684,6 +685,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
     private SkContactsFragment contactsFragment;
     private SkDiscoveryFragment discoveryFragment;
     private SkMineFragment mineFragment;
+    private NavigationController navigationController;
 
     // 杭椒 menu菜单
     private ActionBarMenuItem mPlusMenuItem;
@@ -1100,8 +1102,8 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
 
         @Override
         protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-            int widthSize = View.MeasureSpec.getSize(widthMeasureSpec);
-            int heightSize = View.MeasureSpec.getSize(heightMeasureSpec);
+            int widthSize = MeasureSpec.getSize(widthMeasureSpec);
+            int heightSize = MeasureSpec.getSize(heightMeasureSpec);
             boolean portrait = heightSize > widthSize;
 
             setMeasuredDimension(widthSize, heightSize);
@@ -1155,12 +1157,12 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                     continue;
                 }
                 if (child instanceof DatabaseMigrationHint) {
-                    int contentWidthSpec = View.MeasureSpec.makeMeasureSpec(widthSize, View.MeasureSpec.EXACTLY);
-                    int h = View.MeasureSpec.getSize(heightMeasureSpec) + keyboardSize;
-                    int contentHeightSpec = View.MeasureSpec.makeMeasureSpec(Math.max(dp(10), h - inputFieldHeight + dp(2) - actionBar.getMeasuredHeight()), View.MeasureSpec.EXACTLY);
+                    int contentWidthSpec = MeasureSpec.makeMeasureSpec(widthSize, MeasureSpec.EXACTLY);
+                    int h = MeasureSpec.getSize(heightMeasureSpec) + keyboardSize;
+                    int contentHeightSpec = MeasureSpec.makeMeasureSpec(Math.max(dp(10), h - inputFieldHeight + dp(2) - actionBar.getMeasuredHeight()), MeasureSpec.EXACTLY);
                     child.measure(contentWidthSpec, contentHeightSpec);
                 } else if (child instanceof ViewPage) {
-                    int contentWidthSpec = View.MeasureSpec.makeMeasureSpec(widthSize, View.MeasureSpec.EXACTLY);
+                    int contentWidthSpec = MeasureSpec.makeMeasureSpec(widthSize, MeasureSpec.EXACTLY);
                     int h = heightSize - inputFieldHeight + dp(2) - topPadding;
                     if (hasStories || (filterTabsView != null && filterTabsView.getVisibility() == VISIBLE)) {
                         if (filterTabsView != null && filterTabsView.getVisibility() == VISIBLE) {
@@ -1195,31 +1197,31 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                     int transitionPadding = ((isSlideBackTransition || isDrawerTransition) ? (int) (h * 0.05f) : 0);
                     h += transitionPadding;
                     child.setPadding(child.getPaddingLeft(), child.getPaddingTop(), child.getPaddingRight(), transitionPadding);
-                    child.measure(contentWidthSpec, View.MeasureSpec.makeMeasureSpec(Math.max(dp(10), h), View.MeasureSpec.EXACTLY));
+                    child.measure(contentWidthSpec, MeasureSpec.makeMeasureSpec(Math.max(dp(10), h), MeasureSpec.EXACTLY));
                     child.setPivotX(child.getMeasuredWidth() / 2);
                 } else if (child == searchViewPager) {
                     searchViewPager.setTranslationY(searchViewPagerTranslationY);
-                    int contentWidthSpec = View.MeasureSpec.makeMeasureSpec(widthSize, View.MeasureSpec.EXACTLY);
-                    int h = View.MeasureSpec.getSize(heightMeasureSpec) + keyboardSize;
-                    int contentHeightSpec = View.MeasureSpec.makeMeasureSpec(Math.max(dp(10), h - inputFieldHeight + dp(2) - (onlySelect && initialDialogsType != DIALOGS_TYPE_FORWARD ? 0 : actionBar.getMeasuredHeight()) - topPadding) - (searchTabsView == null ? 0 : dp(44)), View.MeasureSpec.EXACTLY);
+                    int contentWidthSpec = MeasureSpec.makeMeasureSpec(widthSize, MeasureSpec.EXACTLY);
+                    int h = MeasureSpec.getSize(heightMeasureSpec) + keyboardSize;
+                    int contentHeightSpec = MeasureSpec.makeMeasureSpec(Math.max(dp(10), h - inputFieldHeight + dp(2) - (onlySelect && initialDialogsType != DIALOGS_TYPE_FORWARD ? 0 : actionBar.getMeasuredHeight()) - topPadding) - (searchTabsView == null ? 0 : dp(44)), MeasureSpec.EXACTLY);
                     child.measure(contentWidthSpec, contentHeightSpec);
                     child.setPivotX(child.getMeasuredWidth() / 2);
                 } else if (commentView != null && commentView.isPopupView(child)) {
                     if (AndroidUtilities.isInMultiwindow) {
                         if (AndroidUtilities.isTablet()) {
-                            child.measure(View.MeasureSpec.makeMeasureSpec(widthSize, View.MeasureSpec.EXACTLY), View.MeasureSpec.makeMeasureSpec(Math.min(dp(320), heightSize - inputFieldHeight - AndroidUtilities.statusBarHeight + getPaddingTop()), View.MeasureSpec.EXACTLY));
+                            child.measure(MeasureSpec.makeMeasureSpec(widthSize, MeasureSpec.EXACTLY), MeasureSpec.makeMeasureSpec(Math.min(dp(320), heightSize - inputFieldHeight - AndroidUtilities.statusBarHeight + getPaddingTop()), MeasureSpec.EXACTLY));
                         } else {
-                            child.measure(View.MeasureSpec.makeMeasureSpec(widthSize, View.MeasureSpec.EXACTLY), View.MeasureSpec.makeMeasureSpec(heightSize - inputFieldHeight - AndroidUtilities.statusBarHeight + getPaddingTop(), View.MeasureSpec.EXACTLY));
+                            child.measure(MeasureSpec.makeMeasureSpec(widthSize, MeasureSpec.EXACTLY), MeasureSpec.makeMeasureSpec(heightSize - inputFieldHeight - AndroidUtilities.statusBarHeight + getPaddingTop(), MeasureSpec.EXACTLY));
                         }
                     } else {
-                        child.measure(View.MeasureSpec.makeMeasureSpec(widthSize, View.MeasureSpec.EXACTLY), View.MeasureSpec.makeMeasureSpec(child.getLayoutParams().height, View.MeasureSpec.EXACTLY));
+                        child.measure(MeasureSpec.makeMeasureSpec(widthSize, MeasureSpec.EXACTLY), MeasureSpec.makeMeasureSpec(child.getLayoutParams().height, MeasureSpec.EXACTLY));
                     }
                 } else if (child == rightSlidingDialogContainer) {
-                    int h = View.MeasureSpec.getSize(heightMeasureSpec);
+                    int h = MeasureSpec.getSize(heightMeasureSpec);
                     int transitionPadding = ((isSlideBackTransition || isDrawerTransition) ? (int) (h * 0.05f) : 0);
                     h += transitionPadding;
                     rightSlidingDialogContainer.setTransitionPaddingBottom(transitionPadding);
-                    child.measure(widthMeasureSpec, View.MeasureSpec.makeMeasureSpec(Math.max(dp(10), h), View.MeasureSpec.EXACTLY));
+                    child.measure(widthMeasureSpec, MeasureSpec.makeMeasureSpec(Math.max(dp(10), h), MeasureSpec.EXACTLY));
                 } else {
                     measureChildWithMargins(child, widthMeasureSpec, 0, heightMeasureSpec, 0);
                 }
@@ -1257,7 +1259,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                 if (child == null || child.getVisibility() == GONE) {
                     continue;
                 }
-                final FrameLayout.LayoutParams lp = (FrameLayout.LayoutParams) child.getLayoutParams();
+                final LayoutParams lp = (LayoutParams) child.getLayoutParams();
 
                 final int width = child.getMeasuredWidth();
                 final int height = child.getMeasuredHeight();
@@ -2076,7 +2078,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         }
 
         @Override
-        public void setAdapter(RecyclerView.Adapter adapter) {
+        public void setAdapter(Adapter adapter) {
             super.setAdapter(adapter);
             firstLayout = true;
         }
@@ -2086,7 +2088,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
             int t = 0;
             int pos = parentPage.layoutManager.findFirstVisibleItemPosition();
             if (pos != RecyclerView.NO_POSITION && parentPage.itemTouchhelper.isIdle() && !parentPage.layoutManager.hasPendingScrollPosition() && parentPage.listView.getScrollState() != RecyclerView.SCROLL_STATE_DRAGGING) {
-                RecyclerView.ViewHolder holder = parentPage.listView.findViewHolderForAdapterPosition(pos);
+                ViewHolder holder = parentPage.listView.findViewHolderForAdapterPosition(pos);
                 if (holder != null) {
                     int top = holder.itemView.getTop();
                     if (parentPage.dialogsType == DIALOGS_TYPE_DEFAULT && hasHiddenArchive() && parentPage.archivePullViewState == ARCHIVE_ITEM_STATE_HIDDEN) {
@@ -2814,6 +2816,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         getNotificationCenter().addObserver(this, NotificationCenter.storiesEnabledUpdate);
         getNotificationCenter().addObserver(this, NotificationCenter.unconfirmedAuthUpdate);
         getNotificationCenter().addObserver(this, NotificationCenter.premiumPromoUpdated);
+        getNotificationCenter().addObserver(this, NotificationCenter.refreshApplyList);
 
         if (initialDialogsType == DIALOGS_TYPE_DEFAULT) {
             getNotificationCenter().addObserver(this, NotificationCenter.chatlistFolderUpdate);
@@ -2985,6 +2988,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         getNotificationCenter().removeObserver(this, NotificationCenter.storiesEnabledUpdate);
         getNotificationCenter().removeObserver(this, NotificationCenter.unconfirmedAuthUpdate);
         getNotificationCenter().removeObserver(this, NotificationCenter.premiumPromoUpdated);
+        getNotificationCenter().removeObserver(this, NotificationCenter.refreshApplyList);
 
         if (initialDialogsType == DIALOGS_TYPE_DEFAULT) {
             getNotificationCenter().removeObserver(this, NotificationCenter.chatlistFolderUpdate);
@@ -4287,7 +4291,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                 contentViewList.add(createDiscoveryFragment(context));
                 contentViewList.add(createMineFragment(context));
 
-                NavigationController navigationController = customBuilder.build();
+                navigationController = customBuilder.build();
                 navigationController.addTabItemSelectedListener(new OnTabItemSelectedListener() {
                     @Override
                     public void onSelected(int index, int old) {
@@ -5439,7 +5443,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         rightSlidingDialogContainer = new RightSlidingDialogContainer(context) {
 
             boolean anotherFragmentOpened;
-            DialogsActivity.ViewPage transitionPage;
+            ViewPage transitionPage;
 
             float fromScrollYProperty;
 
@@ -5631,6 +5635,17 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         AndroidUtilities.requestAdjustResize(getParentActivity(), classGuid);
 
         return fragmentView;
+    }
+
+    private void refreshApplyCount() {
+        SkRepository.getInstance().getApplyCount(currentAccount, classGuid, new SimpleCallback<Integer>() {
+            @Override
+            public void onResp(Integer result) {
+                // todo 更新底部数量
+                navigationController.setHasMessage(1, true);
+                navigationController.setMessageNumber(1, result);
+            }
+        });
     }
 
     private ViewPage createContactsFragment(Context context) {
@@ -6266,7 +6281,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
 
                     updateDialogsHint();
                 }, () -> {
-                    BaseFragment.BottomSheetParams params = new BaseFragment.BottomSheetParams();
+                    BottomSheetParams params = new BottomSheetParams();
                     params.transitionFromLeft = true;
                     params.allowNestedScroll = false;
                     showAsSheet(new PrivacyControlActivity(PrivacyControlActivity.PRIVACY_RULES_TYPE_BIRTHDAY), params);
@@ -11066,6 +11081,8 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
             updateDialogsHint();
         } else if (id == NotificationCenter.appConfigUpdated) {
             updateDialogsHint();
+        } else if (id == NotificationCenter.refreshApplyList) {
+            refreshApplyCount();
         }
     }
 
@@ -11980,7 +11997,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         ActionBarPopupWindow.ActionBarPopupWindowLayout sendPopupLayout2 = new ActionBarPopupWindow.ActionBarPopupWindowLayout(parentActivity, resourcesProvider);
         sendPopupLayout2.setAnimationEnabled(false);
         sendPopupLayout2.setOnTouchListener(new View.OnTouchListener() {
-            private android.graphics.Rect popupRect = new android.graphics.Rect();
+            private Rect popupRect = new Rect();
 
             @Override
             public boolean onTouch(View v, MotionEvent event) {

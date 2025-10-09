@@ -36,7 +36,9 @@ import org.telegram.messenger.R;
 import org.telegram.tgnet.TLRPC;
 import org.telegram.ui.ActionBar.BaseFragment;
 import org.telegram.ui.Cells.UserCell;
+import org.telegram.ui.ChatActivity;
 import org.telegram.ui.Components.LayoutHelper;
+import org.telegram.ui.ContactsActivity;
 import org.telegram.ui.LaunchActivity;
 
 import java.util.ArrayList;
@@ -96,6 +98,7 @@ public class SkContactsFragment extends BaseFragment implements NotificationCent
         NotificationCenter.getInstance(currentAccount).removeObserver(this, NotificationCenter.updateInterfaces);
         NotificationCenter.getInstance(currentAccount).removeObserver(this, NotificationCenter.encryptedChatCreated);
         NotificationCenter.getInstance(currentAccount).removeObserver(this, NotificationCenter.closeChats);
+        NotificationCenter.getInstance(currentAccount).removeObserver(this, NotificationCenter.refreshApplyList);
 //        AndroidUtilities.removeAdjustResize(getParentActivity(), classGuid);
     }
 
@@ -159,7 +162,7 @@ public class SkContactsFragment extends BaseFragment implements NotificationCent
             } else {
                 itemView = LayoutInflater.from(context).inflate(R.layout.layout_item_contact, parent, false);
             }
-            return new ContactListAdapter.ViewHolder(itemView);
+            return new ViewHolder(itemView);
         }
 
         @Override
@@ -170,6 +173,11 @@ public class SkContactsFragment extends BaseFragment implements NotificationCent
                 TLRPC.User itemData = dataList.get(position).getData();
                 userCell.setData(itemData, itemData.first_name, LocaleController.formatUserStatus(currentAccount, itemData), 0);
                 holder.ll_container.addView(userCell, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT));
+                userCell.setOnClickListener(view -> {
+                    Bundle args = new Bundle();
+                    args.putLong("user_id", itemData.id);
+                    mParentActivity.presentFragment(new ChatActivity(args));
+                });
             } else if (dataList.get(position).getItemType() == ContactModel.typeHeader) {
                 if (dataList.get(position).getCount() > 0) {
                     holder.msgView.setVisibility(View.VISIBLE);
@@ -177,17 +185,13 @@ public class SkContactsFragment extends BaseFragment implements NotificationCent
                     holder.msgView.setMessageNumber(dataList.get(position).getCount());
                     holder.msgView.setMessageNumberColor(Color.WHITE);
                 } else {
+                    holder.msgView.setHasMessage(false);
                     holder.msgView.setVisibility(View.GONE);
                 }
                 holder.ll_apply_list.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        SkRepository.getInstance().getApplyList(currentAccount, classGuid, new SimpleCallback<TLRPC.TL_contacts_requestFriendContacts>() {
-                            @Override
-                            public void onResp(TLRPC.TL_contacts_requestFriendContacts result) {
-
-                            }
-                        });
+                        mParentActivity.presentFragment(new ApplyListFragment());
                     }
                 });
             }
@@ -244,10 +248,10 @@ public class SkContactsFragment extends BaseFragment implements NotificationCent
     @Override
     public void didReceivedNotification(int id, int account, Object... args) {
         if (id == NotificationCenter.refreshApplyList) {
-            SkRepository.getInstance().getApplyList(currentAccount, classGuid, result -> AndroidUtilities.runOnUIThread(() -> {
+            SkRepository.getInstance().getApplyCount(currentAccount, classGuid, result -> AndroidUtilities.runOnUIThread(() -> {
                 for (int i = 0; i < dataList.size(); i++) {
                     if (dataList.get(i).getItemType() == ContactModel.typeHeader) {
-                        dataList.get(i).setCount(result.count);
+                        dataList.get(i).setCount(result);
                     }
                 }
                 listAdapter.notifyDataSetChanged();

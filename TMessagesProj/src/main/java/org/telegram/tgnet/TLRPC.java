@@ -24568,6 +24568,9 @@ public class TLRPC {
                 case 0xb5a1ce5a:
                     result = new TL_messageActionChatEditTitle();
                     break;
+                case TL_messageActionAgreeFriend.constructor:
+                    result = new TL_messageActionAgreeFriend();
+                    break;
                 case 0xabe9affe:
                     result = new TL_messageActionBotAllowed_layer153();
                     break;
@@ -25501,6 +25504,24 @@ public class TLRPC {
         public void serializeToStream(OutputSerializedData stream) {
             stream.writeInt32(constructor);
             stream.writeString(title);
+        }
+    }
+
+    public static class TL_messageActionAgreeFriend extends MessageAction {
+        public static final int constructor = 0xc2ee6135;
+
+        public long user_id;
+        public String message;
+
+        public void readParams(InputSerializedData stream, boolean exception) {
+            user_id = stream.readInt64(exception);
+            message = stream.readString(exception);
+        }
+
+        public void serializeToStream(OutputSerializedData stream) {
+            stream.writeInt32(constructor);
+            stream.writeInt64(user_id);
+            stream.writeString(message);
         }
     }
 
@@ -71381,6 +71402,40 @@ public class TLRPC {
         }
     }
 
+    public static class TL_ssgrams_getcontactRequestCount extends TLObject {
+        public static final int constructor = 0xff689088;
+
+        public TLObject deserializeResponse(InputSerializedData stream, int constructor, boolean exception) {
+            return TL_contactRequestUnreadCount.TLdeserialize(stream, constructor, exception);
+        }
+
+        public void serializeToStream(OutputSerializedData stream) {
+            stream.writeInt32(constructor);
+        }
+    }
+
+    public static class TL_contactRequestUnreadCount extends TLObject {
+        public static final int constructor = 0xbc98e296;
+        public int count;
+
+        public static TL_contactRequestUnreadCount TLdeserialize(InputSerializedData stream, int constructor, boolean exception) {
+            TL_contactRequestUnreadCount result = new TL_contactRequestUnreadCount();
+            result.readParams(stream, exception);
+            return result;
+        }
+
+        @Override
+        public void readParams(InputSerializedData stream, boolean exception) {
+            count = stream.readInt32(exception);
+        }
+
+        @Override
+        public void serializeToStream(OutputSerializedData stream) {
+            stream.writeInt32(constructor);
+            stream.writeInt32(count);
+        }
+    }
+
     public static class TL_ssgrams_requestFriendList extends TLObject {
         public static final int constructor = 0x823847b3;
         public int offset;
@@ -71406,13 +71461,11 @@ public class TLRPC {
         public static TL_contacts_requestFriendContacts TLdeserialize(InputSerializedData stream, int constructor, boolean exception) {
             TL_contacts_requestFriendContacts result = new TL_contacts_requestFriendContacts();
             result.readParams(stream, exception);
-            Log.e("TL_contacts_requestFriendContacts", "TLdeserialize ------- constructor: " + constructor);
             return result;
         }
 
         @Override
         public void readParams(InputSerializedData stream, boolean exception) {
-            Log.e("TL_contacts_requestFriendContacts", "readParams ------- ");
             list = Vector.deserialize(stream, TL_friendContact::TLdeserialize, exception);
             count = stream.readInt32(exception);
             users = Vector.deserialize(stream, TL_user::TLdeserialize, exception);
@@ -71471,7 +71524,6 @@ public class TLRPC {
         public static final int constructor = 0x16a56b7c;
 
         public TLObject deserializeResponse(InputSerializedData stream, int constructor, boolean exception) {
-            Log.e("DiscoverPage", "deserializeResponse111 ------- constructor: " + constructor);
             return TL_discoverList.TLdeserialize(stream, constructor, exception);
         }
 
@@ -71488,13 +71540,11 @@ public class TLRPC {
         public static TL_discoverList TLdeserialize(InputSerializedData stream, int constructor, boolean exception) {
             TL_discoverList result = new TL_discoverList();
             result.readParams(stream, exception);
-            Log.e("DiscoverPage", "TLdeserialize ------- constructor: " + constructor);
             return result;
         }
 
         @Override
         public void readParams(InputSerializedData stream, boolean exception) {
-            Log.e("DiscoverPage", "readParams ------- ");
             list = Vector.deserialize(stream, TL_discoverPage::TLdeserialize, exception);
         }
 

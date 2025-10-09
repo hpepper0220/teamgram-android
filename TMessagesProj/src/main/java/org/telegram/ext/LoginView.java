@@ -112,7 +112,6 @@ public class LoginView extends LinearLayout {
             req.first_name = req.account;
             req.last_name = "";
             req.device = DeviceUtils.getUniqueDeviceId();
-//            req.device = "a3578rssa";
             req.version = BuildVars.BUILD_VERSION_STRING;
             req.invite_code = "";
             req.auto_register = false;

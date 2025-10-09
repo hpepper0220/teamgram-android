@@ -1,6 +1,7 @@
 package org.telegram.ext.respository;
 import android.util.Log;
 
+import org.telegram.messenger.AndroidUtilities;
 import org.telegram.tgnet.ConnectionsManager;
 import org.telegram.tgnet.TLRPC;
 import org.telegram.tgnet.TLRPC.TL_ssgrams_getDiscoverPage;
@@ -36,15 +37,29 @@ public class SkRepository {
         ConnectionsManager.getInstance(currentAccount).bindRequestToGuid(reqId, classGuid);
     }
 
-    public void getApplyList(int currentAccount, int classGuid, SimpleCallback<TLRPC.TL_contacts_requestFriendContacts> callback) {
+    public void getApplyList(int currentAccount, int classGuid, int page, SimpleCallback<TLRPC.TL_contacts_requestFriendContacts> callback) {
         TLRPC.TL_ssgrams_requestFriendList req = new TLRPC.TL_ssgrams_requestFriendList();
-        req.offset = 1;
-        req.limit = 10;
+        req.offset = page;
+        req.limit = 100;
         int reqId = ConnectionsManager.getInstance(currentAccount).sendRequest(req, (response, error) -> {
-            if (response instanceof TLRPC.TL_contacts_requestFriendContacts) {
-                callback.onResp((TLRPC.TL_contacts_requestFriendContacts) response);
-                Log.e("SkRepo", "TL_contacts_requestFriendContacts --------> ");
-            }
+            AndroidUtilities.runOnUIThread(() -> {
+                if (response instanceof TLRPC.TL_contacts_requestFriendContacts) {
+                    callback.onResp((TLRPC.TL_contacts_requestFriendContacts) response);
+                    Log.e("SkRepo", "TL_contacts_requestFriendContacts --------> ");
+                }
+            });
+        }, ConnectionsManager.RequestFlagFailOnServerErrors);
+        ConnectionsManager.getInstance(currentAccount).bindRequestToGuid(reqId, classGuid);
+    }
+
+    public void getApplyCount(int currentAccount, int classGuid, SimpleCallback<Integer> callback) {
+        TLRPC.TL_ssgrams_getcontactRequestCount req = new TLRPC.TL_ssgrams_getcontactRequestCount();
+        int reqId = ConnectionsManager.getInstance(currentAccount).sendRequest(req, (response, error) -> {
+            AndroidUtilities.runOnUIThread(() -> {
+                if (response instanceof TLRPC.TL_contactRequestUnreadCount) {
+                    callback.onResp(((TLRPC.TL_contactRequestUnreadCount) response).count);
+                }
+            });
         }, ConnectionsManager.RequestFlagFailOnServerErrors);
         ConnectionsManager.getInstance(currentAccount).bindRequestToGuid(reqId, classGuid);
     }

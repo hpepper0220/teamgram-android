@@ -222,7 +222,8 @@ public class SkMineFragment extends BaseFragment implements NotificationCenter.N
         subLinearLayout.setOnClickListener(view -> {
             Bundle args = new Bundle();
             args.putLong("user_id", UserConfig.getInstance(currentAccount).clientUserId);
-            mParentActivity.presentFragment(new ProfileActivity(args));
+//            mParentActivity.presentFragment(new ProfileActivity(args));
+            mParentActivity.presentFragment(new EditUserInfoFragment());
         });
 
         LinearLayout nameOnlineLayout = new LinearLayout(context);

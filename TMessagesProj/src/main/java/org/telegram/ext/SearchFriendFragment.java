@@ -3,6 +3,7 @@ package org.telegram.ext;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
+import android.os.Bundle;
 import android.text.InputType;
 import android.util.Log;
 import android.view.Gravity;
@@ -48,6 +49,10 @@ public class SearchFriendFragment extends BaseFragment {
     private LaunchActivity mParentActivity;
     private ArrayList<TLRPC.User> searchResult = new ArrayList<>();
     private SearchListAdapter searchListAdapter;
+
+    public void setParentActivity(LaunchActivity parentActivity) {
+        this.mParentActivity = parentActivity;
+    }
 
     @Override
     public View createView(Context context) {
@@ -127,38 +132,6 @@ public class SearchFriendFragment extends BaseFragment {
         }));
     }
 
-    private void sendApplyRequest(Context context, TLRPC.User target) {
-        final AlertDialog dialog = new AlertDialog(context, AlertDialog.ALERT_TYPE_SPINNER);
-        dialog.setMessage(LocaleController.getString(R.string.Loading));
-        dialog.setCanceledOnTouchOutside(false);
-        dialog.setCancelable(true);
-//        dialog.setOnCancelListener(d -> cancelled[0] = true);
-        AndroidUtilities.runOnUIThread(dialog::show, 250);
-        TLRPC.TL_contacts_addContact req = new TLRPC.TL_contacts_addContact();
-        req.id = getMessagesController().getInputUser(target);
-        req.first_name = target.first_name;
-        req.last_name = target.username;
-        req.phone = target.phone;
-        req.add_phone_privacy_exception = false;
-        req.message = "你好哦~~~~";
-        if (req.phone == null) {
-            req.phone = "";
-        }
-        ConnectionsManager.getInstance(currentAccount).sendRequest(req, (response, error) -> {
-            AndroidUtilities.runOnUIThread(new Runnable() {
-                @Override
-                public void run() {
-                    dialog.dismiss();
-                    if (error != null) {
-                        return;
-                    }
-                    Toast.makeText(context, "" + response, Toast.LENGTH_LONG).show();
-                    Log.e("SearchFriend", "response type -------> " + response);
-                }
-            });
-        });
-    }
-
     private class SearchListAdapter extends RecyclerView.Adapter<SearchListAdapter.ViewHolder> {
         public SearchListAdapter(Context context) {
             this.context = context;
@@ -168,25 +141,34 @@ public class SearchFriendFragment extends BaseFragment {
 
         @NonNull
         @Override
-        public SearchListAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
             View itemView;
             if (viewType == DiscoveryModel.typeEmpty) {
                 itemView = LayoutInflater.from(context).inflate(R.layout.layout_empty, parent, false);
             } else {
                 itemView = LayoutInflater.from(context).inflate(R.layout.layout_item_search, parent, false);
             }
-            return new SearchListAdapter.ViewHolder(itemView);
+            return new ViewHolder(itemView);
         }
 
         @Override
-        public void onBindViewHolder(@NonNull SearchListAdapter.ViewHolder holder, int position) {
+        public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
             UserCell userCell = new UserCell(context, 1, 1, false);
             holder.ll_container.removeAllViews();
             TLRPC.User itemData = searchResult.get(position);
             userCell.setData(itemData, itemData.first_name, LocaleController.formatUserStatus(currentAccount, itemData), 0);
             holder.ll_container.addView(userCell, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT));
 
-            holder.btn_add_friend.setOnClickListener(view -> sendApplyRequest(context, itemData));
+            holder.ll_container.setOnClickListener(view -> {
+                Bundle bundle = new Bundle();
+                bundle.putLong("user_id", itemData.id);
+
+                FriendInfoFragment friendInfoFragment = new FriendInfoFragment(bundle);
+                if (mParentActivity != null) {
+                    friendInfoFragment.setParentActivity(mParentActivity);
+                    mParentActivity.presentFragment(friendInfoFragment);
+                }
+            });
         }
 
         @Override

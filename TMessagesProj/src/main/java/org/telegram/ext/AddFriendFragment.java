@@ -52,7 +52,9 @@ public class AddFriendFragment extends BaseFragment {
         Drawable drawable = Theme.createRoundRectDrawable(AndroidUtilities.dp(8), Color.parseColor("#F4F4F4"));
         searchLayout.setBackground(drawable);
         searchLayout.setOnClickListener(view -> {
-            mParentActivity.presentFragment(new SearchFriendFragment());
+            SearchFriendFragment searchFriendFragment = new SearchFriendFragment();
+            searchFriendFragment.setParentActivity(mParentActivity);
+            mParentActivity.presentFragment(searchFriendFragment);
         });
         contentView.addView(searchLayout, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, 40));
 

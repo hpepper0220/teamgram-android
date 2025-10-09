@@ -4,13 +4,27 @@
     android:layout_width="match_parent"
     android:layout_height="50dp">
 
-    <androidx.appcompat.widget.AppCompatImageView
-        android:id="@+id/icon"
-        android:layout_width="20dp"
-        android:layout_height="20dp"
+    <FrameLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginTop="6dp" />
+        android:layout_marginTop="6dp">
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/icon"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_gravity="center" />
+
+        <me.majiajie.pagerbottomtabstrip.internal.RoundMessageView
+            android:id="@+id/msg_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end|top"
+            android:translationX="4dp"
+            android:translationY="-4dp" />
+    </FrameLayout>
+
 
     <me.majiajie.pagerbottomtabstrip.internal.BaselineLayout
         android:layout_width="wrap_content"

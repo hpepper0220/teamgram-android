@@ -470,6 +470,7 @@ public class IntroActivity extends BaseFragment implements NotificationCenter.No
                         }
                     } else {
                         lastError = error.text;
+                        needShowAlert(getString(R.string.RestorePasswordNoEmailTitle), lastError);
                     }
                 }), ConnectionsManager.RequestFlagFailOnServerErrors | ConnectionsManager.RequestFlagWithoutLogin);
             }

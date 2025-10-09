@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <LinearLayout
+            android:id="@+id/ll_container"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="20dip"
+            android:layout_weight="1"
+            android:gravity="center_vertical"
+            android:orientation="horizontal" />
+
+        <net.csdn.roundview.RoundTextView
+            android:id="@+id/button"
+            android:layout_width="wrap_content"
+            android:layout_height="30dp"
+            android:layout_marginEnd="12dp"
+            android:background="#ff65a9e0"
+            android:gravity="center"
+            android:paddingHorizontal="12dp"
+            android:textColor="@android:color/white"
+            android:textSize="12sp"
+            app:rRadius="32dp"
+            tools:text="已通过" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="24dp"
+        android:background="#F4F4F4"
+        android:gravity="center_vertical"
+        android:paddingHorizontal="12dp">
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center_vertical"
+            android:text="备注信息："
+            android:textColor="#999999"
+            android:textSize="12sp" />
+
+    </LinearLayout>
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tv_remark"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingHorizontal="12dp"
+        android:paddingVertical="6dp"
+        android:textColor="#333333"
+        android:textSize="14sp"
+        tools:text="这里是备注信息" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1px"
+        android:layout_marginStart="10dip"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp"
+        android:background="#F0F0F0" />
+
+</LinearLayout>

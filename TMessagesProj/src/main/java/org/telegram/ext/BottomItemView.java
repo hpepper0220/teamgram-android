@@ -6,6 +6,7 @@ import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.View;
 
 import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
@@ -16,12 +17,14 @@ import androidx.core.content.ContextCompat;
 
 import org.telegram.messenger.R;
 
+import me.majiajie.pagerbottomtabstrip.internal.RoundMessageView;
 import me.majiajie.pagerbottomtabstrip.item.BaseTabItem;
 
 public class BottomItemView extends BaseTabItem {
     private Context context;
     private AppCompatImageView icon;
     private AppCompatTextView textView;
+    private RoundMessageView msgView;
     private Drawable iconDrawable;
     private boolean isSelected;
     private @DrawableRes int imgResId;
@@ -33,6 +36,7 @@ public class BottomItemView extends BaseTabItem {
 
         icon = findViewById(R.id.icon);
         textView = findViewById(R.id.title);
+        msgView = findViewById(R.id.msg_view);
     }
 
     public BottomItemView(@NonNull Context context, @Nullable AttributeSet attrs) {
@@ -48,6 +52,7 @@ public class BottomItemView extends BaseTabItem {
         iconDrawable = ContextCompat.getDrawable(context, resId);
         setTitle(title);
         icon.setImageDrawable(iconDrawable);
+        setHasMessage(false);
     }
 
     @Override
@@ -65,12 +70,17 @@ public class BottomItemView extends BaseTabItem {
 
     @Override
     public void setMessageNumber(int number) {
-
+        msgView.setMessageNumber(number);
+        msgView.setMessageNumberColor(Color.WHITE);
     }
 
     @Override
     public void setHasMessage(boolean hasMessage) {
-
+        if (hasMessage) {
+            msgView.setVisibility(View.VISIBLE);
+        } else {
+            msgView.setVisibility(View.GONE);
+        }
     }
 
     @Override

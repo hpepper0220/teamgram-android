@@ -74,7 +74,7 @@ dependencies {
     // Room 注解处理器（Java 用 annotationProcessor）
     annotationProcessor "androidx.room:room-compiler:2.6.1"
 
-//    implementation 'io.github.csdn-mobile:RoundView:1.8.1'
+    implementation 'io.github.csdn-mobile:RoundView:1.8.1'
 }
 
 def isWindows = String.valueOf(DefaultNativePlatform.currentOperatingSystem.toFamilyName() == OperatingSystemFamily.WINDOWS)
@@ -110,7 +110,7 @@ android {
 
 
     defaultConfig {
-        minSdkVersion 19
+        minSdkVersion 21
         targetSdkVersion 34
 
         vectorDrawables.generatedDensities = ['mdpi', 'hdpi', 'xhdpi', 'xxhdpi']
