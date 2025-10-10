@@ -57,6 +57,7 @@ public class CreateChannelFragment extends BaseFragment {
     private LaunchActivity mParentActivity;
 
     private HashMap<Long, TLRPC.User> selectedMap = new HashMap<>();
+    private AppCompatTextView tv_tip;
 
     public void setParentActivity(LaunchActivity parentActivity) {
         this.mParentActivity = parentActivity;
@@ -77,14 +78,21 @@ public class CreateChannelFragment extends BaseFragment {
 
         RoundLinearLayout selected_layout = new RoundLinearLayout(context);
         selected_layout.setRadius(6f);
-        selected_layout.setGravity(Gravity.CENTER_VERTICAL);
+        selected_layout.setGravity(Gravity.CENTER);
         selected_layout.setBackgroundColor(Color.WHITE);
         contentView.addView(selected_layout, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, 70, 0, 2, 0, 0));
+
+        tv_tip = new AppCompatTextView(context);
+        tv_tip.setText("选择一个或多个联系人发起群聊");
+        tv_tip.setTextColor(Color.parseColor("#999999"));
+        tv_tip.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 14f);
+        selected_layout.addView(tv_tip, LayoutHelper.createLinear(LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT));
 
         selectedListView = new RecyclerView(context);
         LinearLayoutManager layoutManager = new LinearLayoutManager(context);
         layoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
         selectedListView.setLayoutManager(layoutManager);
+        selectedListView.setVisibility(View.GONE);
         selected_layout.addView(selectedListView, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT));
 
         selectedListAdapter = new SelectedContactListAdapter(context);
@@ -141,11 +149,20 @@ public class CreateChannelFragment extends BaseFragment {
             avatarImageView.setForUserOrChat(user, avatarDrawable);
 
             holder.ll_container.addView(avatarImageView, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT));
-            holder.btnClose.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
+            holder.btnClose.setOnClickListener(view -> {
+                selectedDataList.remove(user);
+                notifyItemRemoved(position);
 
+                if (selectedDataList.isEmpty()) {
+                    selectedListView.setVisibility(View.GONE);
+                    tv_tip.setVisibility(View.VISIBLE);
+                } else {
+                    selectedListView.setVisibility(View.VISIBLE);
+                    tv_tip.setVisibility(View.GONE);
                 }
+
+                selectedMap.remove(user.id);
+                listAdapter.notifyDataSetChanged();
             });
         }
 
@@ -200,6 +217,14 @@ public class CreateChannelFragment extends BaseFragment {
                 selectedDataList.clear();
                 selectedDataList = new ArrayList<>(selectedMap.values());
                 selectedListAdapter.notifyDataSetChanged();
+
+                if (selectedDataList.isEmpty()) {
+                    selectedListView.setVisibility(View.GONE);
+                    tv_tip.setVisibility(View.VISIBLE);
+                } else {
+                    selectedListView.setVisibility(View.VISIBLE);
+                    tv_tip.setVisibility(View.GONE);
+                }
             });
         }
 

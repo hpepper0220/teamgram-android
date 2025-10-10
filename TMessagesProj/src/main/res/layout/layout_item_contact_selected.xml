@@ -28,7 +28,7 @@
             android:layout_height="18dp"
             android:layout_alignParentTop="true"
             android:layout_alignParentEnd="true"
-            android:background="#65a9e0"
+            android:background="#80000000"
             android:gravity="center"
             app:rRadius="10dp">
 

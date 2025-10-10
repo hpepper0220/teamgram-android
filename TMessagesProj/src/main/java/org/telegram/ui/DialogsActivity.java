@@ -3307,7 +3307,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                 return !actionBar.isActionModeShowed() && databaseMigrationHint == null;// && !rightSlidingDialogContainer.hasFragment();
             }
         });
-//        searchItem.setVisibility(View.GONE);
+        searchItem.setVisibility(View.GONE);
         searchItem.getSearchField().setTextColor(Color.BLACK);
         searchItem.getSearchField().setHintTextColor(Color.BLACK);
         searchItem.getSearchField().setCursorColor(Color.BLACK);
