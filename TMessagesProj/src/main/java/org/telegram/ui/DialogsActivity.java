@@ -100,6 +100,7 @@ import com.blankj.utilcode.util.ObjectUtils;
 import org.checkerframework.common.subtyping.qual.Bottom;
 import org.telegram.ext.AddFriendFragment;
 import org.telegram.ext.BottomItemView;
+import org.telegram.ext.CreateChannelFragment;
 import org.telegram.ext.SkContactsFragment;
 import org.telegram.ext.SkDiscoveryFragment;
 import org.telegram.ext.SkMineFragment;
@@ -3745,14 +3746,15 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                     PopupCreator.createAddContactPopup(getParentActivity(), actionBar.getActionBarMenu(), v -> {
                         if (v.getId() == R.id.popup_add_contact) {
                             AddFriendFragment addFriendFragment = new AddFriendFragment();
-                            if (getParentActivity() instanceof LaunchActivity) {
-                                addFriendFragment.setParentActivity((LaunchActivity) getParentActivity());
-                            }
+                            addFriendFragment.setParentActivity((LaunchActivity) getParentActivity());
                             presentFragment(addFriendFragment);
                         } else if (v.getId() == R.id.popup_create_group) {
-                            Bundle args = new Bundle();
-                            args.putInt("step", 0);
-                            presentFragment(new ChannelCreateActivity(args));
+//                            Bundle args = new Bundle();
+//                            args.putInt("step", 0);
+//                            presentFragment(new ChannelCreateActivity(args));
+                            CreateChannelFragment fragment = new CreateChannelFragment();
+                            fragment.setParentActivity((LaunchActivity) getParentActivity());
+                            presentFragment(fragment);
                         }
                     });
                 } else if (id == -1) {

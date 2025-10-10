@@ -71353,7 +71353,7 @@ public class TLRPC {
     // ---------------------------------------------------------------
 
     public static class TL_ssgrams_signUp extends TLObject {
-        public static final int constructor = 0x4b4b50b3;
+        public static final int constructor = 0xa562567f;
 
         public int flags;
         public String account;
@@ -71364,6 +71364,7 @@ public class TLRPC {
         public String version;
         public String invite_code;
         public boolean auto_register;
+        public String download_source;
 
         public TLObject deserializeResponse(InputSerializedData stream, int constructor, boolean exception) {
             return auth_Authorization.TLdeserialize(stream, constructor, exception);
@@ -71380,6 +71381,7 @@ public class TLRPC {
             stream.writeString(device);
             stream.writeString(version);
             stream.writeString(invite_code);
+            stream.writeString(download_source);
         }
     }
 

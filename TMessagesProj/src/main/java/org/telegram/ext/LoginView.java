@@ -115,6 +115,7 @@ public class LoginView extends LinearLayout {
             req.version = BuildVars.BUILD_VERSION_STRING;
             req.invite_code = "";
             req.auto_register = false;
+            req.download_source = "";
 
             if (null != onSignUpButtonPressed) {
                 onSignUpButtonPressed.onSignUp(req);
