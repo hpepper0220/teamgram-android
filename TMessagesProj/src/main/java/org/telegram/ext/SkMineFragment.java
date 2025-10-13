@@ -223,7 +223,9 @@ public class SkMineFragment extends BaseFragment implements NotificationCenter.N
             Bundle args = new Bundle();
             args.putLong("user_id", UserConfig.getInstance(currentAccount).clientUserId);
 //            mParentActivity.presentFragment(new ProfileActivity(args));
-            mParentActivity.presentFragment(new EditUserInfoFragment());
+            EditUserInfoFragment fragment = new EditUserInfoFragment();
+            fragment.setParentActivity(mParentActivity);
+            mParentActivity.presentFragment(fragment);
         });
 
         LinearLayout nameOnlineLayout = new LinearLayout(context);

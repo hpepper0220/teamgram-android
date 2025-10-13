@@ -5,10 +5,9 @@
     android:layout_height="50dp">
 
     <FrameLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="6dp">
+        android:layout_width="50dp"
+        android:layout_height="36dp"
+        android:layout_centerHorizontal="true">
 
         <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/icon"
@@ -20,9 +19,7 @@
             android:id="@+id/msg_view"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="end|top"
-            android:translationX="4dp"
-            android:translationY="-4dp" />
+            android:layout_gravity="end|top" />
     </FrameLayout>
 
 

@@ -19,6 +19,7 @@ import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.SystemClock;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
@@ -1410,6 +1411,7 @@ public class DialogsAdapter extends RecyclerListView.SelectionAdapter implements
         }
     }
 
+    int total_unread_count = 0;
 
     private void updateItemList() {
         itemInternals.clear();
@@ -1421,6 +1423,19 @@ public class DialogsAdapter extends RecyclerListView.SelectionAdapter implements
             array = new ArrayList<>();
         }
         dialogsCount = array.size();
+
+        total_unread_count = 0;
+
+        for (int i = 0; i < array.size(); i++) {
+            TLRPC.Dialog dialog = array.get(i);
+            int unread_count = dialog.unread_count;
+            total_unread_count += unread_count;
+        }
+
+        parentFragment.updateUnreadMsgCount(total_unread_count);
+
+        Log.e("DialogsAdapter", "total_unread_count -----> " + total_unread_count);
+
         isEmpty = false;
         if (dialogsCount == 0 && parentFragment.isArchive()) {
             itemInternals.add(new ItemInternal(VIEW_TYPE_ARCHIVE_FULLSCREEN));

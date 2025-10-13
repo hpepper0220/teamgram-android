@@ -38,18 +38,18 @@ public class PopupCreator {
                 });
                 layout.addView(popupCell, LayoutHelper.createLinear(LayoutHelper.WRAP_CONTENT, 46));
 
-                PopupCell popupCell1 = new PopupCell(context);
-                popupCell1.setId(R.id.popup_create_group);
-                popupCell1.setData("创建群组", R.drawable.msg_groups_create);
-                popupCell1.setBackground(Theme.createSimpleSelectorRoundRectDrawable(AndroidUtilities.dp(3), Color.WHITE, 0xFF696969));
-                popupCell1.setPadding(AndroidUtilities.dp(12), 0, AndroidUtilities.dp(12), 0);
-                popupCell1.setOnClickListener(v -> {
-                    dismiss();
-                    if (null != listener) {
-                        listener.onClick(v);
-                    }
-                });
-                layout.addView(popupCell1, LayoutHelper.createLinear(LayoutHelper.WRAP_CONTENT, 46));
+//                PopupCell popupCell1 = new PopupCell(context);
+//                popupCell1.setId(R.id.popup_create_group);
+//                popupCell1.setData("创建群组", R.drawable.msg_groups_create);
+//                popupCell1.setBackground(Theme.createSimpleSelectorRoundRectDrawable(AndroidUtilities.dp(3), Color.WHITE, 0xFF696969));
+//                popupCell1.setPadding(AndroidUtilities.dp(12), 0, AndroidUtilities.dp(12), 0);
+//                popupCell1.setOnClickListener(v -> {
+//                    dismiss();
+//                    if (null != listener) {
+//                        listener.onClick(v);
+//                    }
+//                });
+//                layout.addView(popupCell1, LayoutHelper.createLinear(LayoutHelper.WRAP_CONTENT, 46));
 
                 return layout;
             }

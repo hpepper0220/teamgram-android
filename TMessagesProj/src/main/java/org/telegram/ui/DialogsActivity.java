@@ -5645,14 +5645,16 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         return fragmentView;
     }
 
+    public void updateUnreadMsgCount(int count) {
+        navigationController.setHasMessage(0, true);
+        navigationController.setMessageNumber(0, count);
+    }
+
     private void refreshApplyCount() {
-        SkRepository.getInstance().getApplyCount(currentAccount, classGuid, new SimpleCallback<Integer>() {
-            @Override
-            public void onResp(Integer result) {
-                // todo 更新底部数量
-                navigationController.setHasMessage(1, true);
-                navigationController.setMessageNumber(1, result);
-            }
+        SkRepository.getInstance().getApplyCount(currentAccount, classGuid, result -> {
+            // todo 更新底部数量
+            navigationController.setHasMessage(1, true);
+            navigationController.setMessageNumber(1, result);
         });
     }
 
@@ -11254,6 +11256,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
 
     @NonNull
     public ArrayList<TLRPC.Dialog> getDialogsArray(int currentAccount, int dialogsType, int folderId, boolean frozen) {
+        Log.e("DialogsActivity", "dialogsType ===========> " + dialogsType);
         if (frozen && frozenDialogsList != null) {
             return frozenDialogsList;
         }

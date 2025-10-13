@@ -59,6 +59,7 @@ public class EditUserInfoFragment extends BaseFragment implements ImageUpdater.I
     private TLRPC.FileLocation avatar;
     private TLRPC.FileLocation avatarBig;
     private AvatarDrawable avatarDrawable;
+    private AppCompatTextView tv_nickname;
 
     public void setParentActivity(LaunchActivity parentActivity) {
         this.mParentActivity = parentActivity;
@@ -155,13 +156,15 @@ public class EditUserInfoFragment extends BaseFragment implements ImageUpdater.I
         nickname_layout.setOrientation(LinearLayout.HORIZONTAL);
         contentView.addView(nickname_layout, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, AndroidUtilities.dp(16), 0, 16, 0, 0));
 
+        nickname_layout.setOnClickListener(view -> mParentActivity.presentFragment(new EditNicknameFragment()));
+
         AppCompatTextView tv_nickname_title = new AppCompatTextView(context);
         tv_nickname_title.setText("昵称");
         tv_nickname_title.setGravity(Gravity.CENTER_VERTICAL);
         tv_nickname_title.setPadding(12, 0, 12, 0);
         nickname_layout.addView(tv_nickname_title, LayoutHelper.createLinear(LayoutHelper.WRAP_CONTENT, LayoutHelper.MATCH_PARENT, 8, 0, 8, 0));
 
-        AppCompatTextView tv_nickname = new AppCompatTextView(context);
+        tv_nickname = new AppCompatTextView(context);
         tv_nickname.setMaxLines(1);
         tv_nickname.setTextColor(Color.BLACK);
         tv_nickname.setEllipsize(TextUtils.TruncateAt.END);
@@ -255,6 +258,13 @@ public class EditUserInfoFragment extends BaseFragment implements ImageUpdater.I
     private void updateUserInfo() {
         avatarDrawable.setColor(Theme.getColor(Theme.key_avatar_backgroundInProfileBlue));
         avatarImageView.setForUserOrChat(latestUser, avatarDrawable);
+
+        CharSequence text = UserObject.getUserName(latestUser);
+        try {
+            text = Emoji.replaceEmoji(text, tv_nickname.getPaint().getFontMetricsInt(), false, AndroidUtilities.dp(22));
+        } catch (Exception ignore) {
+        }
+        tv_nickname.setText(text);
     }
 
     private void uploadAvatar() {
