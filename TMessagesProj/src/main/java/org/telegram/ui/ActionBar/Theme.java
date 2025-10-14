@@ -3566,6 +3566,7 @@ public class Theme {
     public static final int key_actionBarBrowser = colorsCount++;
 
     public static final int key_chats_onlineCircle = colorsCount++;
+    // 杭椒 会话列表 未读消息数背景色
     public static final int key_chats_unreadCounter = colorsCount++;
     public static final int key_chats_unreadCounterMuted = colorsCount++;
     public static final int key_chats_unreadCounterText = colorsCount++;

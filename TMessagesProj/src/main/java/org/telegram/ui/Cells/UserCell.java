@@ -546,6 +546,8 @@ public class UserCell extends FrameLayout implements NotificationCenter.Notifica
                 }
             } else if (currentChat != null) {
                 avatarDrawable.setInfo(currentAccount, currentChat);
+                // 杭椒 群组标题居中显示
+                ((LayoutParams) nameTextView.getLayoutParams()).topMargin = dp(19);
             } else if (currentName != null) {
                 avatarDrawable.setInfo(currentId, currentName.toString(), null);
             } else {

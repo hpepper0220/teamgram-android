@@ -218,7 +218,7 @@ public class ThemeColors {
         defaultColors[key_actionBarDefaultArchivedSearchPlaceholder] = 0x88ffffff;
 
         defaultColors[key_chats_onlineCircle] = 0xff4bcb1c;
-        defaultColors[key_chats_unreadCounter] = 0xff4ecc5e;
+        defaultColors[key_chats_unreadCounter] = 0xffff4444;
         defaultColors[key_chats_unreadCounterMuted] = 0xffc6c9cc;
         defaultColors[key_chats_unreadCounterText] = 0xffffffff;
         defaultColors[key_chats_archiveBackground] = 0xff66a9e0;

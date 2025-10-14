@@ -5645,6 +5645,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         return fragmentView;
     }
 
+    // 杭椒 更新消息未读数量
     public void updateUnreadMsgCount(int count) {
         navigationController.setHasMessage(0, true);
         navigationController.setMessageNumber(0, count);

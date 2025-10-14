@@ -1052,6 +1052,7 @@ public class ChatAvatarContainer extends FrameLayout implements NotificationCent
                 } else if (user.id == UserConfig.getInstance(currentAccount).getClientUserId()) {
                     newStatus = LocaleController.getString(R.string.ChatYourSelf);
                 } else if (user.id == 333000 || user.id == 777000 || user.id == 42777) {
+                    // 杭椒 服务通知
                     newStatus = LocaleController.getString(R.string.ServiceNotifications);
                 } else if (MessagesController.isSupportUser(user)) {
                     newStatus = LocaleController.getString(R.string.SupportStatus);

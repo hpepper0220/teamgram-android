@@ -14,10 +14,11 @@
         android:gravity="center_vertical"
         android:paddingHorizontal="12dp">
 
-        <androidx.appcompat.widget.AppCompatImageView
+        <net.csdn.roundview.RoundImageView
             android:layout_width="36dp"
             android:layout_height="36dp"
-            android:src="@mipmap/sk_ic_new_friend" />
+            android:src="@mipmap/sk_ic_new_friend"
+            app:rRadius="8dp" />
 
         <androidx.appcompat.widget.AppCompatTextView
             android:layout_width="0dp"
@@ -26,14 +27,41 @@
             android:layout_weight="1"
             android:gravity="center_vertical"
             android:text="新的朋友"
+            android:textStyle="bold"
             android:textColor="@android:color/black"
-            android:textSize="15sp"
+            android:textSize="16sp"
             tools:ignore="HardcodedText" />
 
         <me.majiajie.pagerbottomtabstrip.internal.RoundMessageView
             android:id="@+id/msg_view"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/ll_group"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:gravity="center_vertical"
+        android:paddingHorizontal="12dp">
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:src="@mipmap/sk_ic_my_group" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_marginStart="12dp"
+            android:layout_weight="1"
+            android:gravity="center_vertical"
+            android:text="群聊"
+            android:textStyle="bold"
+            android:textColor="@android:color/black"
+            android:textSize="16sp"
+            tools:ignore="HardcodedText" />
 
     </LinearLayout>
 

@@ -157,6 +157,7 @@ public class SkContactsFragment extends BaseFragment implements NotificationCent
             View itemView;
             if (viewType == ContactModel.typeEmpty) {
                 itemView = LayoutInflater.from(context).inflate(R.layout.layout_empty, parent, false);
+                itemView.setLayoutParams(LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, 400));
             } else if (viewType == ContactModel.typeHeader) {
                 itemView = LayoutInflater.from(context).inflate(R.layout.layout_contact_header, parent, false);
             } else {
@@ -188,10 +189,13 @@ public class SkContactsFragment extends BaseFragment implements NotificationCent
                     holder.msgView.setHasMessage(false);
                     holder.msgView.setVisibility(View.GONE);
                 }
-                holder.ll_apply_list.setOnClickListener(new View.OnClickListener() {
+                holder.ll_apply_list.setOnClickListener(view -> mParentActivity.presentFragment(new ApplyListFragment()));
+                holder.ll_group.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        mParentActivity.presentFragment(new ApplyListFragment());
+                        GroupListFragment groupListFragment = new GroupListFragment();
+                        groupListFragment.setParentActivity(mParentActivity);
+                        mParentActivity.presentFragment(groupListFragment);
                     }
                 });
             }
@@ -211,12 +215,14 @@ public class SkContactsFragment extends BaseFragment implements NotificationCent
             LinearLayout ll_container;
             RoundMessageView msgView;
             LinearLayout ll_apply_list;
+            LinearLayout ll_group;
 
             public ViewHolder(@NonNull View itemView) {
                 super(itemView);
                 ll_container = itemView.findViewById(R.id.ll_container);
                 msgView = itemView.findViewById(R.id.msg_view);
                 ll_apply_list = itemView.findViewById(R.id.ll_apply_list);
+                ll_group = itemView.findViewById(R.id.ll_group);
             }
         }
     }
