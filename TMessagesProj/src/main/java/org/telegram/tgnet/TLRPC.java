@@ -71352,6 +71352,23 @@ public class TLRPC {
 
     // ---------------------------------------------------------------
 
+    public static class TL_ssgrams_checkAccountAndPassword extends TLObject {
+        public static final int constructor = 0xdcb5091e;
+
+        public String account;
+        public String password;
+
+        public TLObject deserializeResponse(InputSerializedData stream, int constructor, boolean exception) {
+            return Bool.TLdeserialize(stream, constructor, exception);
+        }
+
+        public void serializeToStream(OutputSerializedData stream) {
+            stream.writeInt32(constructor);
+            stream.writeString(account);
+            stream.writeString(password);
+        }
+    }
+
     public static class TL_ssgrams_signUp extends TLObject {
         public static final int constructor = 0xa562567f;
 

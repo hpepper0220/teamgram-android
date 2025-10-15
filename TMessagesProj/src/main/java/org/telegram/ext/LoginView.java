@@ -101,24 +101,24 @@ public class LoginView extends LinearLayout {
         setLayoutAnimation(controller);
 
         signUpButton.setOnClickListener(view -> {
-            TLRPC.TL_ssgrams_signUp req = new TLRPC.TL_ssgrams_signUp();
-            req.account = Objects.requireNonNull(usernameEt.getText()).toString();
-            req.password = Objects.requireNonNull(passwordEt.getText()).toString();
+//            TLRPC.TL_ssgrams_signUp req = new TLRPC.TL_ssgrams_signUp();
+//            req.account = Objects.requireNonNull(usernameEt.getText()).toString();
+//            req.password = Objects.requireNonNull(passwordEt.getText()).toString();
+//
+//            if (req.account.isEmpty() || req.password.isEmpty()) {
+//                return;
+//            }
 
-            if (req.account.isEmpty() || req.password.isEmpty()) {
-                return;
-            }
-
-            req.first_name = req.account;
-            req.last_name = "";
-            req.device = DeviceUtils.getUniqueDeviceId();
-            req.version = BuildVars.BUILD_VERSION_STRING;
-            req.invite_code = "";
-            req.auto_register = false;
-            req.download_source = "";
+//            req.first_name = req.account;
+//            req.last_name = "";
+//            req.device = DeviceUtils.getUniqueDeviceId();
+//            req.version = BuildVars.BUILD_VERSION_STRING;
+//            req.invite_code = "";
+//            req.auto_register = false;
+//            req.download_source = "";
 
             if (null != onSignUpButtonPressed) {
-                onSignUpButtonPressed.onSignUp(req);
+                onSignUpButtonPressed.onSignUp(Objects.requireNonNull(usernameEt.getText()).toString(), Objects.requireNonNull(passwordEt.getText()).toString());
             }
         });
 
@@ -196,7 +196,8 @@ public class LoginView extends LinearLayout {
     }
 
     public interface OnSignUpButtonPressed {
-        void onSignUp(TLRPC.TL_ssgrams_signUp req);
+//        void onSignUp(TLRPC.TL_ssgrams_signUp req);
+        void onSignUp(String account, String password);
         void onSignIn(TLRPC.TL_ssgrams_signIn req);
     }
 }
