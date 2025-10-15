@@ -3,6 +3,8 @@ import android.util.Log;
 
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.tgnet.ConnectionsManager;
+import org.telegram.tgnet.RequestDelegate;
+import org.telegram.tgnet.TLObject;
 import org.telegram.tgnet.TLRPC;
 import org.telegram.tgnet.TLRPC.TL_ssgrams_getDiscoverPage;
 
@@ -62,6 +64,16 @@ public class SkRepository {
             });
         }, ConnectionsManager.RequestFlagFailOnServerErrors);
         ConnectionsManager.getInstance(currentAccount).bindRequestToGuid(reqId, classGuid);
+    }
+
+    public void getChannels(int currentAccount, int classGuid) {
+        TLRPC.TL_channels_getInactiveChannels req = new TLRPC.TL_channels_getInactiveChannels();
+        ConnectionsManager.getInstance(currentAccount).sendRequest(req, new RequestDelegate() {
+            @Override
+            public void run(TLObject response, TLRPC.TL_error error) {
+
+            }
+        });
     }
 
 }

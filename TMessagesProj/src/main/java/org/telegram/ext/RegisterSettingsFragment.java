@@ -63,7 +63,6 @@ import org.telegram.ui.TwoStepVerificationSetupActivity;
 import org.telegram.ui.RestrictedLanguagesSelectActivity;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 
 public class RegisterSettingsFragment extends BaseFragment implements ImageUpdater.ImageUpdaterDelegate {

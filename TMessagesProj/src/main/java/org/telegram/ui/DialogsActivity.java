@@ -3747,7 +3747,10 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                         if (v.getId() == R.id.popup_add_contact) {
                             AddFriendFragment addFriendFragment = new AddFriendFragment();
                             addFriendFragment.setParentActivity((LaunchActivity) getParentActivity());
-                            presentFragment(addFriendFragment);
+//                            presentFragment(addFriendFragment);
+                            Bundle bundle = new Bundle();
+                            bundle.putInt("step", 0);
+                            presentFragment(new ChannelCreateActivity(bundle));
                         } else if (v.getId() == R.id.popup_create_group) {
 //                            Bundle args = new Bundle();
 //                            args.putInt("step", 0);

@@ -190,13 +190,15 @@ public class SkContactsFragment extends BaseFragment implements NotificationCent
                     holder.msgView.setVisibility(View.GONE);
                 }
                 holder.ll_apply_list.setOnClickListener(view -> mParentActivity.presentFragment(new ApplyListFragment()));
-                holder.ll_group.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        GroupListFragment groupListFragment = new GroupListFragment();
-                        groupListFragment.setParentActivity(mParentActivity);
-                        mParentActivity.presentFragment(groupListFragment);
-                    }
+                holder.ll_group.setOnClickListener(view -> {
+                    GroupListFragment groupListFragment = new GroupListFragment();
+                    groupListFragment.setParentActivity(mParentActivity);
+                    mParentActivity.presentFragment(groupListFragment);
+                });
+                holder.ll_channel.setOnClickListener(view -> {
+                    ChannelListFragment channelListFragment = new ChannelListFragment();
+                    channelListFragment.setParentActivity(mParentActivity);
+                    mParentActivity.presentFragment(channelListFragment);
                 });
             }
         }
@@ -216,6 +218,7 @@ public class SkContactsFragment extends BaseFragment implements NotificationCent
             RoundMessageView msgView;
             LinearLayout ll_apply_list;
             LinearLayout ll_group;
+            LinearLayout ll_channel;
 
             public ViewHolder(@NonNull View itemView) {
                 super(itemView);
@@ -223,6 +226,7 @@ public class SkContactsFragment extends BaseFragment implements NotificationCent
                 msgView = itemView.findViewById(R.id.msg_view);
                 ll_apply_list = itemView.findViewById(R.id.ll_apply_list);
                 ll_group = itemView.findViewById(R.id.ll_group);
+                ll_channel = itemView.findViewById(R.id.ll_channel);
             }
         }
     }

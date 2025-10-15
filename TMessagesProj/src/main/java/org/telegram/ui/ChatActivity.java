@@ -7710,8 +7710,10 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         if (!ChatObject.isChannel(currentChat) || currentChat.megagroup) {
             chatActivityEnterView.setBotInfo(botInfo, false);
         }
-        boolean isService = UserObject.isService(currentUser.id);
-        Log.e("ChatActivity", "isService --------> " + isService);
+        if (null != currentUser) {
+            boolean isService = UserObject.isService(currentUser.id);
+            Log.e("ChatActivity", "isService --------> " + isService);
+        }
         contentView.addView(chatActivityEnterView, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, Gravity.LEFT | Gravity.BOTTOM));
         if (chatMode != MODE_EDIT_BUSINESS_LINK) {
             chatActivityEnterView.checkChannelRights();

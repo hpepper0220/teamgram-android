@@ -19,12 +19,10 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
-import org.telegram.ext.model.ApplyModel;
+import org.telegram.ext.model.ChannelModel;
 import org.telegram.ext.model.ContactModel;
 import org.telegram.ext.model.GroupModel;
-import org.telegram.ext.respository.SkRepository;
 import org.telegram.messenger.AndroidUtilities;
-import org.telegram.messenger.LocaleController;
 import org.telegram.messenger.R;
 import org.telegram.tgnet.TLRPC;
 import org.telegram.ui.ActionBar.ActionBar;
@@ -40,14 +38,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class GroupListFragment extends BaseFragment {
+public class ChannelListFragment extends BaseFragment {
     private FrameLayout frameContainerView;
     private RecyclerView listview;
     private SwipeRefreshLayout refreshLayout;
     private RadialProgressView progressView;
     private AnimatorSet animatorSet;
     private int curPage = 1;
-    private List<GroupModel> dataList = new ArrayList<>();
+    private List<ChannelModel> dataList = new ArrayList<>();
     private GroupListAdapter listAdapter;
     private LaunchActivity mParentActivity;
 
@@ -114,16 +112,16 @@ public class GroupListFragment extends BaseFragment {
                     dataList.clear();
                     TLRPC.TL_messages_dialogsSlice result = (TLRPC.TL_messages_dialogsSlice) response;
                     for (int i = 0; i < result.chats.size(); i++) {
-                        if (result.chats.get(i) instanceof TLRPC.TL_chat) {
+                        if (result.chats.get(i) instanceof TLRPC.TL_channel) {
                             Log.e("GroupListFragment", "name ------> " + result.chats.get(i).title);
-                            GroupModel model = new GroupModel();
+                            ChannelModel model = new ChannelModel();
                             model.setItemType(GroupModel.typeData);
-                            model.setData(result.chats.get(i));
+                            model.setData((TLRPC.TL_channel) result.chats.get(i));
                             dataList.add(model);
                         }
                     }
                     if (dataList.isEmpty()) {
-                        GroupModel model = new GroupModel();
+                        ChannelModel model = new ChannelModel();
                         model.setItemType(GroupModel.typeEmpty);
                         dataList.add(model);
                     }
@@ -143,22 +141,22 @@ public class GroupListFragment extends BaseFragment {
 
         @NonNull
         @Override
-        public GroupListAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
             View itemView;
             if (viewType == ContactModel.typeEmpty) {
                 itemView = LayoutInflater.from(context).inflate(R.layout.layout_empty, parent, false);
             } else {
                 itemView = LayoutInflater.from(context).inflate(R.layout.layout_item_group, parent, false);
             }
-            return new GroupListAdapter.ViewHolder(itemView);
+            return new ViewHolder(itemView);
         }
 
         @Override
-        public void onBindViewHolder(@NonNull GroupListAdapter.ViewHolder holder, int position) {
+        public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
             if (dataList.get(position).getItemType() == ContactModel.typeData) {
                 UserCell userCell = new UserCell(context, 1, 1, false);
                 holder.ll_container.removeAllViews();
-                TLRPC.Chat itemData = dataList.get(position).getData();
+                TLRPC.TL_channel itemData = dataList.get(position).getData();
                 userCell.setData(itemData, itemData.title, null, 0);
                 holder.ll_container.addView(userCell, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT));
                 userCell.setOnClickListener(view -> {

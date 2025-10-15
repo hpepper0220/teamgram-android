@@ -192,10 +192,11 @@ public class SkDiscoveryFragment extends BaseFragment {
                 holder.atvContent.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteBlackText));
                 holder.containerView.setBackground(Theme.createSimpleSelectorRoundRectDrawable(0, 0xFFFFFFFF, 0xFFF0F0F0));
                 holder.containerView.setOnClickListener(v -> {
-                    Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(itemData.url));
-                    intent.addCategory(Intent.CATEGORY_BROWSABLE);
-                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                    context.startActivity(intent);
+                    WebActivity.launch(context, getUserConfig().clientUserId, itemData.title, itemData.url);
+//                    Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(itemData.url));
+//                    intent.addCategory(Intent.CATEGORY_BROWSABLE);
+//                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+//                    context.startActivity(intent);
                 });
 
                 Glide.with(context).load(itemData.logo).diskCacheStrategy(DiskCacheStrategy.ALL).transform(new RoundedCorners(30)).transition(DrawableTransitionOptions.withCrossFade()).into(holder.imageView);
