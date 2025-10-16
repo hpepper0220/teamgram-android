@@ -8,9 +8,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.net.Uri;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.WebSettings;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -76,6 +78,9 @@ public class SkDiscoveryFragment extends BaseFragment {
         refreshLayout.addView(listview, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT));
 
         createProgressView(context);
+
+        String userAgent = WebSettings.getDefaultUserAgent(context);
+        Log.e("UA", "Default UA: " + userAgent);
 
         return frameContainerView;
     }

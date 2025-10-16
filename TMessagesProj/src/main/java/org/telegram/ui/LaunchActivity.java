@@ -986,7 +986,7 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
 
         RestrictedLanguagesSelectActivity.checkRestrictedLanguages(false);
 
-        TgUtils.setGlobalInfo(currentAccount);
+        TgUtils.setGlobalInfo(this, currentAccount);
     }
 
     private void showAttachMenuBot(TLRPC.TL_attachMenuBot attachMenuBot, String startApp, boolean sidemenu) {

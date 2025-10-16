@@ -111,7 +111,7 @@ public class ChatThemeController extends BaseController {
                     isError = true;
                     AndroidUtilities.runOnUIThread(() -> callback.onError(error));
                 }
-                if (!isError) {
+                if (!isError && !chatThemes.isEmpty()) {
                     if (withDefault && !chatThemes.get(0).showAsDefaultStub) {
                         chatThemes.add(0, EmojiThemes.createChatThemesDefault(currentAccount));
                     }

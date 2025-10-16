@@ -1848,11 +1848,12 @@ uint8_t ConnectionsManager::getIpStratagy() {
     return ipStrategy;
 }
 
-void ConnectionsManager::updateGlobal(std::string mId, std::string ip) {
+void ConnectionsManager::updateGlobal(std::string mId, std::string ip, std::string userAgent) {
     scheduleTask([&, mId, ip] {
-        if (LOGS_ENABLED) DEBUG_D("updateGlobal merchantId： %s ipAddress： %s", mId.c_str(), ip.c_str());
+        if (LOGS_ENABLED) DEBUG_D("updateGlobal merchantId： %s ipAddress： %s userAgent： %s", mId.c_str(), ip.c_str(), userAgent.c_str());
         merchantId = mId;
         ipAddress = ip;
+        user_agent = userAgent;
     });
 }
 
@@ -3313,6 +3314,13 @@ std::unique_ptr<TLObject> ConnectionsManager::wrapInLayer(TLObject *object, Data
             jsonString = new TL_jsonString();
             jsonString->value = ipAddress;
             objectValue->key = "client_addr";
+            objectValue->value = std::unique_ptr<JSONValue>(jsonString);
+
+            objectValue = new TL_jsonObjectValue();
+            jsonObject->value.push_back(std::unique_ptr<TL_jsonObjectValue>(objectValue));
+            jsonString = new TL_jsonString();
+            jsonString->value = user_agent;
+            objectValue->key = "user_agent";
             objectValue->value = std::unique_ptr<JSONValue>(jsonString);
 
             objectValue = new TL_jsonObjectValue();
