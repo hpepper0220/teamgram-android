@@ -130,3 +130,10 @@
 # 保留 Room 实体类（Entity）、字段、Dao 接口
 -keep class androidx.room.** { *; }
 -keep class * extends androidx.room.RoomDatabase
+
+# 忽略丢失的类，不要报错
+-dontwarn com.alipay.sdk.**
+-dontwarn com.download.library.**
+
+# 保留 AgentWeb 相关类（避免混淆出错）
+-keep class com.just.agentweb.** { *; }

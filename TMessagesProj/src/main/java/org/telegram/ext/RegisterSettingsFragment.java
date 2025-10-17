@@ -43,6 +43,7 @@ import org.telegram.messenger.MessagesStorage;
 import org.telegram.messenger.NotificationCenter;
 import org.telegram.messenger.R;
 import org.telegram.messenger.UserConfig;
+import org.telegram.messenger.Utilities;
 import org.telegram.tgnet.ConnectionsManager;
 import org.telegram.tgnet.RequestDelegate;
 import org.telegram.tgnet.TLObject;
@@ -234,6 +235,10 @@ public class RegisterSettingsFragment extends BaseFragment implements ImageUpdat
                                 contentView.postDelayed(() -> {
                                     AndroidUtilities.hideKeyboard(contentView.findFocus());
                                     onAuthSuccess((TLRPC.TL_auth_authorization) response, true);
+                                    if (avatarBig != null) {
+                                        TLRPC.FileLocation avatar = avatarBig;
+                                        Utilities.cacheClearQueue.postRunnable(()-> MessagesController.getInstance(currentAccount).uploadAndApplyUserAvatar(avatar));
+                                    }
                                 }, 150);
                             } else {
                                 if (error.text.contains("PHONE_NUMBER_INVALID")) {

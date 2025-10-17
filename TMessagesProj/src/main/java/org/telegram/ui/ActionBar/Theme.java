@@ -4993,9 +4993,9 @@ public class Theme {
         }
 
         int switchToTheme = needSwitchToTheme();
-        if (switchToTheme == 2) {
-            applyingTheme = currentNightTheme;
-        }
+//        if (switchToTheme == 2) {
+//            applyingTheme = currentNightTheme;
+//        }
         applyTheme(applyingTheme, false, false, switchToTheme == 2);
         AndroidUtilities.runOnUIThread(Theme::checkAutoNightThemeConditions);
     }
@@ -7035,7 +7035,8 @@ public class Theme {
     }
 
     public static boolean isCurrentThemeDark() {
-        return currentTheme.isDark();
+//        return currentTheme.isDark();
+        return false;
     }
 
     public static ThemeInfo getActiveTheme() {
@@ -7233,7 +7234,7 @@ public class Theme {
         cancelAutoNightThemeCallbacks();
         int switchToTheme = needSwitchToTheme();
         if (switchToTheme != 0) {
-            applyDayNightThemeMaybe(switchToTheme == 2);
+//            applyDayNightThemeMaybe(switchToTheme == 2);
         }
         if (force) {
             lastThemeSwitchTime = 0;
@@ -10569,7 +10570,8 @@ public class Theme {
     }
 
     public static boolean isCurrentThemeDay() {
-        return !getActiveTheme().isDark();
+//        return !getActiveTheme().isDark();
+        return true;
     }
 
     public static boolean isHome(ThemeAccent accent) {
