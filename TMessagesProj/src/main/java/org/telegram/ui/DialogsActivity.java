@@ -3747,10 +3747,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                         if (v.getId() == R.id.popup_add_contact) {
                             AddFriendFragment addFriendFragment = new AddFriendFragment();
                             addFriendFragment.setParentActivity((LaunchActivity) getParentActivity());
-//                            presentFragment(addFriendFragment);
-                            Bundle bundle = new Bundle();
-                            bundle.putInt("step", 0);
-                            presentFragment(new ChannelCreateActivity(bundle));
+                            presentFragment(addFriendFragment);
                         } else if (v.getId() == R.id.popup_create_group) {
 //                            Bundle args = new Bundle();
 //                            args.putInt("step", 0);
@@ -4448,33 +4445,33 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                 }
                 onItemClick(view, position, viewPage.dialogsAdapter, x, y);
             });
-            viewPage.listView.setOnItemLongClickListener(new RecyclerListView.OnItemLongClickListenerExtended() {
-                @Override
-                public boolean onItemClick(View view, int position, float x, float y) {
-                    if (view instanceof DialogCell && ((DialogCell) view).isBlocked()) {
-                        showPremiumBlockedToast(view, ((DialogCell) view).getDialogId());
-                        return true;
-                    }
-                    if (filterTabsView != null && filterTabsView.getVisibility() == View.VISIBLE && filterTabsView.isEditing()) {
-                        return false;
-                    }
-                    return onItemLongClick(viewPage.listView, view, position, x, y, viewPage.dialogsType, viewPage.dialogsAdapter);
-                }
-
-                @Override
-                public void onMove(float dx, float dy) {
-                    if (AndroidUtilities.displaySize.x > AndroidUtilities.displaySize.y) {
-                        movePreviewFragment(dy);
-                    }
-                }
-
-                @Override
-                public void onLongClickRelease() {
-                    if (AndroidUtilities.displaySize.x > AndroidUtilities.displaySize.y) {
-                        finishPreviewFragment();
-                    }
-                }
-            });
+//            viewPage.listView.setOnItemLongClickListener(new RecyclerListView.OnItemLongClickListenerExtended() {
+//                @Override
+//                public boolean onItemClick(View view, int position, float x, float y) {
+//                    if (view instanceof DialogCell && ((DialogCell) view).isBlocked()) {
+//                        showPremiumBlockedToast(view, ((DialogCell) view).getDialogId());
+//                        return true;
+//                    }
+//                    if (filterTabsView != null && filterTabsView.getVisibility() == View.VISIBLE && filterTabsView.isEditing()) {
+//                        return false;
+//                    }
+//                    return onItemLongClick(viewPage.listView, view, position, x, y, viewPage.dialogsType, viewPage.dialogsAdapter);
+//                }
+//
+//                @Override
+//                public void onMove(float dx, float dy) {
+//                    if (AndroidUtilities.displaySize.x > AndroidUtilities.displaySize.y) {
+//                        movePreviewFragment(dy);
+//                    }
+//                }
+//
+//                @Override
+//                public void onLongClickRelease() {
+//                    if (AndroidUtilities.displaySize.x > AndroidUtilities.displaySize.y) {
+//                        finishPreviewFragment();
+//                    }
+//                }
+//            });
             viewPage.swipeController = new SwipeController(viewPage);
             viewPage.recyclerItemsEnterAnimator = new RecyclerItemsEnterAnimator(viewPage.listView, false);
 

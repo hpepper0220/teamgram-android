@@ -16233,7 +16233,9 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
         } else if (currentMessageObject.isRepostPreview) {
             timeString = LocaleController.formatSmallDateChat(messageObject.messageOwner.date) + ", " + LocaleController.getInstance().getFormatterDay().format((long) (messageObject.messageOwner.date) * 1000);
         } else if (edited) {
-            timeString = getString(R.string.EditedMessage) + " " + LocaleController.getInstance().getFormatterDay().format((long) (messageObject.messageOwner.date) * 1000);
+//            timeString = getString(R.string.EditedMessage) + " " + LocaleController.getInstance().getFormatterDay().format((long) (messageObject.messageOwner.date) * 1000);
+            /// 杭椒 隐藏已编辑标识
+            timeString = LocaleController.getInstance().getFormatterDay().format((long) (messageObject.messageOwner.date) * 1000);
         } else if (currentMessageObject.isSaved && currentMessageObject.messageOwner.fwd_from != null && (currentMessageObject.messageOwner.fwd_from.date != 0 || currentMessageObject.messageOwner.fwd_from.saved_date != 0)) {
             int date = currentMessageObject.messageOwner.fwd_from.saved_date;
             if (date == 0) {
@@ -24767,9 +24769,9 @@ public class ChatMessageCell extends BaseCell implements SeekBar.SeekBarDelegate
                     if (i == 0) {
                         animateEditedLayout = new StaticLayout(editedStr, Theme.chat_timePaint, timeTextWidth + dp(100), Layout.Alignment.ALIGN_NORMAL, 1.0f, 0.0f, false);
                         SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder();
-                        spannableStringBuilder.append(editedStr);
+//                        spannableStringBuilder.append(editedStr);
                         spannableStringBuilder.append(text.subSequence(editedStr.length(), text.length()));
-                        spannableStringBuilder.setSpan(new EmptyStubSpan(), 0, editedStr.length(), 0);
+//                        spannableStringBuilder.setSpan(new EmptyStubSpan(), 0, editedStr.length(), 0);
                         animateTimeLayout = new StaticLayout(spannableStringBuilder, Theme.chat_timePaint, timeTextWidth + dp(100), Layout.Alignment.ALIGN_NORMAL, 1.0f, 0.0f, false);
                         animateEditedWidthDiff = timeWidth - lastTimeWidth;
                     } else {

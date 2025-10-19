@@ -4993,9 +4993,9 @@ public class Theme {
         }
 
         int switchToTheme = needSwitchToTheme();
-//        if (switchToTheme == 2) {
-//            applyingTheme = currentNightTheme;
-//        }
+        if (switchToTheme == 2) {
+            applyingTheme = currentNightTheme;
+        }
         applyTheme(applyingTheme, false, false, switchToTheme == 2);
         AndroidUtilities.runOnUIThread(Theme::checkAutoNightThemeConditions);
     }
@@ -7130,74 +7130,74 @@ public class Theme {
     }
 
     private static int needSwitchToTheme() {
-        if (selectedAutoNightType == AUTO_NIGHT_TYPE_SCHEDULED) {
-            Calendar calendar = Calendar.getInstance();
-            calendar.setTimeInMillis(System.currentTimeMillis());
-            int time = calendar.get(Calendar.HOUR_OF_DAY) * 60 + calendar.get(Calendar.MINUTE);
-            int timeStart;
-            int timeEnd;
-            if (autoNightScheduleByLocation) {
-                int day = calendar.get(Calendar.DAY_OF_MONTH);
-                if (autoNightLastSunCheckDay != day && autoNightLocationLatitude != 10000 && autoNightLocationLongitude != 10000) {
-                    int[] t = SunDate.calculateSunriseSunset(autoNightLocationLatitude, autoNightLocationLongitude);
-                    autoNightSunriseTime = t[0];
-                    autoNightSunsetTime = t[1];
-                    autoNightLastSunCheckDay = day;
-                    saveAutoNightThemeConfig();
-                }
-                timeStart = autoNightSunsetTime;
-                timeEnd = autoNightSunriseTime;
-            } else {
-                timeStart = autoNightDayStartTime;
-                timeEnd = autoNightDayEndTime;
-            }
-            if (timeStart < timeEnd) {
-                if (timeStart <= time && time <= timeEnd) {
-                    return 2;
-                } else {
-                    return 1;
-                }
-            } else {
-                if (timeStart <= time && time <= 24 * 60 || 0 <= time && time <= timeEnd) {
-                    return 2;
-                } else {
-                    return 1;
-                }
-            }
-        } else if (selectedAutoNightType == AUTO_NIGHT_TYPE_AUTOMATIC) {
-            if (lightSensor == null) {
-                sensorManager = (SensorManager) ApplicationLoader.applicationContext.getSystemService(Context.SENSOR_SERVICE);
-                lightSensor = sensorManager.getDefaultSensor(Sensor.TYPE_LIGHT);
-            }
-            if (!lightSensorRegistered && lightSensor != null && ambientSensorListener != null) {
-                sensorManager.registerListener(ambientSensorListener, lightSensor, 500000);
-                lightSensorRegistered = true;
-                if (BuildVars.LOGS_ENABLED) {
-                    FileLog.d("light sensor registered");
-                }
-            }
-            if (lastBrightnessValue <= autoNightBrighnessThreshold) {
-                if (!switchNightRunnableScheduled) {
-                    return 2;
-                }
-            } else {
-                if (!switchDayRunnableScheduled) {
-                    return 1;
-                }
-            }
-        } else if (selectedAutoNightType == AUTO_NIGHT_TYPE_SYSTEM) {
-            Configuration configuration = ApplicationLoader.applicationContext.getResources().getConfiguration();
-            int currentNightMode = configuration.uiMode & Configuration.UI_MODE_NIGHT_MASK;
-            switch (currentNightMode) {
-                case Configuration.UI_MODE_NIGHT_NO:
-                case Configuration.UI_MODE_NIGHT_UNDEFINED:
-                    return 1;
-                case Configuration.UI_MODE_NIGHT_YES:
-                    return 2;
-            }
-        } else if (selectedAutoNightType == AUTO_NIGHT_TYPE_NONE) {
-            return 1;
-        }
+//        if (selectedAutoNightType == AUTO_NIGHT_TYPE_SCHEDULED) {
+//            Calendar calendar = Calendar.getInstance();
+//            calendar.setTimeInMillis(System.currentTimeMillis());
+//            int time = calendar.get(Calendar.HOUR_OF_DAY) * 60 + calendar.get(Calendar.MINUTE);
+//            int timeStart;
+//            int timeEnd;
+//            if (autoNightScheduleByLocation) {
+//                int day = calendar.get(Calendar.DAY_OF_MONTH);
+//                if (autoNightLastSunCheckDay != day && autoNightLocationLatitude != 10000 && autoNightLocationLongitude != 10000) {
+//                    int[] t = SunDate.calculateSunriseSunset(autoNightLocationLatitude, autoNightLocationLongitude);
+//                    autoNightSunriseTime = t[0];
+//                    autoNightSunsetTime = t[1];
+//                    autoNightLastSunCheckDay = day;
+//                    saveAutoNightThemeConfig();
+//                }
+//                timeStart = autoNightSunsetTime;
+//                timeEnd = autoNightSunriseTime;
+//            } else {
+//                timeStart = autoNightDayStartTime;
+//                timeEnd = autoNightDayEndTime;
+//            }
+//            if (timeStart < timeEnd) {
+//                if (timeStart <= time && time <= timeEnd) {
+//                    return 2;
+//                } else {
+//                    return 1;
+//                }
+//            } else {
+//                if (timeStart <= time && time <= 24 * 60 || 0 <= time && time <= timeEnd) {
+//                    return 2;
+//                } else {
+//                    return 1;
+//                }
+//            }
+//        } else if (selectedAutoNightType == AUTO_NIGHT_TYPE_AUTOMATIC) {
+//            if (lightSensor == null) {
+//                sensorManager = (SensorManager) ApplicationLoader.applicationContext.getSystemService(Context.SENSOR_SERVICE);
+//                lightSensor = sensorManager.getDefaultSensor(Sensor.TYPE_LIGHT);
+//            }
+//            if (!lightSensorRegistered && lightSensor != null && ambientSensorListener != null) {
+//                sensorManager.registerListener(ambientSensorListener, lightSensor, 500000);
+//                lightSensorRegistered = true;
+//                if (BuildVars.LOGS_ENABLED) {
+//                    FileLog.d("light sensor registered");
+//                }
+//            }
+//            if (lastBrightnessValue <= autoNightBrighnessThreshold) {
+//                if (!switchNightRunnableScheduled) {
+//                    return 2;
+//                }
+//            } else {
+//                if (!switchDayRunnableScheduled) {
+//                    return 1;
+//                }
+//            }
+//        } else if (selectedAutoNightType == AUTO_NIGHT_TYPE_SYSTEM) {
+//            Configuration configuration = ApplicationLoader.applicationContext.getResources().getConfiguration();
+//            int currentNightMode = configuration.uiMode & Configuration.UI_MODE_NIGHT_MASK;
+//            switch (currentNightMode) {
+//                case Configuration.UI_MODE_NIGHT_NO:
+//                case Configuration.UI_MODE_NIGHT_UNDEFINED:
+//                    return 1;
+//                case Configuration.UI_MODE_NIGHT_YES:
+//                    return 2;
+//            }
+//        } else if (selectedAutoNightType == AUTO_NIGHT_TYPE_NONE) {
+//            return 1;
+//        }
         return 0;
     }
 
@@ -7234,7 +7234,7 @@ public class Theme {
         cancelAutoNightThemeCallbacks();
         int switchToTheme = needSwitchToTheme();
         if (switchToTheme != 0) {
-//            applyDayNightThemeMaybe(switchToTheme == 2);
+            applyDayNightThemeMaybe(switchToTheme == 2);
         }
         if (force) {
             lastThemeSwitchTime = 0;

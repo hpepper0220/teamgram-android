@@ -91,8 +91,6 @@ public class SkMineFragment extends BaseFragment implements NotificationCenter.N
 
     @Override
     public View createView(Context context) {
-        isDark = Theme.isCurrentThemeDark();
-
         this.context = context;
         frameLayout = new FrameLayout(context);
         frameLayout.setLayoutParams(LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT));
