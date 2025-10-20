@@ -31,6 +31,8 @@ import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager.widget.ViewPager;
 
+import org.telegram.ext.widgets.SimpleDialogCell;
+import org.telegram.messenger.AccountInstance;
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.BuildVars;
 import org.telegram.messenger.ChatObject;
@@ -39,6 +41,7 @@ import org.telegram.messenger.DialogObject;
 import org.telegram.messenger.FileLog;
 import org.telegram.messenger.LocaleController;
 import org.telegram.messenger.MessagesController;
+import org.telegram.messenger.NotificationsController;
 import org.telegram.messenger.R;
 import org.telegram.messenger.SharedConfig;
 import org.telegram.messenger.UserConfig;
@@ -143,6 +146,8 @@ public class DialogsAdapter extends RecyclerListView.SelectionAdapter implements
     private TLRPC.RequestPeerType requestPeerType;
     public boolean isEmpty;
 
+    private SharedPreferences preferences;
+
     public DialogsAdapter(DialogsActivity fragment, Context context, int type, int folder, boolean onlySelect, ArrayList<Long> selected, int account, TLRPC.RequestPeerType requestPeerType) {
         mContext = context;
         parentFragment = fragment;
@@ -157,6 +162,7 @@ public class DialogsAdapter extends RecyclerListView.SelectionAdapter implements
             this.preloader = new DialogsPreloader();
         }
         this.requestPeerType = requestPeerType;
+        preferences = AccountInstance.getInstance(currentAccount).getNotificationsSettings();
     }
 
     public void setRecyclerListView(RecyclerListView recyclerListView) {
@@ -582,7 +588,12 @@ public class DialogsAdapter extends RecyclerListView.SelectionAdapter implements
                     dialogCell.setPreloader(preloader);
                     dialogCell.setDialogCellDelegate(this);
                     dialogCell.setIsTransitionSupport(isTransitionSupport);
-                    view = dialogCell;
+
+                    SimpleDialogCell simpleDialogCell = new SimpleDialogCell(mContext);
+
+                    simpleDialogCell.addDialog(dialogCell, currentAccount);
+
+                    view = simpleDialogCell;
                 }
                 if (dialogsType == DialogsActivity.DIALOGS_TYPE_BOT_REQUEST_PEER) {
                     view.setBackgroundColor(Theme.getColor(Theme.key_windowBackgroundWhite));
@@ -866,7 +877,10 @@ public class DialogsAdapter extends RecyclerListView.SelectionAdapter implements
                     cell.setData(object, null, title, subtitle, isRecent, false);
                     cell.setChecked(selectedDialogs.contains(cell.getDialogId()), oldDialogId == cell.getDialogId());
                 } else {
-                    DialogCell cell = (DialogCell) holder.itemView;
+                    SimpleDialogCell dialogCell = (SimpleDialogCell) holder.itemView;
+                    DialogCell cell = dialogCell.findViewById(R.id.dialog_cell);
+
+//                    DialogCell cell = (DialogCell) holder.itemView;
                     cell.useSeparator = nextDialog != null;
                     cell.fullSeparator = dialog.pinned && nextDialog != null && !nextDialog.pinned;
                     if (dialogsType == DialogsActivity.DIALOGS_TYPE_DEFAULT) {
@@ -894,6 +908,10 @@ public class DialogsAdapter extends RecyclerListView.SelectionAdapter implements
                     if (preloader != null && i < 10) {
                         preloader.add(dialog.id);
                     }
+
+                    int mute_type = preferences.getInt("notify2_" + NotificationsController.getSharedPrefKey(dialog.id, 0), -1);
+
+                    dialogCell.addDialog(cell, currentAccount);
                 }
                 break;
             }

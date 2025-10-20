@@ -108,6 +108,8 @@ import org.telegram.ext.components.PopupCreator;
 import org.telegram.ext.config.SkMenuAction;
 import org.telegram.ext.respository.SimpleCallback;
 import org.telegram.ext.respository.SkRepository;
+import org.telegram.ext.utils.TgUtils;
+import org.telegram.ext.widgets.SimpleDialogCell;
 import org.telegram.messenger.AccountInstance;
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.AnimationNotificationsLocker;
@@ -4262,7 +4264,17 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                 LinearLayout.LayoutParams vpLayoutParams = new LinearLayout.LayoutParams(LayoutHelper.MATCH_PARENT, 0, 1);
                 viewPagerLayout.setLayoutParams(vpLayoutParams);
 
-                viewPager = new ViewPager(context);
+                viewPager = new ViewPager(context) {
+                    @Override
+                    public boolean onTouchEvent(MotionEvent ev) {
+                        return true;
+                    }
+
+                    @Override
+                    public boolean onInterceptTouchEvent(MotionEvent ev) {
+                        return false;
+                    }
+                };
                 viewPager.setId(R.id.main_view_pager);
                 viewPager.setLayoutParams(LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT));
                 viewPagerLayout.addView(viewPager);
@@ -4379,7 +4391,154 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                 }
             }
 
+            viewPage.listView.addChildClickViewIds(R.id.btn_delete, R.id.btn_mark_read, R.id.btn_mute, R.id.btn_pin);
+            viewPage.listView.setOnItemChildClickListener((view, childView, position) -> {
+                if (viewPage.listView.childClickViewIds.contains(childView.getId())) {
+                    Log.e("DialogsActivity", "view ------> " + childView.getId() + " pos: " + position);
+                    RecyclerListView.Adapter adapter = viewPage.dialogsAdapter;
+                    SimpleDialogCell dialogCell = null;
+                    if (adapter != null) {
+                        DialogsAdapter dialogsAdapter = (DialogsAdapter) adapter;
+
+                        if (view instanceof SimpleDialogCell) {
+                            dialogCell = (SimpleDialogCell) view;
+                        }
+
+                        TLRPC.Dialog dialog;
+                        ArrayList<TLRPC.Dialog> dialogs = getDialogsArray(currentAccount, 0, folderId, dialogsListFrozen);
+                        position = dialogsAdapter.fixPosition(position);
+                        if (position < 0 || position >= dialogs.size()) {
+                            return;
+                        }
+                        dialog = dialogs.get(position);
+                        if (null != dialog) {
+
+                            long selectedDialog = dialog.id;
+
+                            TLRPC.Chat chat;
+                            TLRPC.User user = null;
+
+                            TLRPC.EncryptedChat encryptedChat = null;
+                            if (DialogObject.isEncryptedDialog(selectedDialog)) {
+                                encryptedChat = getMessagesController().getEncryptedChat(DialogObject.getEncryptedChatId(selectedDialog));
+                                chat = null;
+                                if (encryptedChat != null) {
+                                    user = getMessagesController().getUser(encryptedChat.user_id);
+                                } else {
+                                    user = new TLRPC.TL_userEmpty();
+                                }
+                            } else if (DialogObject.isUserDialog(selectedDialog)) {
+                                user = getMessagesController().getUser(selectedDialog);
+                                chat = null;
+                            } else {
+                                chat = getMessagesController().getChat(-selectedDialog);
+                            }
+
+                            if (null != user) {
+                                Log.e("DialogsActivity", "user first name ------> " + user.first_name);
+                            }
+
+                            if (null != chat) {
+                                Log.e("DialogsActivity", "chat ------> " + chat.title + " username ------> " + chat.username);
+                            }
+
+                            int action = delete;
+
+                            if (childView.getId() == R.id.btn_delete) {
+                                AlertsCreator.createClearOrDeleteDialogAlert(DialogsActivity.this, action == clear, chat, user, DialogObject.isEncryptedDialog(dialog.id), action == delete, (param) -> {
+                                    hideActionMode(false);
+                                    if (action == clear && ChatObject.isChannel(chat) && (!chat.megagroup || ChatObject.isPublic(chat))) {
+                                        getMessagesController().deleteDialog(selectedDialog, 2, param);
+                                    } else {
+                                        if (action == delete && folderId != 0 && getDialogsArray(currentAccount, viewPages[0].dialogsType, folderId, false).size() == 1) {
+                                            viewPages[0].progressView.setVisibility(View.INVISIBLE);
+                                        }
+
+                                        debugLastUpdateAction = 3;
+                                        int selectedDialogIndex = -1;
+                                        if (action == delete) {
+                                            setDialogsListFrozen(true);
+                                            if (frozenDialogsList != null) {
+                                                for (int i = 0; i < frozenDialogsList.size(); i++) {
+                                                    if (frozenDialogsList.get(i).id == selectedDialog) {
+                                                        selectedDialogIndex = i;
+                                                        break;
+                                                    }
+                                                }
+                                            }
+                                            checkAnimationFinished();
+                                        }
+
+                                        final UndoView undoView = getUndoView();
+                                        if (undoView != null) {
+                                            undoView.showWithAction(selectedDialog, action == clear ? UndoView.ACTION_CLEAR : UndoView.ACTION_DELETE, () -> performDeleteOrClearDialogAction(action, selectedDialog, chat, false, param));
+                                        }
+
+                                        ArrayList<TLRPC.Dialog> currentDialogs = new ArrayList<>(getDialogsArray(currentAccount, viewPages[0].dialogsType, folderId, false));
+                                        int currentDialogIndex = -1;
+                                        for (int i = 0; i < currentDialogs.size(); i++) {
+                                            if (currentDialogs.get(i).id == selectedDialog) {
+                                                currentDialogIndex = i;
+                                                break;
+                                            }
+                                        }
+
+                                        if (action == delete) {
+                                            if (selectedDialogIndex >= 0 && currentDialogIndex < 0 && frozenDialogsList != null) {
+                                                frozenDialogsList.remove(selectedDialogIndex);
+                                                viewPages[0].dialogsItemAnimator.prepareForRemove();
+                                                viewPages[0].updateList(true);
+                                            } else {
+                                                setDialogsListFrozen(false);
+                                            }
+                                        }
+
+                                        if (null != view && view instanceof SimpleDialogCell) {
+                                            ((SimpleDialogCell) view).close(true);
+                                        }
+                                    }
+                                });
+                            } else if (childView.getId() == R.id.btn_mark_read) {
+                                int canReadCount = dialog.unread_count > 0 || dialog.unread_mark ? 1 : 0;
+                                if (canReadCount != 0) {
+                                    markAsRead(selectedDialog);
+                                } else {
+                                    markAsUnread(selectedDialog);
+                                }
+                                if (null != dialogCell) {
+                                    dialogCell.close(true);
+                                }
+                                viewPage.dialogsAdapter.notifyDataSetChanged();
+                            } else if (childView.getId() == R.id.btn_mute) {
+                                canMuteCount = MessagesController.getInstance(currentAccount).isDialogMuted(selectedDialog, 0) ? 0 : 1;
+                                canUnmuteCount = canMuteCount > 0 ? 0 : 1;
+                                if (canMuteCount == 1) {
+                                    NotificationsController.getInstance(UserConfig.selectedAccount).setDialogNotificationsSettings(selectedDialog, 0, NotificationsController.SETTING_MUTE_FOREVER);
+                                } else {
+                                    if (canUnmuteCount != 0) {
+                                        if (!getMessagesController().isDialogMuted(selectedDialog, 0)) {
+                                            return;
+                                        }
+                                        getNotificationsController().setDialogNotificationsSettings(selectedDialog, 0, NotificationsController.SETTING_MUTE_UNMUTE);
+                                    }
+                                }
+                                if (null != dialogCell) {
+                                    dialogCell.close(true);
+                                }
+                                viewPage.dialogsAdapter.notifyDataSetChanged();
+                            } else if (childView.getId() == R.id.btn_pin) {
+                                ArrayList<Long> selectedDialogs = new ArrayList<>();
+                                selectedDialogs.add(selectedDialog);
+                                boolean pinned = isDialogPinned(dialog);
+                                canPinCount = pinned ? 0 : 1;
+                                performSelectedDialogsAction(selectedDialogs, pin, true, false);
+                            }
+                        }
+                    }
+                }
+            });
             viewPage.listView.setOnItemClickListener((view, position, x, y) -> {
+                Log.e("DialogsActivity", "onItemClick pos: " + position + " view class: " + view.getClass() + " x,y: " + x + "," + y);
                 if (view instanceof GraySectionCell)
                     return;
                 if (view instanceof DialogCell && ((DialogCell) view).isBlocked()) {
@@ -9384,6 +9543,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
             hideActionMode(false);
             return;
         } else if ((action == pin || action == pin2) && canPinCount != 0) {
+            Log.e("DialogsActivity", "canPinCount ------> " + canPinCount);
             int pinnedCount = 0;
             int pinnedSecretCount = 0;
             int newPinnedCount = 0;
@@ -9558,6 +9718,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
             }
             boolean isBot = user != null && user.bot && !MessagesController.isSupportUser(user);
             if (action == pin || action == pin2) {
+                Log.e("DialogsActivity", "canPinCount111 ------> " + canPinCount);
                 if (canPinCount != 0) {
                     if (isDialogPinned(dialog)) {
                         continue;

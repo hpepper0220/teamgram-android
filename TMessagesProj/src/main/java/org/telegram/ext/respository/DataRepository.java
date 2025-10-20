@@ -60,8 +60,10 @@ public class DataRepository {
                 Gson gson = new Gson();
                 IpApiResponse info = gson.fromJson(body, IpApiResponse.class);
                 AndroidUtilities.runOnUIThread(() -> {
-                    Log.e("getIpAddress", "info  -------> " + info.toString());
-                    callback.onResp(info);
+                    if (null != info) {
+                        Log.e("getIpAddress", "info  -------> " + info);
+                        callback.onResp(info);
+                    }
                 });
             }
         });

@@ -59,4 +59,7 @@
 
     <item name="popup_add_contact" type="id" />
     <item name="popup_create_group" type="id" />
+    <item name="dialog_cell" type="id" />
+    <item name="dialog_button_negative" type="id" />
+    <item name="dialog_button_positive" type="id" />
 </resources>

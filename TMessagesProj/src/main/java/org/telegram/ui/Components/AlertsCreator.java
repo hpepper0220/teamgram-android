@@ -68,6 +68,9 @@ import androidx.annotation.RawRes;
 import androidx.annotation.RequiresApi;
 import androidx.core.util.Consumer;
 
+import com.skg.lib.BaseDialog;
+
+import org.telegram.ext.components.DialogCreator;
 import org.telegram.messenger.AccountInstance;
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.ApplicationLoader;
@@ -1994,6 +1997,7 @@ public class AlertsCreator {
 
         Context context = fragment.getParentActivity();
         AlertDialog.Builder builder = new AlertDialog.Builder(context, resourcesProvider);
+
         long selfUserId = UserConfig.getInstance(account).getClientUserId();
 
         CheckBoxCell[] cell = new CheckBoxCell[1];
@@ -2040,36 +2044,49 @@ public class AlertsCreator {
         textView.setSingleLine(true);
         textView.setGravity((LocaleController.isRTL ? Gravity.RIGHT : Gravity.LEFT) | Gravity.CENTER_VERTICAL);
         textView.setEllipsize(TextUtils.TruncateAt.END);
+
+        String dialogTitle;
+        String dialogMessage;
+
         if (clear) {
             if (clearingCache) {
                 textView.setText(LocaleController.getString(R.string.ClearHistoryCache));
+                dialogTitle = LocaleController.getString(R.string.ClearHistoryCache);
             } else {
                 textView.setText(LocaleController.getString(R.string.ClearHistory));
+                dialogTitle = LocaleController.getString(R.string.ClearHistory);
             }
         } else {
             if (admin) {
                 if (ChatObject.isChannel(chat)) {
                     if (chat.megagroup) {
                         textView.setText(LocaleController.getString(R.string.DeleteMegaMenu));
+                        dialogTitle = LocaleController.getString(R.string.DeleteMegaMenu);
                     } else {
                         textView.setText(LocaleController.getString(R.string.ChannelDeleteMenu));
+                        dialogTitle = LocaleController.getString(R.string.ChannelDeleteMenu);
                     }
                 } else {
                     textView.setText(LocaleController.getString(R.string.DeleteMegaMenu));
+                    dialogTitle = LocaleController.getString(R.string.DeleteMegaMenu);
                 }
             } else {
                 if (chat != null) {
                     if (ChatObject.isChannel(chat)) {
                         if (chat.megagroup) {
                             textView.setText(LocaleController.getString(R.string.LeaveMegaMenu));
+                            dialogTitle = LocaleController.getString(R.string.LeaveMegaMenu);
                         } else {
                             textView.setText(LocaleController.getString(R.string.LeaveChannelMenu));
+                            dialogTitle = LocaleController.getString(R.string.LeaveChannelMenu);
                         }
                     } else {
                         textView.setText(LocaleController.getString(R.string.LeaveMegaMenu));
+                        dialogTitle = LocaleController.getString(R.string.LeaveMegaMenu);
                     }
                 } else {
                     textView.setText(LocaleController.getString(R.string.DeleteChatUser));
+                    dialogTitle = LocaleController.getString(R.string.DeleteChatUser);
                 }
             }
         }
@@ -2150,11 +2167,14 @@ public class AlertsCreator {
         if (second) {
             if (UserObject.isUserSelf(user)) {
                 messageTextView.setText(AndroidUtilities.replaceTags(LocaleController.getString(R.string.DeleteAllMessagesSavedAlert)));
+                dialogMessage = AndroidUtilities.replaceTags(LocaleController.getString(R.string.DeleteAllMessagesSavedAlert)).toString();
             } else {
                 if (chat != null && ChatObject.isChannelAndNotMegaGroup(chat)) {
                     messageTextView.setText(AndroidUtilities.replaceTags(LocaleController.getString(R.string.DeleteAllMessagesChannelAlert)));
+                    dialogMessage = AndroidUtilities.replaceTags(LocaleController.getString(R.string.DeleteAllMessagesChannelAlert)).toString();
                 } else {
                     messageTextView.setText(AndroidUtilities.replaceTags(LocaleController.getString(R.string.DeleteAllMessagesAlert)));
+                    dialogMessage = AndroidUtilities.replaceTags(LocaleController.getString(R.string.DeleteAllMessagesAlert)).toString();
                 }
             }
         } else {
@@ -2162,20 +2182,26 @@ public class AlertsCreator {
                 if (user != null) {
                     if (secret) {
                         messageTextView.setText(AndroidUtilities.replaceTags(LocaleController.formatString("AreYouSureClearHistoryWithSecretUser", R.string.AreYouSureClearHistoryWithSecretUser, UserObject.getUserName(user))));
+                        dialogMessage = AndroidUtilities.replaceTags(AndroidUtilities.replaceTags(LocaleController.formatString("AreYouSureClearHistoryWithSecretUser", R.string.AreYouSureClearHistoryWithSecretUser, UserObject.getUserName(user)))).toString();
                     } else {
                         if (user.id == selfUserId) {
                             messageTextView.setText(AndroidUtilities.replaceTags(LocaleController.getString(R.string.AreYouSureClearHistorySavedMessages)));
+                            dialogMessage = AndroidUtilities.replaceTags(LocaleController.getString(R.string.AreYouSureClearHistorySavedMessages)).toString();
                         } else {
                             messageTextView.setText(AndroidUtilities.replaceTags(LocaleController.formatString("AreYouSureClearHistoryWithUser", R.string.AreYouSureClearHistoryWithUser, UserObject.getUserName(user))));
+                            dialogMessage = AndroidUtilities.replaceTags(LocaleController.formatString("AreYouSureClearHistoryWithUser", R.string.AreYouSureClearHistoryWithUser, UserObject.getUserName(user))).toString();
                         }
                     }
                 } else {
                     if (!ChatObject.isChannel(chat) || chat.megagroup && !ChatObject.isPublic(chat)) {
                         messageTextView.setText(AndroidUtilities.replaceTags(LocaleController.formatString("AreYouSureClearHistoryWithChat", R.string.AreYouSureClearHistoryWithChat, chat.title)));
+                        dialogMessage = AndroidUtilities.replaceTags(LocaleController.formatString("AreYouSureClearHistoryWithChat", R.string.AreYouSureClearHistoryWithChat, chat.title)).toString();
                     } else if (chat.megagroup) {
                         messageTextView.setText(LocaleController.getString(R.string.AreYouSureClearHistoryGroup));
+                        dialogMessage = LocaleController.getString(R.string.AreYouSureClearHistoryGroup);
                     } else {
                         messageTextView.setText(LocaleController.getString(R.string.AreYouSureClearHistoryChannel));
+                        dialogMessage = LocaleController.getString(R.string.AreYouSureClearHistoryChannel);
                     }
                 }
             } else {
@@ -2183,35 +2209,45 @@ public class AlertsCreator {
                     if (ChatObject.isChannel(chat)) {
                         if (chat.megagroup) {
                             messageTextView.setText(LocaleController.getString(R.string.AreYouSureDeleteAndExit));
+                            dialogMessage = LocaleController.getString(R.string.AreYouSureDeleteAndExit);
                         } else {
                             messageTextView.setText(LocaleController.getString(R.string.AreYouSureDeleteAndExitChannel));
+                            dialogMessage = LocaleController.getString(R.string.AreYouSureDeleteAndExitChannel);
                         }
                     } else {
                         messageTextView.setText(LocaleController.getString(R.string.AreYouSureDeleteAndExit));
+                        dialogMessage = LocaleController.getString(R.string.AreYouSureDeleteAndExit);
                     }
                 } else {
                     if (user != null) {
                         if (secret) {
                             messageTextView.setText(AndroidUtilities.replaceTags(LocaleController.formatString("AreYouSureDeleteThisChatWithSecretUser", R.string.AreYouSureDeleteThisChatWithSecretUser, UserObject.getUserName(user))));
+                            dialogMessage = String.valueOf(AndroidUtilities.replaceTags(LocaleController.formatString("AreYouSureDeleteThisChatWithSecretUser", R.string.AreYouSureDeleteThisChatWithSecretUser, UserObject.getUserName(user))));
                         } else {
                             if (user.id == selfUserId) {
                                 messageTextView.setText(AndroidUtilities.replaceTags(LocaleController.getString(R.string.AreYouSureDeleteThisChatSavedMessages)));
+                                dialogMessage = String.valueOf(AndroidUtilities.replaceTags(LocaleController.getString(R.string.AreYouSureDeleteThisChatSavedMessages)));
                             } else {
                                 if (user.bot && !user.support) {
                                     messageTextView.setText(AndroidUtilities.replaceTags(LocaleController.formatString(R.string.AreYouSureDeleteThisChatWithBotWithCheckmark, UserObject.getUserName(user))));
+                                    dialogMessage = String.valueOf(AndroidUtilities.replaceTags(LocaleController.formatString(R.string.AreYouSureDeleteThisChatWithBotWithCheckmark, UserObject.getUserName(user))));
                                 } else {
                                     messageTextView.setText(AndroidUtilities.replaceTags(LocaleController.formatString("AreYouSureDeleteThisChatWithUser", R.string.AreYouSureDeleteThisChatWithUser, UserObject.getUserName(user))));
+                                    dialogMessage = String.valueOf(AndroidUtilities.replaceTags(LocaleController.formatString("AreYouSureDeleteThisChatWithUser", R.string.AreYouSureDeleteThisChatWithUser, UserObject.getUserName(user))));
                                 }
                             }
                         }
                     } else if (ChatObject.isChannel(chat)) {
                         if (chat.megagroup) {
                             messageTextView.setText(AndroidUtilities.replaceTags(LocaleController.formatString("MegaLeaveAlertWithName", R.string.MegaLeaveAlertWithName, chat.title)));
+                            dialogMessage = String.valueOf(AndroidUtilities.replaceTags(LocaleController.formatString("MegaLeaveAlertWithName", R.string.MegaLeaveAlertWithName, chat.title)));
                         } else {
                             messageTextView.setText(AndroidUtilities.replaceTags(LocaleController.formatString("ChannelLeaveAlertWithName", R.string.ChannelLeaveAlertWithName, chat.title)));
+                            dialogMessage = String.valueOf(AndroidUtilities.replaceTags(LocaleController.formatString("ChannelLeaveAlertWithName", R.string.ChannelLeaveAlertWithName, chat.title)));
                         }
                     } else {
                         messageTextView.setText(AndroidUtilities.replaceTags(LocaleController.formatString("AreYouSureDeleteAndExitName", R.string.AreYouSureDeleteAndExitName, chat.title)));
+                        dialogMessage = String.valueOf(AndroidUtilities.replaceTags(LocaleController.formatString("AreYouSureDeleteAndExitName", R.string.AreYouSureDeleteAndExitName, chat.title)));
                     }
                 }
             }
@@ -2251,35 +2287,59 @@ public class AlertsCreator {
                 }
             }
         }
-        builder.setPositiveButton(actionText, (dialogInterface, i) -> {
-            if (!clearingCache && !second && !secret) {
-                if (UserObject.isUserSelf(user)) {
-                    createClearOrDeleteDialogAlert(fragment, clear, admin, true, chat, user, false, checkDeleteForAll, canDeleteHistory, onProcessRunnable, resourcesProvider);
-                    return;
-                } else if (user != null && deleteForAll[0]) {
-                    MessagesStorage.getInstance(fragment.getCurrentAccount()).getMessagesCount(user.id, (count) -> {
-                        if (count >= 50) {
-                            createClearOrDeleteDialogAlert(fragment, clear, admin, true, chat, user, false, checkDeleteForAll, canDeleteHistory, onProcessRunnable, resourcesProvider);
-                        } else {
-                            if (onProcessRunnable != null) {
-                                onProcessRunnable.run(deleteForAll[0]);
-                            }
+
+        DialogCreator.createDeleteMessagesDialog(context, dialogTitle, dialogMessage, null, actionText, null, view -> {
+        if (!clearingCache && !second && !secret) {
+            if (UserObject.isUserSelf(user)) {
+                createClearOrDeleteDialogAlert(fragment, clear, admin, true, chat, user, false, checkDeleteForAll, canDeleteHistory, onProcessRunnable, resourcesProvider);
+                return;
+            } else if (user != null && deleteForAll[0]) {
+                MessagesStorage.getInstance(fragment.getCurrentAccount()).getMessagesCount(user.id, (count) -> {
+                    if (count >= 50) {
+                        createClearOrDeleteDialogAlert(fragment, clear, admin, true, chat, user, false, checkDeleteForAll, canDeleteHistory, onProcessRunnable, resourcesProvider);
+                    } else {
+                        if (onProcessRunnable != null) {
+                            onProcessRunnable.run(deleteForAll[0]);
                         }
-                    });
-                    return;
-                }
+                    }
+                });
+                return;
             }
-            if (onProcessRunnable != null) {
-                onProcessRunnable.run(second || deleteForAll[0]);
-            }
-        });
-        builder.setNegativeButton(LocaleController.getString(R.string.Cancel), null);
-        AlertDialog alertDialog = builder.create();
-        fragment.showDialog(alertDialog);
-        TextView button = (TextView) alertDialog.getButton(DialogInterface.BUTTON_POSITIVE);
-        if (button != null) {
-            button.setTextColor(Theme.getColor(Theme.key_text_RedBold));
         }
+        if (onProcessRunnable != null) {
+            onProcessRunnable.run(second || deleteForAll[0]);
+        }
+        });
+
+//        builder.setPositiveButton(actionText, (dialogInterface, i) -> {
+//            if (!clearingCache && !second && !secret) {
+//                if (UserObject.isUserSelf(user)) {
+//                    createClearOrDeleteDialogAlert(fragment, clear, admin, true, chat, user, false, checkDeleteForAll, canDeleteHistory, onProcessRunnable, resourcesProvider);
+//                    return;
+//                } else if (user != null && deleteForAll[0]) {
+//                    MessagesStorage.getInstance(fragment.getCurrentAccount()).getMessagesCount(user.id, (count) -> {
+//                        if (count >= 50) {
+//                            createClearOrDeleteDialogAlert(fragment, clear, admin, true, chat, user, false, checkDeleteForAll, canDeleteHistory, onProcessRunnable, resourcesProvider);
+//                        } else {
+//                            if (onProcessRunnable != null) {
+//                                onProcessRunnable.run(deleteForAll[0]);
+//                            }
+//                        }
+//                    });
+//                    return;
+//                }
+//            }
+//            if (onProcessRunnable != null) {
+//                onProcessRunnable.run(second || deleteForAll[0]);
+//            }
+//        });
+//        builder.setNegativeButton(LocaleController.getString(R.string.Cancel), null);
+//        AlertDialog alertDialog = builder.create();
+//        fragment.showDialog(alertDialog);
+//        TextView button = (TextView) alertDialog.getButton(DialogInterface.BUTTON_POSITIVE);
+//        if (button != null) {
+//            button.setTextColor(Theme.getColor(Theme.key_text_RedBold));
+//        }
     }
 
     public static void createClearOrDeleteDialogsAlert(BaseFragment fragment, boolean clear, boolean canDeleteHistory, int canClearCacheCount, int count, boolean hasDialogsToRevoke, MessagesStorage.BooleanCallback onProcessRunnable, Theme.ResourcesProvider resourcesProvider) {
