@@ -6627,52 +6627,71 @@ public class AlertsCreator {
             }
         };
 
+        String dialogTitle = "";
+        String dialogContent = "";
+        String positiveButtonText = LocaleController.getString("Delete", R.string.Delete);
+
         if (isSavedMessages) {
             if (count == 1) {
                 builder.setTitle(LocaleController.getString(R.string.UnsaveSingleMessagesTitle));
+                dialogTitle = LocaleController.getString(R.string.UnsaveSingleMessagesTitle);
             } else {
                 builder.setTitle(LocaleController.formatString(R.string.UnsaveMessagesTitle, LocaleController.formatPluralString("messages", count)));
+                dialogTitle = LocaleController.formatString(R.string.UnsaveMessagesTitle, LocaleController.formatPluralString("messages", count));
             }
         } else {
             if (count == 1) {
                 builder.setTitle(LocaleController.getString(R.string.DeleteSingleMessagesTitle));
+                dialogTitle = LocaleController.getString(R.string.DeleteSingleMessagesTitle);
             } else {
                 builder.setTitle(LocaleController.formatString(R.string.DeleteMessagesTitle, LocaleController.formatPluralString("messages", count)));
+                dialogTitle = LocaleController.formatString(R.string.DeleteMessagesTitle, LocaleController.formatPluralString("messages", count));
             }
         }
 
         if (isSavedMessages) {
             if (count == 1) {
                 builder.setMessage(LocaleController.getString(R.string.AreYouSureUnsaveSingleMessage));
+                dialogContent = LocaleController.getString(R.string.AreYouSureUnsaveSingleMessage);
             } else {
                 builder.setMessage(LocaleController.getString(R.string.AreYouSureUnsaveFewMessages));
+                dialogContent = LocaleController.getString(R.string.AreYouSureUnsaveFewMessages);
             }
         } else if (chat != null && hasNotOut) {
             if (hasDeleteForAllCheck && myMessagesCount != count) {
                 builder.setMessage(LocaleController.formatString(R.string.DeleteMessagesTextGroupPart, LocaleController.formatPluralString("messages", myMessagesCount)));
+                dialogContent = LocaleController.formatString(R.string.DeleteMessagesTextGroupPart, LocaleController.formatPluralString("messages", myMessagesCount));
             } else if (count == 1) {
                 builder.setMessage(LocaleController.getString(R.string.AreYouSureDeleteSingleMessage));
+                dialogContent = LocaleController.getString(R.string.AreYouSureDeleteSingleMessage);
             } else {
                 builder.setMessage(LocaleController.getString(R.string.AreYouSureDeleteFewMessages));
+                dialogContent = LocaleController.getString(R.string.AreYouSureDeleteFewMessages);
             }
         } else if (hasDeleteForAllCheck && !canDeleteInbox && myMessagesCount != count) {
             if (chat != null) {
                 builder.setMessage(LocaleController.formatString("DeleteMessagesTextGroup", R.string.DeleteMessagesTextGroup, LocaleController.formatPluralString("messages", myMessagesCount)));
+                dialogContent = LocaleController.formatString("DeleteMessagesTextGroup", R.string.DeleteMessagesTextGroup, LocaleController.formatPluralString("messages", myMessagesCount));
             } else {
                 builder.setMessage(AndroidUtilities.replaceTags(LocaleController.formatString("DeleteMessagesText", R.string.DeleteMessagesText, LocaleController.formatPluralString("messages", myMessagesCount), UserObject.getFirstName(user))));
+                dialogContent = String.valueOf(AndroidUtilities.replaceTags(LocaleController.formatString("DeleteMessagesText", R.string.DeleteMessagesText, LocaleController.formatPluralString("messages", myMessagesCount), UserObject.getFirstName(user))));
             }
         } else {
             if (chat != null && chat.megagroup && !scheduled) {
                 if (count == 1) {
                     builder.setMessage(LocaleController.getString(R.string.AreYouSureDeleteSingleMessageMega));
+                    dialogContent = LocaleController.getString(R.string.AreYouSureDeleteSingleMessageMega);
                 } else {
                     builder.setMessage(LocaleController.getString(R.string.AreYouSureDeleteFewMessagesMega));
+                    dialogContent = LocaleController.getString(R.string.AreYouSureDeleteFewMessagesMega);
                 }
             } else {
                 if (count == 1) {
                     builder.setMessage(LocaleController.getString(R.string.AreYouSureDeleteSingleMessage));
+                    dialogContent = LocaleController.getString(R.string.AreYouSureDeleteSingleMessage);
                 } else {
                     builder.setMessage(LocaleController.getString(R.string.AreYouSureDeleteFewMessages));
+                    dialogContent = LocaleController.getString(R.string.AreYouSureDeleteFewMessages);
                 }
             }
         }
@@ -6706,27 +6725,92 @@ public class AlertsCreator {
             builder.setTitle(LocaleController.getString(R.string.BoostingGiveawayDeleteMsgTitle));
             builder.setMessage(AndroidUtilities.replaceTags(LocaleController.formatString("BoostingGiveawayDeleteMsgText", R.string.BoostingGiveawayDeleteMsgText, giveawayEndDate)));
             builder.setNeutralButton(LocaleController.getString(R.string.Delete), deleteAction);
+
+            dialogTitle = LocaleController.getString(R.string.BoostingGiveawayDeleteMsgTitle);
+            dialogContent = String.valueOf(AndroidUtilities.replaceTags(LocaleController.formatString("BoostingGiveawayDeleteMsgText", R.string.BoostingGiveawayDeleteMsgText, giveawayEndDate)));
         } else {
             builder.setPositiveButton(LocaleController.getString(isSavedMessages ? R.string.Remove : R.string.Delete), deleteAction);
+            positiveButtonText = LocaleController.getString(isSavedMessages ? R.string.Remove : R.string.Delete);
         }
-        builder.setNegativeButton(LocaleController.getString(R.string.Cancel), null);
-        builder.setOnPreDismissListener(di -> {
+
+        DialogCreator.createDeleteMessagesDialog(activity, dialogTitle, dialogContent, null, LocaleController.getString("Delete", R.string.Delete), dialog -> {
             if (hideDim != null) {
                 hideDim.run();
             }
+        }, v -> {
+            ArrayList<Integer> ids = null;
+            long thisDialogId = dialogId;
+            if (isSavedMessages) {
+                thisDialogId = UserConfig.getInstance(currentAccount).getClientUserId();
+            }
+            if (selectedMessage != null) {
+                ids = new ArrayList<>();
+                ArrayList<Long> random_ids = null;
+                if (selectedGroup != null) {
+                    for (int a = 0; a < selectedGroup.messages.size(); a++) {
+                        MessageObject messageObject = selectedGroup.messages.get(a);
+                        ids.add(messageObject.getId());
+                        if (encryptedChat != null && messageObject.messageOwner.random_id != 0 && messageObject.type != 10) {
+                            if (random_ids == null) {
+                                random_ids = new ArrayList<>();
+                            }
+                            random_ids.add(messageObject.messageOwner.random_id);
+                        }
+                    }
+                } else {
+                    ids.add(selectedMessage.getId());
+                    if (encryptedChat != null && selectedMessage.messageOwner.random_id != 0 && selectedMessage.type != 10) {
+                        random_ids = new ArrayList<>();
+                        random_ids.add(selectedMessage.messageOwner.random_id);
+                    }
+                }
+                if (mergeDialogId != 0 && selectedMessage.messageOwner.peer_id != null && selectedMessage.messageOwner.peer_id.chat_id == -mergeDialogId) {
+                    thisDialogId = mergeDialogId;
+                }
+                MessagesController.getInstance(currentAccount).deleteMessages(ids, random_ids, encryptedChat, thisDialogId, topicId, deleteForAll[0], mode);
+            } else {
+                for (int a = 1; a >= 0; a--) {
+                    ids = new ArrayList<>();
+                    for (int b = 0; b < selectedMessages[a].size(); b++) {
+                        ids.add(selectedMessages[a].keyAt(b));
+                    }
+                    ArrayList<Long> random_ids = null;
+                    if (encryptedChat != null) {
+                        random_ids = new ArrayList<>();
+                        for (int b = 0; b < selectedMessages[a].size(); b++) {
+                            MessageObject msg = selectedMessages[a].valueAt(b);
+                            if (msg.messageOwner.random_id != 0 && msg.type != 10) {
+                                random_ids.add(msg.messageOwner.random_id);
+                            }
+                        }
+                    }
+                    MessagesController.getInstance(currentAccount).deleteMessages(ids, random_ids, encryptedChat, (a == 1 && mergeDialogId != 0) ? mergeDialogId : thisDialogId, topicId, deleteForAll[0], mode);
+                    selectedMessages[a].clear();
+                }
+            }
+            if (onDelete != null) {
+                onDelete.run();
+            }
         });
-        AlertDialog dialog = builder.create();
-        fragment.showDialog(dialog);
-        TextView positiveButton = (TextView) dialog.getButton(DialogInterface.BUTTON_POSITIVE);
-        if (positiveButton != null) {
-            positiveButton.setTextColor(Theme.getColor(Theme.key_text_RedBold));
-        }
-        TextView neutralButton = (TextView) dialog.getButton(DialogInterface.BUTTON_NEUTRAL);
-        if (neutralButton != null) {
-            dialog.getButtonsLayout().setPadding(dp(12), dp(0), dp(8), dp(12));
-            ((ViewGroup.MarginLayoutParams) dialog.getButtonsLayout().getLayoutParams()).topMargin = dp(-8);
-            neutralButton.setTextColor(Theme.getColor(Theme.key_text_RedBold));
-        }
+
+//        builder.setNegativeButton(LocaleController.getString(R.string.Cancel), null);
+//        builder.setOnPreDismissListener(di -> {
+//            if (hideDim != null) {
+//                hideDim.run();
+//            }
+//        });
+//        AlertDialog dialog = builder.create();
+//        fragment.showDialog(dialog);
+//        TextView positiveButton = (TextView) dialog.getButton(DialogInterface.BUTTON_POSITIVE);
+//        if (positiveButton != null) {
+//            positiveButton.setTextColor(Theme.getColor(Theme.key_text_RedBold));
+//        }
+//        TextView neutralButton = (TextView) dialog.getButton(DialogInterface.BUTTON_NEUTRAL);
+//        if (neutralButton != null) {
+//            dialog.getButtonsLayout().setPadding(dp(12), dp(0), dp(8), dp(12));
+//            ((ViewGroup.MarginLayoutParams) dialog.getButtonsLayout().getLayoutParams()).topMargin = dp(-8);
+//            neutralButton.setTextColor(Theme.getColor(Theme.key_text_RedBold));
+//        }
     }
 
     public static void createThemeCreateDialog(BaseFragment fragment, int type, Theme.ThemeInfo switchToTheme, Theme.ThemeAccent switchToAccent) {
