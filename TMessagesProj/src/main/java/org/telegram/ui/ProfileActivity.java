@@ -2469,19 +2469,19 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                         FileLog.e(e);
                     }
                 } else if (id == call_item || id == video_call_item) {
-                    if (userId != 0) {
-                        TLRPC.User user = getMessagesController().getUser(userId);
-                        if (user != null) {
-                            VoIPHelper.startCall(user, id == video_call_item, userInfo != null && userInfo.video_calls_available, getParentActivity(), userInfo, getAccountInstance());
-                        }
-                    } else if (chatId != 0) {
-                        ChatObject.Call call = getMessagesController().getGroupCall(chatId, false);
-                        if (call == null) {
-                            VoIPHelper.showGroupCallAlert(ProfileActivity.this, currentChat, null, false, getAccountInstance());
-                        } else {
-                            VoIPHelper.startCall(currentChat, null, null, false, getParentActivity(), ProfileActivity.this, getAccountInstance());
-                        }
-                    }
+//                    if (userId != 0) {
+//                        TLRPC.User user = getMessagesController().getUser(userId);
+//                        if (user != null) {
+//                            VoIPHelper.startCall(user, id == video_call_item, userInfo != null && userInfo.video_calls_available, getParentActivity(), userInfo, getAccountInstance());
+//                        }
+//                    } else if (chatId != 0) {
+//                        ChatObject.Call call = getMessagesController().getGroupCall(chatId, false);
+//                        if (call == null) {
+//                            VoIPHelper.showGroupCallAlert(ProfileActivity.this, currentChat, null, false, getAccountInstance());
+//                        } else {
+//                            VoIPHelper.startCall(currentChat, null, null, false, getParentActivity(), ProfileActivity.this, getAccountInstance());
+//                        }
+//                    }
                 } else if (id == search_members) {
                     Bundle args = new Bundle();
                     args.putLong("chat_id", chatId);
@@ -6353,7 +6353,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
             ArrayList<CharSequence> items = new ArrayList<>();
             ArrayList<Integer> actions = new ArrayList<>();
             List<Integer> icons = new ArrayList<>();
-            if (position == phoneRow) {
+            if (position == phoneRow && !UserObject.isService(userId)) {
                 if (userInfo != null && userInfo.phone_calls_available) {
                     icons.add(R.drawable.msg_calls);
                     items.add(LocaleController.getString(R.string.CallViaTelegram));
@@ -10304,6 +10304,11 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                 if (userInfo != null && userInfo.phone_calls_available) {
                     callItemVisible = true;
                     videoCallItemVisible = Build.VERSION.SDK_INT >= 18 && userInfo.video_calls_available;
+                }
+                // 杭椒 服务号 隐藏 videoCall
+                if (UserObject.isService(userId)) {
+                    callItemVisible = false;
+                    videoCallItemVisible = false;
                 }
                 if (isBot || getContactsController().contactsDict.get(userId) == null) {
                     if (MessagesController.isSupportUser(user)) {

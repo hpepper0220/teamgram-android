@@ -480,7 +480,9 @@ public class IntroActivity extends BaseFragment implements NotificationCenter.No
                     loginView.signInButton.hideLoading();
 
                     if (error == null) {
-                        if (response instanceof TLRPC.TL_auth_authorizationSignUpRequired) {} else {
+                        if (response instanceof TLRPC.TL_auth_authorizationSignUpRequired) {
+                            needShowAlert(getString(R.string.RestorePasswordNoEmailTitle), "账号未注册，请先注册");
+                        } else {
                             onAuthSuccess((TLRPC.TL_auth_authorization) response);
                         }
                     } else {

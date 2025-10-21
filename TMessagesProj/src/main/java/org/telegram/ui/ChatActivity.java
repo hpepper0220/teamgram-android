@@ -3979,7 +3979,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
             }
             if (currentUser != null && chatMode != MODE_SAVED) {
                 headerItem.lazilyAddSubItem(call, R.drawable.msg_callback, LocaleController.getString(R.string.Call));
-                if (Build.VERSION.SDK_INT >= 18) {
+                if (Build.VERSION.SDK_INT >= 18 && !UserObject.isService(dialog_id)) {
                     headerItem.lazilyAddSubItem(video_call, R.drawable.msg_videocall, LocaleController.getString(R.string.VideoCall));
                 }
                 if (userFull != null && userFull.phone_calls_available) {
@@ -33251,6 +33251,9 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         }
         if (searchItem != null) {
             searchItem.setSearchFieldText(text, false);
+            searchItem.getSearchField().setTextColor(Color.BLACK);
+            searchItem.getSearchField().setHintTextColor(Color.BLACK);
+            searchItem.getSearchField().setCursorColor(Color.BLACK);
         }
         getMediaDataController().searchMessagesInChat(searchingQuery = (text == null ? "" : text), dialog_id, mergeDialogId, classGuid, 0, threadMessageId, false, searchingUserMessages, searchingChatMessages, !TextUtils.isEmpty(text), searchingReaction);
         updatePinnedMessageView(true);
