@@ -213,6 +213,8 @@ public class TLRPC {
         public boolean send_voices;
         public boolean send_docs;
         public boolean send_plain;
+        public boolean add_contact;
+        public boolean group_member_chat;
         public int until_date;
 
         public static TL_chatBannedRights TLdeserialize(InputSerializedData stream, int constructor, boolean exception) {
@@ -263,6 +265,8 @@ public class TLRPC {
             send_voices = (flags & 8388608) != 0;
             send_docs = (flags & 16777216) != 0;
             send_plain = (flags & 33554432) != 0;
+            add_contact = (flags & 67108864) != 0;
+            group_member_chat = (flags & 134217728) != 0;
             if (send_media) {
                 send_photos = true;
                 send_videos = true;
@@ -306,6 +310,8 @@ public class TLRPC {
             flags = send_voices ? (flags | 8388608) : (flags &~ 8388608);
             flags = send_docs ? (flags | 16777216) : (flags &~ 16777216);
             flags = send_plain ? (flags | 33554432) : (flags &~ 33554432);
+            flags = add_contact ? (flags | 67108864) : (flags &~ 67108864);
+            flags = group_member_chat ? (flags | 134217728) : (flags &~ 134217728);
             stream.writeInt32(flags);
             stream.writeInt32(until_date);
         }
