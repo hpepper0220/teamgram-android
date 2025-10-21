@@ -2431,6 +2431,9 @@ public class AlertsCreator {
         AlertDialog.Builder builder = new AlertDialog.Builder(context, resourcesProvider);
         long selfUserId = UserConfig.getInstance(account).getClientUserId();
 
+        String dialogTitle = "";
+        String dialogContent = "";
+
         CheckBoxCell[] cell = new CheckBoxCell[1];
 
         TextView messageTextView = new TextView(context) {
@@ -2472,24 +2475,33 @@ public class AlertsCreator {
 
         if (days == -1) {
             textView.setText(LocaleController.formatString("ClearHistory", R.string.ClearHistory));
+            dialogTitle = LocaleController.formatString("ClearHistory", R.string.ClearHistory);
             if (user != null) {
                 messageTextView.setText(AndroidUtilities.replaceTags(LocaleController.formatString("AreYouSureClearHistoryWithUser", R.string.AreYouSureClearHistoryWithUser, UserObject.getUserName(user))));
+                dialogContent = String.valueOf(AndroidUtilities.replaceTags(LocaleController.formatString("AreYouSureClearHistoryWithUser", R.string.AreYouSureClearHistoryWithUser, UserObject.getUserName(user))));
             } else {
                 if (canDeleteHistory) {
                     if (ChatObject.isChannelAndNotMegaGroup(chat)) {
                         messageTextView.setText(AndroidUtilities.replaceTags(LocaleController.formatString("AreYouSureClearHistoryWithChannel", R.string.AreYouSureClearHistoryWithChannel, chat.title)));
+                        dialogContent = String.valueOf(AndroidUtilities.replaceTags(LocaleController.formatString("AreYouSureClearHistoryWithChannel", R.string.AreYouSureClearHistoryWithChannel, chat.title)));
                     } else {
                         messageTextView.setText(AndroidUtilities.replaceTags(LocaleController.formatString("AreYouSureClearHistoryWithChat", R.string.AreYouSureClearHistoryWithChat, chat.title)));
+                        dialogContent = String.valueOf(AndroidUtilities.replaceTags(LocaleController.formatString("AreYouSureClearHistoryWithChat", R.string.AreYouSureClearHistoryWithChat, chat.title)));
                     }
                 } else if (chat.megagroup) {
                     messageTextView.setText(LocaleController.getString(R.string.AreYouSureClearHistoryGroup));
+                    dialogContent = LocaleController.getString(R.string.AreYouSureClearHistoryGroup);
                 } else {
                     messageTextView.setText(LocaleController.getString(R.string.AreYouSureClearHistoryChannel));
+                    dialogContent = LocaleController.getString(R.string.AreYouSureClearHistoryChannel);
                 }
             }
         } else {
             textView.setText(LocaleController.formatPluralString("DeleteDays", days));
             messageTextView.setText(LocaleController.getString(R.string.DeleteHistoryByDaysMessage));
+
+            dialogTitle = LocaleController.formatPluralString("DeleteDays", days);
+            dialogContent = LocaleController.getString(R.string.DeleteHistoryByDaysMessage);
         }
         final boolean[] deleteForAll = new boolean[]{false};
 
@@ -2520,16 +2532,21 @@ public class AlertsCreator {
         if (chat != null && canDeleteHistory && ChatObject.isPublic(chat) && !ChatObject.isChannelAndNotMegaGroup(chat)) {
             deleteText = LocaleController.getString(R.string.ClearForAll);
         }
-        builder.setPositiveButton(deleteText, (dialogInterface, i) -> {
+
+        DialogCreator.createClearOrDeleteDialogAlert(context, textView.getText(), messageTextView.getText(), null, deleteText, v -> {
             onProcessRunnable.run(deleteForAll[0]);
         });
-        builder.setNegativeButton(LocaleController.getString(R.string.Cancel), null);
-        AlertDialog alertDialog = builder.create();
-        fragment.showDialog(alertDialog);
-        TextView button = (TextView) alertDialog.getButton(DialogInterface.BUTTON_POSITIVE);
-        if (button != null) {
-            button.setTextColor(Theme.getColor(Theme.key_text_RedBold));
-        }
+
+//        builder.setPositiveButton(deleteText, (dialogInterface, i) -> {
+//            onProcessRunnable.run(deleteForAll[0]);
+//        });
+//        builder.setNegativeButton(LocaleController.getString(R.string.Cancel), null);
+//        AlertDialog alertDialog = builder.create();
+//        fragment.showDialog(alertDialog);
+//        TextView button = (TextView) alertDialog.getButton(DialogInterface.BUTTON_POSITIVE);
+//        if (button != null) {
+//            button.setTextColor(Theme.getColor(Theme.key_text_RedBold));
+//        }
     }
 
     public static void createCallDialogAlert(BaseFragment fragment, TLRPC.User user, boolean videoCall) {
