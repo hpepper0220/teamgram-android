@@ -28,6 +28,14 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
+
+        // ✅ 添加这一段
+        maybeCreate("standalone")
+        standalone {
+            // 复制 release 或 debug 的配置
+            initWith(buildTypes.release)
+            matchingFallbacks = ['release', 'debug']
+        }
     }
 
 }
