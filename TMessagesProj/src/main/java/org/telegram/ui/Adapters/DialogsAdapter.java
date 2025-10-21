@@ -1435,6 +1435,7 @@ public class DialogsAdapter extends RecyclerListView.SelectionAdapter implements
         itemInternals.clear();
         updateHasHints();
 
+        // 杭椒 获取会话列表
         MessagesController messagesController = MessagesController.getInstance(currentAccount);
         ArrayList<TLRPC.Dialog> array = parentFragment.getDialogsArray(currentAccount, dialogsType, folderId, dialogsListFrozen);
         if (array == null) {

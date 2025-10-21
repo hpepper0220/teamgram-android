@@ -20247,8 +20247,12 @@ public class MessagesController extends BaseController implements NotificationCe
         } catch (Exception e) {}
     }
 
+    // 杭椒 转发列表去除服务号
     public boolean canAddToForward(TLRPC.Dialog d) {
         if (d == null) {
+            return false;
+        }
+        if (UserObject.isService(d.id)) {
             return false;
         }
         if (DialogObject.isEncryptedDialog(d.id)) {

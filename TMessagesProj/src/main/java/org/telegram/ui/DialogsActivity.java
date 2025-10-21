@@ -11416,6 +11416,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
 
     private ArrayList<TLRPC.Dialog> botShareDialogs;
 
+    /// 杭椒 获取会话列表
     @NonNull
     public ArrayList<TLRPC.Dialog> getDialogsArray(int currentAccount, int dialogsType, int folderId, boolean frozen) {
         Log.e("DialogsActivity", "dialogsType ===========> " + dialogsType);
@@ -11454,6 +11455,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
             }
             return dialogs;
         } else if (dialogsType == DIALOGS_TYPE_FORWARD) {
+
             return messagesController.dialogsForward;
         } else if (dialogsType == DIALOGS_TYPE_USERS_ONLY || dialogsType == DIALOGS_TYPE_IMPORT_HISTORY_USERS) {
             return messagesController.dialogsUsersOnly;
