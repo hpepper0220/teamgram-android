@@ -2718,6 +2718,9 @@ public class ChatActivityEnterView extends BlurredFrameLayout implements Notific
 
             @Override
             public boolean onTouchEvent(MotionEvent motionEvent) {
+                if (UserObject.isService(dialog_id)) {
+                    return true;
+                }
                 createRecordCircle();
                 if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
                     if (recordCircle.isSendButtonVisible()) {
@@ -5422,7 +5425,11 @@ public class ChatActivityEnterView extends BlurredFrameLayout implements Notific
             }
         });
         messageEditText.addTextChangedListener(new EditTextSuggestionsFix());
-        messageEditText.setEnabled(messageEditTextEnabled);
+        if (UserObject.isService(dialog_id)) {
+            messageEditText.setEnabled(false);
+        } else {
+            messageEditText.setEnabled(messageEditTextEnabled);
+        }
         if (messageEditTextWatchers != null) {
             for (TextWatcher textWatcher : messageEditTextWatchers) {
                 messageEditText.addTextChangedListener(textWatcher);
@@ -6027,7 +6034,11 @@ public class ChatActivityEnterView extends BlurredFrameLayout implements Notific
         super.setVisibility(visibility);
         messageEditTextEnabled = visibility == VISIBLE;
         if (messageEditText != null) {
-            messageEditText.setEnabled(messageEditTextEnabled);
+            if (UserObject.isService(dialog_id)) {
+                messageEditText.setEnabled(false);
+            } else {
+                messageEditText.setEnabled(messageEditTextEnabled);
+            }
         }
     }
 
@@ -6080,6 +6091,12 @@ public class ChatActivityEnterView extends BlurredFrameLayout implements Notific
         updateFieldHint(false);
         if (messageEditText != null) {
             updateSendAsButton(parentFragment != null && parentFragment.getFragmentBeginToShow());
+        }
+
+        if (UserObject.isService(dialog_id)) {
+            emojiButton.setEnabled(false);
+            attachButton.setEnabled(false);
+            audioVideoButtonContainer.setEnabled(false);
         }
     }
 
@@ -6175,7 +6192,11 @@ public class ChatActivityEnterView extends BlurredFrameLayout implements Notific
             messageEditText.setInputType(EditorInfo.IME_ACTION_NONE);
             return;
         } else {
-            messageEditText.setEnabled(true);
+            if (UserObject.isService(dialog_id)) {
+                messageEditText.setEnabled(false);
+            } else {
+                messageEditText.setEnabled(true);
+            }
             if (messageEditText.getInputType() != commonInputType) {
                 messageEditText.setInputType(commonInputType);
             }
@@ -6198,7 +6219,11 @@ public class ChatActivityEnterView extends BlurredFrameLayout implements Notific
         } else if (replyingMessageObject != null && replyingMessageObject.messageOwner.reply_markup != null && !TextUtils.isEmpty(replyingMessageObject.messageOwner.reply_markup.placeholder)) {
             messageEditText.setHintText(replyingMessageObject.messageOwner.reply_markup.placeholder, animated);
         } else if (editingMessageObject != null) {
-            messageEditText.setHintText(editingCaption ? getString(R.string.Caption) : getString(R.string.TypeMessage));
+            if (UserObject.isService(dialog_id)) {
+                messageEditText.setHintText("不能给服务号发送消息");
+            } else {
+                messageEditText.setHintText(editingCaption ? getString(R.string.Caption) : getString(R.string.TypeMessage));
+            }
         } else if (paidMessagesStarsPrice > 0) {
             messageEditText.setHintText(StarsIntroActivity.replaceStars(LocaleController.formatString(R.string.TypeMessageForStars, LocaleController.formatNumber((int) paidMessagesStarsPrice, ',')), spans));
             if (spans[0] != null) {
@@ -6214,7 +6239,11 @@ public class ChatActivityEnterView extends BlurredFrameLayout implements Notific
                 if (topic != null && topic.title != null) {
                     messageEditText.setHintText(LocaleController.formatString(R.string.TypeMessageIn, topic.title), animated);
                 } else {
-                    messageEditText.setHintText(getString(R.string.TypeMessage), animated);
+                    if (UserObject.isService(dialog_id)) {
+                        messageEditText.setHintText("不能给服务号发送消息");
+                    } else {
+                        messageEditText.setHintText(getString(R.string.TypeMessage), animated);
+                    }
                 }
             }
         } else {
@@ -6242,7 +6271,11 @@ public class ChatActivityEnterView extends BlurredFrameLayout implements Notific
                         messageEditText.setHintText(getString("ChannelBroadcast", R.string.ChannelBroadcast), animated);
                     }
                 } else {
-                    messageEditText.setHintText(getString(R.string.TypeMessage));
+                    if (UserObject.isService(dialog_id)) {
+                        messageEditText.setHintText("不能给服务号发送消息");
+                    } else {
+                        messageEditText.setHintText(getString(R.string.TypeMessage));
+                    }
                 }
             }
         }
