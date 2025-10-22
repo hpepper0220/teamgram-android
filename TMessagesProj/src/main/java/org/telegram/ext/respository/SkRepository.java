@@ -28,6 +28,15 @@ public class SkRepository {
         return sInstance;
     }
 
+    public void getExplore(int currentAccount) {
+        TLRPC.TL_ssgrams_getExplorePage req = new TLRPC.TL_ssgrams_getExplorePage();
+        ConnectionsManager.getInstance(currentAccount).sendRequest(req, (response, error) -> {
+            if (response instanceof TLRPC.TL_discoverList) {
+
+            }
+        }, ConnectionsManager.RequestFlagFailOnServerErrors);
+    }
+
     public void getDiscovery(int currentAccount, int classGuid, SimpleCallback<List<TLRPC.TL_discoverPage>> callback) {
         TL_ssgrams_getDiscoverPage req = new TL_ssgrams_getDiscoverPage();
         int reqId = ConnectionsManager.getInstance(currentAccount).sendRequest(req, (response, error) -> {

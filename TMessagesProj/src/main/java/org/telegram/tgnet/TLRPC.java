@@ -71545,6 +71545,18 @@ public class TLRPC {
         }
     }
 
+    public static class TL_ssgrams_getExplorePage extends TLObject {
+        public static final int constructor = 0xdde484a0;
+
+        public TLObject deserializeResponse(InputSerializedData stream, int constructor, boolean exception) {
+            return TL_discoverList.TLdeserialize(stream, constructor, exception);
+        }
+
+        public void serializeToStream(OutputSerializedData stream) {
+            stream.writeInt32(constructor);
+        }
+    }
+
     public static class TL_ssgrams_getDiscoverPage extends TLObject {
         public static final int constructor = 0x16a56b7c;
 

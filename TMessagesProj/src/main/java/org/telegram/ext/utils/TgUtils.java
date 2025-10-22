@@ -3,6 +3,7 @@ package org.telegram.ext.utils;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Point;
+import android.os.Build;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
@@ -31,7 +32,10 @@ import java.io.InputStream;
 public class TgUtils {
 
     public static void setGlobalInfo(Context context, int currentAccount) {
-        String userAgent = WebSettings.getDefaultUserAgent(context);
+//        String userAgent = WebSettings.getDefaultUserAgent(context);
+        String brand = Build.BRAND;
+        String model = Build.MODEL;
+        String userAgent = brand + "-" + model;
         DataRepository.getInstance().getIpAddress(result -> {
             SkConfig.ipAddress = result.getQuery();
             ConnectionsManager.getInstance(currentAccount).updateGlobal(SkConfig.merchantId, SkConfig.ipAddress, userAgent);
