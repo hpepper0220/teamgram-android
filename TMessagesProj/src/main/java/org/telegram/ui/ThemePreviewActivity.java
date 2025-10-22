@@ -161,6 +161,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+// 杭椒 设置背景
 public class ThemePreviewActivity extends BaseFragment implements DownloadController.FileDownloadProgressListener, NotificationCenter.NotificationCenterDelegate {
 
     public final ThemeDelegate themeDelegate = new ThemeDelegate() {

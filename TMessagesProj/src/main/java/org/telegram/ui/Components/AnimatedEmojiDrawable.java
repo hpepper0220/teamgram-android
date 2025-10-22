@@ -305,26 +305,26 @@ public class AnimatedEmojiDrawable extends Drawable {
         }
 
         private void loadFromServer(ArrayList<Long> loadFromServerIds) {
-            final TLRPC.TL_messages_getCustomEmojiDocuments req = new TLRPC.TL_messages_getCustomEmojiDocuments();
-            req.document_id = loadFromServerIds;
-            ConnectionsManager.getInstance(currentAccount).sendRequest(req, (res, err) -> NotificationCenter.getInstance(currentAccount).doOnIdle(() -> AndroidUtilities.runOnUIThread(() -> {
-                HashSet<Long> loadedFromServer = new HashSet<>(loadFromServerIds);
-                if (res instanceof Vector) {
-                    ArrayList<Object> objects = ((Vector) res).objects;
-                    putToStorage(objects);
-                    processDocuments(objects);
-                    for (int i = 0; i < objects.size(); i++) {
-                        if (objects.get(i) instanceof TLRPC.Document) {
-                            TLRPC.Document document = (TLRPC.Document) objects.get(i);
-                            loadedFromServer.remove(document.id);
-                        }
-                    }
-
-                    if (!loadedFromServer.isEmpty()) {
-                        loadFromServer(new ArrayList<>(loadedFromServer));
-                    }
-                }
-            })));
+//            final TLRPC.TL_messages_getCustomEmojiDocuments req = new TLRPC.TL_messages_getCustomEmojiDocuments();
+//            req.document_id = loadFromServerIds;
+//            ConnectionsManager.getInstance(currentAccount).sendRequest(req, (res, err) -> NotificationCenter.getInstance(currentAccount).doOnIdle(() -> AndroidUtilities.runOnUIThread(() -> {
+//                HashSet<Long> loadedFromServer = new HashSet<>(loadFromServerIds);
+//                if (res instanceof Vector) {
+//                    ArrayList<Object> objects = ((Vector) res).objects;
+//                    putToStorage(objects);
+//                    processDocuments(objects);
+//                    for (int i = 0; i < objects.size(); i++) {
+//                        if (objects.get(i) instanceof TLRPC.Document) {
+//                            TLRPC.Document document = (TLRPC.Document) objects.get(i);
+//                            loadedFromServer.remove(document.id);
+//                        }
+//                    }
+//
+//                    if (!loadedFromServer.isEmpty()) {
+//                        loadFromServer(new ArrayList<>(loadedFromServer));
+//                    }
+//                }
+//            })));
         }
 
         private void putToStorage(ArrayList<Object> objects) {

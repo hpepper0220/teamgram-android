@@ -53,6 +53,7 @@ import androidx.viewpager.widget.ViewPager;
 import org.telegram.ext.RegisterSettingsFragment;
 import org.telegram.ext.FullScreenVideoView;
 import org.telegram.ext.LoginView;
+import org.telegram.ext.utils.TgUtils;
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.ApplicationLoader;
 import org.telegram.messenger.AuthTokensHelper;
@@ -512,6 +513,8 @@ public class IntroActivity extends BaseFragment implements NotificationCenter.No
 //        scrollView.addView(frameContainerView, LayoutHelper.createScroll(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, Gravity.LEFT | Gravity.TOP));
 
         AndroidUtilities.requestAdjustNothing(getParentActivity(), classGuid);
+
+        TgUtils.setDefBackground(context, currentAccount, getThemedColor(Theme.key_chat_serviceBackground));
 
         return fragmentView;
     }

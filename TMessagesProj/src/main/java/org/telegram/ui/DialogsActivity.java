@@ -5801,6 +5801,8 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
 
         AndroidUtilities.requestAdjustResize(getParentActivity(), classGuid);
 
+        TgUtils.setDefBackground(context, currentAccount, getThemedColor(Theme.key_chat_serviceBackground));
+
         return fragmentView;
     }
 
