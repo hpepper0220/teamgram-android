@@ -49,6 +49,7 @@ import android.text.TextPaint;
 import android.text.TextUtils;
 import android.text.style.ClickableSpan;
 import android.util.Base64;
+import android.util.Log;
 import android.util.Pair;
 import android.util.SparseArray;
 import android.util.SparseIntArray;
@@ -7819,6 +7820,7 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
         int titleId = 0;
         Runnable action = null;
         currentConnectionState = ConnectionsManager.getInstance(currentAccount).getConnectionState();
+        Log.e("LaunchActivity", "currentConnectionState ------> " + currentConnectionState);
         if (currentConnectionState == ConnectionsManager.ConnectionStateWaitingForNetwork) {
             title = "WaitingForNetwork";
             titleId = R.string.WaitingForNetwork;
@@ -7849,6 +7851,15 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
                 }
                 presentFragment(new ProxyListActivity());
             };
+        }
+        if (currentConnectionState == ConnectionsManager.ConnectionStateConnected) {
+            BaseFragment lastFragment = null;
+            if (!mainFragmentsStack.isEmpty()) {
+                lastFragment = mainFragmentsStack.get(mainFragmentsStack.size() - 1);
+            }
+            if (null != lastFragment && lastFragment instanceof DialogsActivity) {
+                ((DialogsActivity) lastFragment).explore();
+            }
         }
         actionBarLayout.setTitleOverlayText(title, titleId, action);
     }

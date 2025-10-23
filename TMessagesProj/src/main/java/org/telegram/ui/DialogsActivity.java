@@ -95,6 +95,8 @@ import androidx.viewpager.widget.PagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 import androidx.viewpager2.widget.ViewPager2;
 
+import com.android.billingclient.api.BillingClient;
+import com.blankj.utilcode.util.ArrayUtils;
 import com.blankj.utilcode.util.ObjectUtils;
 
 import org.checkerframework.common.subtyping.qual.Bottom;
@@ -689,6 +691,8 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
     private SkDiscoveryFragment discoveryFragment;
     private SkMineFragment mineFragment;
     private NavigationController navigationController;
+
+    private List<TLRPC.TL_discoverPage> exploreList;
 
     // 杭椒 menu菜单
     private ActionBarMenuItem mPlusMenuItem;
@@ -5804,6 +5808,21 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         TgUtils.setDefBackground(context, currentAccount, getThemedColor(Theme.key_chat_serviceBackground));
 
         return fragmentView;
+    }
+
+    // 杭椒 加载探索页数据
+    public void explore() {
+        if (null == exploreList || exploreList.isEmpty()) {
+            SkRepository.getInstance().getExplore(currentAccount, new SimpleCallback<List<TLRPC.TL_discoverPage>>() {
+                @Override
+                public void onResp(List<TLRPC.TL_discoverPage> result) {
+                    exploreList = result;
+                    if (!exploreList.isEmpty()) {
+
+                    }
+                }
+            });
+        }
     }
 
     // 杭椒 更新消息未读数量
@@ -10937,6 +10956,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
     @SuppressWarnings("unchecked")
     @Override
     public void didReceivedNotification(int id, int account, Object... args) {
+        Log.e("DialogsActivity", "didReceivedNotification -------> " + id);
         if (id == NotificationCenter.dialogsNeedReload) {
             if (viewPages == null || dialogsListFrozen) {
                 return;
