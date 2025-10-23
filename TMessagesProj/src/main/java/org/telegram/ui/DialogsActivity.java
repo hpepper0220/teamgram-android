@@ -103,6 +103,7 @@ import org.checkerframework.common.subtyping.qual.Bottom;
 import org.telegram.ext.AddFriendFragment;
 import org.telegram.ext.BottomItemView;
 import org.telegram.ext.CreateChannelFragment;
+import org.telegram.ext.ExploreFragment;
 import org.telegram.ext.SkContactsFragment;
 import org.telegram.ext.SkDiscoveryFragment;
 import org.telegram.ext.SkMineFragment;
@@ -263,8 +264,11 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
 import me.majiajie.pagerbottomtabstrip.NavigationController;
@@ -303,6 +307,13 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
     private boolean storiesOverscrollCalled;
     private boolean wasDrawn;
     private int fragmentContextTopPadding;
+    private PageNavigationView.CustomBuilder customBuilder;
+    private LinearLayout mainViewContainer;
+    private ViewPage contactViewPage;
+    private FrameLayout discoveryViewPage;
+    private FrameLayout mineViewPage;
+    private ViewPage conversationViewPage;
+    private Map<Integer, ExploreFragment> exploreFragmentMap = new HashMap<>();
 
     public MessagesStorage.TopicKey getOpenedDialogId() {
         return openedDialogId;
@@ -431,6 +442,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
     private ActionBarMenuItem proxyItem;
     private boolean proxyItemVisible;
     private ActionBarMenuItem searchItem;
+    private ActionBarMenuItem refreshItem;
     private ActionBarMenuItem optionsItem;
     private ActionBarMenuItem speedItem;
     private AnimatorSet speedAnimator;
@@ -692,7 +704,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
     private SkMineFragment mineFragment;
     private NavigationController navigationController;
 
-    private List<TLRPC.TL_discoverPage> exploreList;
+    private List<TLRPC.TL_discoverPage> exploreList = new ArrayList<>();
 
     // 杭椒 menu菜单
     private ActionBarMenuItem mPlusMenuItem;
@@ -3095,8 +3107,11 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         }
     }
 
+    private Context mContext;
+
     @Override
     public View createView(final Context context) {
+        mContext = context;
         searching = false;
         searchWas = false;
         wasDrawn = false;
@@ -3142,6 +3157,8 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
             updateProxyButton(false, false);
         }
         mPlusMenuItem = menu.addItem(SkMenuAction.plus, R.mipmap.ic_add_circle);
+        refreshItem = menu.addItem(SkMenuAction.refresh, R.mipmap.editor_rotate);
+        refreshItem.setVisibility(View.GONE);
         searchItem = menu.addItem(1000, R.drawable.ic_ab_search).setIsSearchField(true, false).setActionBarMenuItemSearchListener(new ActionBarMenuItem.ActionBarMenuItemSearchListener() {
             boolean isSpeedItemCreated = false;
 
@@ -3755,14 +3772,15 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                             addFriendFragment.setParentActivity((LaunchActivity) getParentActivity());
                             presentFragment(addFriendFragment);
                         } else if (v.getId() == R.id.popup_create_group) {
-//                            Bundle args = new Bundle();
-//                            args.putInt("step", 0);
-//                            presentFragment(new ChannelCreateActivity(args));
                             CreateChannelFragment fragment = new CreateChannelFragment();
                             fragment.setParentActivity((LaunchActivity) getParentActivity());
                             presentFragment(fragment);
                         }
                     });
+                } else if (id == SkMenuAction.refresh) {
+                    if (!exploreList.isEmpty()) {
+                        Objects.requireNonNull(exploreFragmentMap.get(mCurrentPosition)).reload();
+                    }
                 } else if (id == -1) {
                     if (rightSlidingDialogContainer != null && rightSlidingDialogContainer.hasFragment()) {
                         if (actionBar.isActionModeShowed()) {
@@ -3947,7 +3965,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                 }
             };
 
-            LinearLayout mainViewContainer = new LinearLayout(context);
+            mainViewContainer = new LinearLayout(context);
             mainViewContainer.setOrientation(LinearLayout.VERTICAL);
             LinearLayout.LayoutParams layoutParams = LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT);
             mainViewContainer.setLayoutParams(layoutParams);
@@ -4285,103 +4303,10 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
 
                 conversationListPage = viewPage;
 
-                int topPadding = ActionBar.getCurrentActionBarHeight() + AndroidUtilities.statusBarHeight;
                 pageNavigationView = new PageNavigationView(context);
                 pageNavigationView.setId(R.id.main_bottom_navigation_bar);
-                PageNavigationView.CustomBuilder customBuilder = pageNavigationView.custom();
-                List<String> titleList = new ArrayList<>();
-                titleList.add("聊天");
-                titleList.add("通讯录");
-                titleList.add("发现");
-                titleList.add("设置");
-                mTitleList.clear();
-                mTitleList.addAll(titleList);
 
-                List<Integer> imageList = new ArrayList<>();
-                imageList.add(R.mipmap.sk_tab_message);
-                imageList.add(R.mipmap.sk_tab_contacts);
-                imageList.add(R.mipmap.sk_tab_discovery);
-                imageList.add(R.mipmap.sk_tab_settings);
-
-                for (int i = 0; i < titleList.size(); i++) {
-                    BottomItemView itemView = new BottomItemView(context);
-                    itemView.initialize(titleList.get(i), imageList.get(i));
-                    customBuilder.addItem(itemView);
-                }
-
-                List<FrameLayout> contentViewList = new ArrayList<>();
-                contentViewList.add(conversationListPage);
-                contentViewList.add(createContactsFragment(context));
-                contentViewList.add(createDiscoveryFragment(context));
-                contentViewList.add(createMineFragment(context));
-
-                navigationController = customBuilder.build();
-                navigationController.addTabItemSelectedListener(new OnTabItemSelectedListener() {
-                    @Override
-                    public void onSelected(int index, int old) {
-                        mCurrentPosition = index;
-                        updateActionBarTitle();
-                        viewPager.setCurrentItem(index);
-                        if (index == 0) {
-                            mPlusMenuItem.setVisibility(View.VISIBLE);
-                        } else {
-                            mPlusMenuItem.setVisibility(View.GONE);
-                        }
-                        if (index == 0) {
-                            mainViewContainer.setPadding(0, topPadding, 0, 0);
-                            actionBar.setVisibility(View.VISIBLE);
-                        } else if (index == 1) {
-                            mainViewContainer.setPadding(0, topPadding, 0, 0);
-                            actionBar.setVisibility(View.VISIBLE);
-                            searchItem.setVisibility(View.GONE);
-                            ContactsController.getInstance(currentAccount).loadContacts(false, 0);
-                        } else if (index == 2) {
-                            mainViewContainer.setPadding(0, topPadding, 0, 0);
-                            actionBar.setVisibility(View.VISIBLE);
-                            searchItem.setVisibility(View.GONE);
-                            discoveryFragment.fetchData(currentAccount, classGuid, true, false);
-                        } else {
-                            mainViewContainer.setPadding(0, 0, 0, 0);
-                            actionBar.setVisibility(View.GONE);
-                            mainViewContainer.setBackgroundColor(Color.WHITE);
-                            mineFragment.onResume();
-                        }
-                    }
-
-                    @Override
-                    public void onRepeat(int index) {
-
-                    }
-                });
-
-                navigationController.setupWithViewPager(viewPager);
-
-                viewPager.setCurrentItem(0);
-                viewPager.setOffscreenPageLimit(4);
-                viewPager.setAdapter(new PagerAdapter() {
-                    @Override
-                    public int getCount() {
-                        return contentViewList.size();
-                    }
-
-                    @NonNull
-                    @Override
-                    public Object instantiateItem(@NonNull ViewGroup container, int position) {
-                        FrameLayout frameLayout = contentViewList.get(position);
-                        container.addView(frameLayout);
-                        return frameLayout;
-                    }
-
-                    @Override
-                    public void destroyItem(@NonNull ViewGroup container, int position, @NonNull Object object) {
-                        container.removeView((View) object);
-                    }
-
-                    @Override
-                    public boolean isViewFromObject(@NonNull View view, @NonNull Object object) {
-                        return view == object;
-                    }
-                });
+                createBottomNavigation();
 
                 mainViewContainer.addView(viewPagerLayout);
                 mainViewContainer.addView(pageNavigationView, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, 48, Gravity.BOTTOM, 2, 0, 2, 2));
@@ -4391,7 +4316,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                     mainViewContainer.setPadding(0, 0, 0, 0);
                 } else {
                     pageNavigationView.setVisibility(View.VISIBLE);
-                    mainViewContainer.setPadding(0, topPadding, 0, 0);
+                    mainViewContainer.setPadding(0, 0, 0, 0);
                 }
             }
 
@@ -5813,15 +5738,15 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
     // 杭椒 加载探索页数据
     public void explore() {
         if (null == exploreList || exploreList.isEmpty()) {
-            SkRepository.getInstance().getExplore(currentAccount, new SimpleCallback<List<TLRPC.TL_discoverPage>>() {
+            SkRepository.getInstance().getExplore(currentAccount, result -> AndroidUtilities.runOnUIThread(new Runnable() {
                 @Override
-                public void onResp(List<TLRPC.TL_discoverPage> result) {
+                public void run() {
                     exploreList = result;
                     if (!exploreList.isEmpty()) {
-
+                        createBottomNavigation();
                     }
                 }
-            });
+            }));
         }
     }
 
@@ -5839,37 +5764,261 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         });
     }
 
-    private ViewPage createContactsFragment(Context context) {
-        ViewPage viewPage = new ViewPage(context);
-        contactsFragment = new SkContactsFragment();
-        contactsFragment.onFragmentCreate();
-        if (getParentActivity() instanceof LaunchActivity) {
-            contactsFragment.setParentActivity((LaunchActivity) getParentActivity());
+    private void createBottomNavigation() {
+        int topPadding = ActionBar.getCurrentActionBarHeight() + AndroidUtilities.statusBarHeight;
+        pageNavigationView.removeAllViews();
+        customBuilder = pageNavigationView.custom();
+        List<String> titleList = new ArrayList<>();
+        titleList.add("聊天");
+        titleList.add("通讯录");
+        if (!exploreList.isEmpty()) {
+            for (int i = 0; i < exploreList.size(); i++) {
+                titleList.add(exploreList.get(i).title);
+            }
         }
-        contactsFragment.setCurrentAccount(currentAccount);
-        viewPage.addView(contactsFragment.createView(getParentActivity()), LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT));
-        return viewPage;
+        titleList.add("发现");
+        titleList.add("设置");
+        mTitleList.clear();
+        mTitleList.addAll(titleList);
+
+        List<Integer> imageList = new ArrayList<>();
+        imageList.add(R.mipmap.sk_tab_message);
+        imageList.add(R.mipmap.sk_tab_contacts);
+        if (!exploreList.isEmpty()) {
+            for (int i = 0; i < exploreList.size(); i++) {
+                imageList.add(i);
+            }
+        }
+        imageList.add(R.mipmap.sk_tab_discovery);
+        imageList.add(R.mipmap.sk_tab_settings);
+
+        for (int i = 0; i < titleList.size(); i++) {
+            BottomItemView itemView = new BottomItemView(mContext);
+            if (exploreList.isEmpty()) {
+                itemView.initialize(titleList.get(i), imageList.get(i), "");
+            } else {
+                if (exploreList.size() == 1) {
+                    if (i == 2) {
+                        itemView.initialize(titleList.get(i), imageList.get(i), exploreList.get(imageList.get(i)).logo);
+                    } else {
+                        itemView.initialize(titleList.get(i), imageList.get(i), "");
+                    }
+                } else if (exploreList.size() == 2) {
+                    if (i == 2 || i == 3) {
+                        itemView.initialize(titleList.get(i), imageList.get(i), exploreList.get(imageList.get(i)).logo);
+                    } else {
+                        itemView.initialize(titleList.get(i), imageList.get(i), "");
+                    }
+                } else {
+                    itemView.initialize(titleList.get(i), imageList.get(i), "");
+                }
+            }
+            customBuilder.addItem(itemView);
+        }
+
+        List<FrameLayout> contentViewList = new ArrayList<>();
+        contentViewList.add(createConversationList(mContext, topPadding));
+        contentViewList.add(createContactsFragment(mContext, topPadding));
+        if (!exploreList.isEmpty()) {
+            for (int i = 0; i < exploreList.size(); i++) {
+                contentViewList.add(createExploreFragment(mContext, topPadding, 2 + i, exploreList.get(i)));
+            }
+        }
+        contentViewList.add(createDiscoveryFragment(mContext, topPadding));
+        contentViewList.add(createMineFragment(mContext));
+
+        navigationController = customBuilder.build();
+        navigationController.addTabItemSelectedListener(new OnTabItemSelectedListener() {
+            @Override
+            public void onSelected(int index, int old) {
+                mCurrentPosition = index;
+                updateActionBarTitle();
+                viewPager.setCurrentItem(index);
+                if (index == 0) {
+                    mPlusMenuItem.setVisibility(View.VISIBLE);
+                } else {
+                    mPlusMenuItem.setVisibility(View.GONE);
+                }
+                if (index == 0) {
+                    actionBar.setVisibility(View.VISIBLE);
+                    refreshItem.setVisibility(View.GONE);
+                } else if (index == 1) {
+                    actionBar.setVisibility(View.VISIBLE);
+                    searchItem.setVisibility(View.GONE);
+                    refreshItem.setVisibility(View.GONE);
+                    ContactsController.getInstance(currentAccount).loadContacts(false, 0);
+                } else {
+                    if (exploreList.isEmpty()) {
+                        if (index == 2) {
+                            actionBar.setVisibility(View.VISIBLE);
+                            searchItem.setVisibility(View.GONE);
+                            refreshItem.setVisibility(View.GONE);
+                            discoveryFragment.fetchData(currentAccount, classGuid, true, false);
+                        } else {
+                            actionBar.setVisibility(View.GONE);
+                            searchItem.setVisibility(View.GONE);
+                            refreshItem.setVisibility(View.GONE);
+                            mainViewContainer.setBackgroundColor(Color.WHITE);
+                            mineFragment.onResume();
+                        }
+                    } else {
+                        if (exploreList.size() == 1) {
+                            if (index == 2) {
+                                actionBar.setVisibility(View.VISIBLE);
+                                searchItem.setVisibility(View.GONE);
+                                refreshItem.setVisibility(View.VISIBLE);
+                            } else if (index == 3) {
+                                actionBar.setVisibility(View.VISIBLE);
+                                searchItem.setVisibility(View.GONE);
+                                refreshItem.setVisibility(View.GONE);
+                                discoveryFragment.fetchData(currentAccount, classGuid, true, false);
+                            } else {
+                                actionBar.setVisibility(View.GONE);
+                                searchItem.setVisibility(View.GONE);
+                                mainViewContainer.setBackgroundColor(Color.WHITE);
+                                mineFragment.onResume();
+                            }
+                        } else if (exploreList.size() == 2) {
+                            if (index == 2) {
+                                actionBar.setVisibility(View.VISIBLE);
+                                searchItem.setVisibility(View.GONE);
+                                refreshItem.setVisibility(View.VISIBLE);
+                            } else if (index == 3) {
+                                actionBar.setVisibility(View.VISIBLE);
+                                searchItem.setVisibility(View.GONE);
+                                refreshItem.setVisibility(View.VISIBLE);
+                            } else if (index == 4) {
+                                actionBar.setVisibility(View.VISIBLE);
+                                searchItem.setVisibility(View.GONE);
+                                refreshItem.setVisibility(View.GONE);
+                                discoveryFragment.fetchData(currentAccount, classGuid, true, false);
+                            } else {
+                                actionBar.setVisibility(View.GONE);
+                                searchItem.setVisibility(View.GONE);
+                                mainViewContainer.setBackgroundColor(Color.WHITE);
+                                mineFragment.onResume();
+                            }
+                        }
+                    }
+                }
+            }
+
+            @Override
+            public void onRepeat(int index) {
+
+            }
+        });
+
+        navigationController.setupWithViewPager(viewPager);
+
+        viewPager.setCurrentItem(0);
+        viewPager.setOffscreenPageLimit(4);
+        viewPager.setAdapter(new PagerAdapter() {
+            @Override
+            public int getCount() {
+                return contentViewList.size();
+            }
+
+            @NonNull
+            @Override
+            public Object instantiateItem(@NonNull ViewGroup container, int position) {
+                FrameLayout frameLayout = contentViewList.get(position);
+                container.addView(frameLayout);
+                return frameLayout;
+            }
+
+            @Override
+            public void destroyItem(@NonNull ViewGroup container, int position, @NonNull Object object) {
+                container.removeView((View) object);
+            }
+
+            @Override
+            public boolean isViewFromObject(@NonNull View view, @NonNull Object object) {
+                return view == object;
+            }
+        });
     }
 
-    private FrameLayout createDiscoveryFragment(Context context) {
-        FrameLayout viewPage = new FrameLayout(context);
-        discoveryFragment = new SkDiscoveryFragment();
-        discoveryFragment.onFragmentCreate();
-        discoveryFragment.setCurrentAccount(currentAccount);
-        viewPage.addView(discoveryFragment.createView(getParentActivity()), LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT));
-        return viewPage;
+    private ViewPage createConversationList(Context context, int topPadding) {
+        if (null == conversationViewPage) {
+            conversationViewPage = new ViewPage(context);
+        } else {
+            conversationViewPage.removeAllViews();
+        }
+        conversationViewPage.setPadding(0, topPadding, 0, 0);
+        conversationViewPage.addView(conversationListPage, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT, Gravity.TOP, 0, 0, 0, 0));
+        return conversationViewPage;
+    }
+
+    private ViewPage createExploreFragment(Context context, int topPadding, int index, TLRPC.TL_discoverPage data) {
+        ViewPage exploreViewPage = new ViewPage(context);
+        exploreViewPage.removeAllViews();
+        Bundle bundle = new Bundle();
+        bundle.putString("title", data.title);
+        bundle.putString("web_url", data.url);
+        ExploreFragment exploreFragment = new ExploreFragment(bundle);
+        if (getParentActivity() instanceof LaunchActivity) {
+            exploreFragment.setParentActivity((LaunchActivity) getParentActivity());
+        }
+        exploreFragment.onFragmentCreate();
+        exploreFragment.setCurrentAccount(currentAccount);
+        exploreViewPage.setPadding(0, topPadding, 0, 0);
+        exploreViewPage.addView(exploreFragment.createView(getParentActivity()), LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT, Gravity.TOP, 0, 0, 0, 0));
+        exploreFragmentMap.put(index, exploreFragment);
+        return exploreViewPage;
+    }
+
+    private ViewPage createContactsFragment(Context context, int topPadding) {
+        if (null == contactViewPage) {
+            contactViewPage = new ViewPage(context);
+        } else {
+            contactViewPage.removeAllViews();
+        }
+        if (null == contactsFragment) {
+            contactsFragment = new SkContactsFragment();
+            contactsFragment.onFragmentCreate();
+            if (getParentActivity() instanceof LaunchActivity) {
+                contactsFragment.setParentActivity((LaunchActivity) getParentActivity());
+            }
+            contactsFragment.setCurrentAccount(currentAccount);
+        }
+        contactViewPage.setPadding(0, topPadding, 0, 0);
+        contactViewPage.addView(contactsFragment.createView(getParentActivity()), LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT, Gravity.TOP, 0, 0, 0, 0));
+        return contactViewPage;
+    }
+
+    private FrameLayout createDiscoveryFragment(Context context, int topPadding) {
+        if (null == discoveryViewPage) {
+            discoveryViewPage = new FrameLayout(context);
+        } else {
+            discoveryViewPage.removeAllViews();
+        }
+        if (null == discoveryFragment) {
+            discoveryFragment = new SkDiscoveryFragment();
+            discoveryFragment.onFragmentCreate();
+            discoveryFragment.setCurrentAccount(currentAccount);
+        }
+        discoveryViewPage.setPadding(0, topPadding, 0, 0);
+        discoveryViewPage.addView(discoveryFragment.createView(getParentActivity()), LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT, Gravity.TOP, 0, 0, 0, 0));
+        return discoveryViewPage;
     }
 
     private FrameLayout createMineFragment(Context context) {
-        FrameLayout viewPage = new FrameLayout(context);
-        mineFragment = new SkMineFragment();
-        mineFragment.onFragmentCreate();
-        if (getParentActivity() instanceof LaunchActivity) {
-            mineFragment.setParentActivity((LaunchActivity) getParentActivity());
+        if (null == mineViewPage) {
+            mineViewPage = new FrameLayout(context);
+        } else {
+            mineViewPage.removeAllViews();
         }
-        mineFragment.setCurrentAccount(currentAccount);
-        viewPage.addView(mineFragment.createView(getParentActivity()), LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT));
-        return viewPage;
+        if (null == mineFragment) {
+            mineFragment = new SkMineFragment();
+            mineFragment.onFragmentCreate();
+            if (getParentActivity() instanceof LaunchActivity) {
+                mineFragment.setParentActivity((LaunchActivity) getParentActivity());
+            }
+            mineFragment.setCurrentAccount(currentAccount);
+        }
+        mineViewPage.addView(mineFragment.createView(getParentActivity()), LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT));
+        return mineViewPage;
     }
 
     private void setStoriesOvercroll(ViewPage viewPage, float storiesOverscroll) {

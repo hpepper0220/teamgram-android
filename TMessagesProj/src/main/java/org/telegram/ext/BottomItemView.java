@@ -15,6 +15,11 @@ import androidx.appcompat.widget.AppCompatImageView;
 import androidx.appcompat.widget.AppCompatTextView;
 import androidx.core.content.ContextCompat;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
+
 import org.telegram.messenger.R;
 
 import me.majiajie.pagerbottomtabstrip.internal.RoundMessageView;
@@ -28,6 +33,7 @@ public class BottomItemView extends BaseTabItem {
     private Drawable iconDrawable;
     private boolean isSelected;
     private @DrawableRes int imgResId;
+    private String iconUrl;
 
     public BottomItemView(@NonNull Context context) {
         super(context);
@@ -47,24 +53,44 @@ public class BottomItemView extends BaseTabItem {
         super(context, attrs, defStyleAttr);
     }
 
-    public void initialize(String title, @DrawableRes int resId) {
+    public void initialize(String title, @DrawableRes int resId, String imgUrl) {
         this.imgResId = resId;
-        iconDrawable = ContextCompat.getDrawable(context, resId);
+        iconUrl = imgUrl;
+        if (resId != 0) {
+            iconDrawable = ContextCompat.getDrawable(context, resId);
+            icon.setImageDrawable(iconDrawable);
+        } else {
+            Glide.with(context).load(imgUrl)
+                    .diskCacheStrategy(DiskCacheStrategy.ALL)
+                    .transition(DrawableTransitionOptions.withCrossFade())
+                    .into(icon);
+        }
         setTitle(title);
-        icon.setImageDrawable(iconDrawable);
         setHasMessage(false);
     }
 
     @Override
     public void setChecked(boolean checked) {
         isSelected = checked;
-        icon.setImageDrawable(iconDrawable);
-        if (checked) {
-            icon.setColorFilter(Color.BLACK);
-            textView.setTextColor(Color.BLACK);
+        if (null != iconUrl && !iconUrl.isEmpty()) {
+            Glide.with(context).load(iconUrl)
+                    .diskCacheStrategy(DiskCacheStrategy.ALL)
+                    .transition(DrawableTransitionOptions.withCrossFade())
+                    .into(icon);
+            if (checked) {
+                textView.setTextColor(Color.BLACK);
+            } else {
+                textView.setTextColor(Color.parseColor("#999999"));
+            }
         } else {
-            icon.setColorFilter(Color.parseColor("#999999"));
-            textView.setTextColor(Color.parseColor("#999999"));
+            icon.setImageDrawable(iconDrawable);
+            if (checked) {
+                icon.setColorFilter(Color.BLACK);
+                textView.setTextColor(Color.BLACK);
+            } else {
+                icon.setColorFilter(Color.parseColor("#999999"));
+                textView.setTextColor(Color.parseColor("#999999"));
+            }
         }
     }
 
