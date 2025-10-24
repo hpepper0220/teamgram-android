@@ -62,4 +62,6 @@
     <item name="dialog_cell" type="id" />
     <item name="dialog_button_negative" type="id" />
     <item name="dialog_button_positive" type="id" />
+    <item name="dialog_hide" type="id" />
+    <item name="dialog_refresh" type="id" />
 </resources>

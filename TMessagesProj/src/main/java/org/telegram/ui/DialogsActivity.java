@@ -5726,6 +5726,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
 
         actionBar.setBackgroundColor(Color.WHITE);
         actionBar.setTitleColor(Color.BLACK);
+        actionBar.setItemsColor(Color.BLACK, false);
 //        AndroidUtilities.setLightStatusBar(((Activity) getContext()).getWindow(), true);
 
         AndroidUtilities.requestAdjustResize(getParentActivity(), classGuid);
@@ -5996,6 +5997,9 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         if (null == discoveryFragment) {
             discoveryFragment = new SkDiscoveryFragment();
             discoveryFragment.onFragmentCreate();
+            if (getParentActivity() instanceof LaunchActivity) {
+                discoveryFragment.setParentActivity((LaunchActivity) getParentActivity());
+            }
             discoveryFragment.setCurrentAccount(currentAccount);
         }
         discoveryViewPage.setPadding(0, topPadding, 0, 0);

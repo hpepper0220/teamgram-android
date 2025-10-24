@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.net.Uri;
+import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -41,6 +42,7 @@ import org.telegram.ui.ActionBar.BaseFragment;
 import org.telegram.ui.ActionBar.Theme;
 import org.telegram.ui.Components.LayoutHelper;
 import org.telegram.ui.Components.RadialProgressView;
+import org.telegram.ui.LaunchActivity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -54,6 +56,11 @@ public class SkDiscoveryFragment extends BaseFragment {
     private RadialProgressView progressView;
     private List<DiscoveryModel> dataList = new ArrayList<>();
     private DiscoveryAdapter discoveryAdapter;
+    private LaunchActivity mParentActivity;
+
+    public void setParentActivity(LaunchActivity parentActivity) {
+        this.mParentActivity = parentActivity;
+    }
 
     @Override
     public View createView(Context context) {
@@ -197,11 +204,13 @@ public class SkDiscoveryFragment extends BaseFragment {
                 holder.atvContent.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteBlackText));
                 holder.containerView.setBackground(Theme.createSimpleSelectorRoundRectDrawable(0, 0xFFFFFFFF, 0xFFF0F0F0));
                 holder.containerView.setOnClickListener(v -> {
-                    WebActivity.launch(context, getUserConfig().clientUserId, itemData.title, itemData.url);
-//                    Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(itemData.url));
-//                    intent.addCategory(Intent.CATEGORY_BROWSABLE);
-//                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-//                    context.startActivity(intent);
+                    Bundle bundle = new Bundle();
+                    bundle.putString("web_url", itemData.url);
+
+                    WebFragment webFragment = new WebFragment(bundle);
+                    webFragment.setParentActivity(mParentActivity);
+
+                    mParentActivity.presentFragment(webFragment);
                 });
 
                 Glide.with(context).load(itemData.logo).diskCacheStrategy(DiskCacheStrategy.ALL).transform(new RoundedCorners(30)).transition(DrawableTransitionOptions.withCrossFade()).into(holder.imageView);
