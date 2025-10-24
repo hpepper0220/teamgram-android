@@ -10001,66 +10001,68 @@ public class MessageObject {
         return false;
     }
 
+    // 杭椒 禁止编辑消息
     public static boolean canEditMessage(int currentAccount, TLRPC.Message message, TLRPC.Chat chat, boolean scheduled) {
-        if (scheduled && message.date < ConnectionsManager.getInstance(currentAccount).getCurrentTime() - 60) {
-            return false;
-        }
-        if (chat != null && (chat.left || chat.kicked) && (!chat.megagroup || !chat.has_link)) {
-            return false;
-        }
-        TLRPC.MessageMedia media = getMedia(message);
-        if (message == null || message.peer_id == null || media != null && (isRoundVideoDocument(media.document) || isStickerDocument(media.document) || isAnimatedStickerDocument(media.document, true) || isLocationMessage(message)) || message.action != null && !(message.action instanceof TLRPC.TL_messageActionEmpty) || isForwardedMessage(message) || message.via_bot_id != 0 || message.id < 0) {
-            return false;
-        }
-        if (message.from_id instanceof TLRPC.TL_peerUser && message.from_id.user_id == message.peer_id.user_id && message.from_id.user_id == UserConfig.getInstance(currentAccount).getClientUserId() && !isLiveLocationMessage(message) && !(media instanceof TLRPC.TL_messageMediaContact)) {
-            return true;
-        }
-        if (chat == null && message.peer_id.channel_id != 0) {
-            chat = MessagesController.getInstance(currentAccount).getChat(message.peer_id.channel_id);
-            if (chat == null) {
-                return false;
-            }
-        }
-        if (
-            media != null &&
-            !(media instanceof TLRPC.TL_messageMediaEmpty) &&
-            !(media instanceof TLRPC.TL_messageMediaPhoto) &&
-            !(media instanceof TLRPC.TL_messageMediaDocument) &&
-            !(media instanceof TLRPC.TL_messageMediaWebPage) &&
-            !(media instanceof TLRPC.TL_messageMediaPaidMedia)
-        ) {
-            return false;
-        }
-        if (ChatObject.isChannel(chat) && !chat.megagroup && (chat.creator || chat.admin_rights != null && chat.admin_rights.edit_messages)) {
-            return true;
-        }
-        if (message.out && chat != null && chat.megagroup && (chat.creator || chat.admin_rights != null && chat.admin_rights.pin_messages || chat.default_banned_rights != null && !chat.default_banned_rights.pin_messages)) {
-            return true;
-        }
-        if (!scheduled && Math.abs(message.date - ConnectionsManager.getInstance(currentAccount).getCurrentTime()) > MessagesController.getInstance(currentAccount).maxEditTime) {
-            return false;
-        }
-        if (message.peer_id.channel_id == 0) {
-            return (message.out || message.from_id instanceof TLRPC.TL_peerUser && message.from_id.user_id == UserConfig.getInstance(currentAccount).getClientUserId()) && (
-                    media instanceof TLRPC.TL_messageMediaPhoto ||
-                    media instanceof TLRPC.TL_messageMediaDocument && !isStickerMessage(message) && !isAnimatedStickerMessage(message) ||
-                    media instanceof TLRPC.TL_messageMediaEmpty ||
-                    media instanceof TLRPC.TL_messageMediaWebPage ||
-                    media instanceof TLRPC.TL_messageMediaPaidMedia ||
-                    media == null);
-        }
-        if (chat != null && chat.megagroup && message.out || chat != null && !chat.megagroup && (chat.creator || chat.admin_rights != null && (chat.admin_rights.edit_messages || message.out && chat.admin_rights.post_messages)) && message.post) {
-            if (media instanceof TLRPC.TL_messageMediaPhoto ||
-                media instanceof TLRPC.TL_messageMediaDocument && !isStickerMessage(message) && !isAnimatedStickerMessage(message) ||
-                media instanceof TLRPC.TL_messageMediaEmpty ||
-                media instanceof TLRPC.TL_messageMediaWebPage ||
-                media instanceof TLRPC.TL_messageMediaPaidMedia ||
-                media == null
-            ) {
-                return true;
-            }
-        }
         return false;
+//        if (scheduled && message.date < ConnectionsManager.getInstance(currentAccount).getCurrentTime() - 60) {
+//            return false;
+//        }
+//        if (chat != null && (chat.left || chat.kicked) && (!chat.megagroup || !chat.has_link)) {
+//            return false;
+//        }
+//        TLRPC.MessageMedia media = getMedia(message);
+//        if (message == null || message.peer_id == null || media != null && (isRoundVideoDocument(media.document) || isStickerDocument(media.document) || isAnimatedStickerDocument(media.document, true) || isLocationMessage(message)) || message.action != null && !(message.action instanceof TLRPC.TL_messageActionEmpty) || isForwardedMessage(message) || message.via_bot_id != 0 || message.id < 0) {
+//            return false;
+//        }
+//        if (message.from_id instanceof TLRPC.TL_peerUser && message.from_id.user_id == message.peer_id.user_id && message.from_id.user_id == UserConfig.getInstance(currentAccount).getClientUserId() && !isLiveLocationMessage(message) && !(media instanceof TLRPC.TL_messageMediaContact)) {
+//            return true;
+//        }
+//        if (chat == null && message.peer_id.channel_id != 0) {
+//            chat = MessagesController.getInstance(currentAccount).getChat(message.peer_id.channel_id);
+//            if (chat == null) {
+//                return false;
+//            }
+//        }
+//        if (
+//            media != null &&
+//            !(media instanceof TLRPC.TL_messageMediaEmpty) &&
+//            !(media instanceof TLRPC.TL_messageMediaPhoto) &&
+//            !(media instanceof TLRPC.TL_messageMediaDocument) &&
+//            !(media instanceof TLRPC.TL_messageMediaWebPage) &&
+//            !(media instanceof TLRPC.TL_messageMediaPaidMedia)
+//        ) {
+//            return false;
+//        }
+//        if (ChatObject.isChannel(chat) && !chat.megagroup && (chat.creator || chat.admin_rights != null && chat.admin_rights.edit_messages)) {
+//            return true;
+//        }
+//        if (message.out && chat != null && chat.megagroup && (chat.creator || chat.admin_rights != null && chat.admin_rights.pin_messages || chat.default_banned_rights != null && !chat.default_banned_rights.pin_messages)) {
+//            return true;
+//        }
+//        if (!scheduled && Math.abs(message.date - ConnectionsManager.getInstance(currentAccount).getCurrentTime()) > MessagesController.getInstance(currentAccount).maxEditTime) {
+//            return false;
+//        }
+//        if (message.peer_id.channel_id == 0) {
+//            return (message.out || message.from_id instanceof TLRPC.TL_peerUser && message.from_id.user_id == UserConfig.getInstance(currentAccount).getClientUserId()) && (
+//                    media instanceof TLRPC.TL_messageMediaPhoto ||
+//                    media instanceof TLRPC.TL_messageMediaDocument && !isStickerMessage(message) && !isAnimatedStickerMessage(message) ||
+//                    media instanceof TLRPC.TL_messageMediaEmpty ||
+//                    media instanceof TLRPC.TL_messageMediaWebPage ||
+//                    media instanceof TLRPC.TL_messageMediaPaidMedia ||
+//                    media == null);
+//        }
+//        if (chat != null && chat.megagroup && message.out || chat != null && !chat.megagroup && (chat.creator || chat.admin_rights != null && (chat.admin_rights.edit_messages || message.out && chat.admin_rights.post_messages)) && message.post) {
+//            if (media instanceof TLRPC.TL_messageMediaPhoto ||
+//                media instanceof TLRPC.TL_messageMediaDocument && !isStickerMessage(message) && !isAnimatedStickerMessage(message) ||
+//                media instanceof TLRPC.TL_messageMediaEmpty ||
+//                media instanceof TLRPC.TL_messageMediaWebPage ||
+//                media instanceof TLRPC.TL_messageMediaPaidMedia ||
+//                media == null
+//            ) {
+//                return true;
+//            }
+//        }
+//        return false;
     }
 
     public boolean canDeleteMessage(boolean inScheduleMode, TLRPC.Chat chat) {
