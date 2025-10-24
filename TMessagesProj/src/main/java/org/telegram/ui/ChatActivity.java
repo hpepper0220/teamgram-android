@@ -29371,11 +29371,11 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                             options.add(OPTION_TRANSLATE);
                             icons.add(R.drawable.msg_translate);
                         }
-                        if (message.canEditMessage(currentChat)) {
-                            items.add(LocaleController.getString(R.string.Edit));
-                            options.add(OPTION_EDIT);
-                            icons.add(R.drawable.msg_edit);
-                        }
+//                        if (message.canEditMessage(currentChat)) {
+//                            items.add(LocaleController.getString(R.string.Edit));
+//                            options.add(OPTION_EDIT);
+//                            icons.add(R.drawable.msg_edit);
+//                        }
 //                        if (message.scheduled && message.type == MessageObject.TYPE_PAID_MEDIA && message.canEditMessage(currentChat)) {
 //                            items.add(LocaleController.getString(R.string.PaidMediaPriceButton));
 //                            options.add(OPTION_EDIT_PRICE);
@@ -29650,11 +29650,11 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                             options.add(OPTION_TRANSLATE);
                             icons.add(R.drawable.msg_translate);
                         }
-                        if (allowEdit) {
-                            items.add(LocaleController.getString(R.string.Edit));
-                            options.add(OPTION_EDIT);
-                            icons.add(R.drawable.msg_edit);
-                        }
+//                        if (allowEdit) {
+//                            items.add(LocaleController.getString(R.string.Edit));
+//                            options.add(OPTION_EDIT);
+//                            icons.add(R.drawable.msg_edit);
+//                        }
 //                        if (message.scheduled && message.type == MessageObject.TYPE_PAID_MEDIA && allowEdit) {
 //                            items.add(LocaleController.getString(R.string.PaidMediaPriceButton));
 //                            options.add(OPTION_EDIT_PRICE);
