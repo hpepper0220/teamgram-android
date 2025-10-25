@@ -401,7 +401,8 @@ public class ChatAttachAlert extends BottomSheet implements NotificationCenter.N
                                         }
                                     } else {
                                         buttonsRecyclerView.setAlpha(0f);
-                                        buttonsRecyclerView.setVisibility(View.VISIBLE);
+//                                        buttonsRecyclerView.setVisibility(View.VISIBLE);
+                                        buttonsRecyclerView.setVisibility(View.GONE);
                                     }
                                 }
 
@@ -1358,17 +1359,17 @@ public class ChatAttachAlert extends BottomSheet implements NotificationCenter.N
                     }
                     invalidate();
 
-                    if (currentAttachLayout instanceof ChatAttachAlertBotWebViewLayout) {
-                        if (!botButtonWasVisible) {
-                            if (keyboardVisible) {
-                                shadow.setVisibility(GONE);
-                                buttonsRecyclerView.setVisibility(GONE);
-                            } else {
-                                shadow.setVisibility(VISIBLE);
-                                buttonsRecyclerView.setVisibility(VISIBLE);
-                            }
-                        }
-                    }
+//                    if (currentAttachLayout instanceof ChatAttachAlertBotWebViewLayout) {
+//                        if (!botButtonWasVisible) {
+//                            if (keyboardVisible) {
+//                                shadow.setVisibility(GONE);
+//                                buttonsRecyclerView.setVisibility(GONE);
+//                            } else {
+//                                shadow.setVisibility(VISIBLE);
+//                                buttonsRecyclerView.setVisibility(VISIBLE);
+//                            }
+//                        }
+//                    }
 
                     currentAttachLayout.onPanTransitionStart(keyboardVisible, contentHeight);
                 }
@@ -2382,6 +2383,7 @@ public class ChatAttachAlert extends BottomSheet implements NotificationCenter.N
         buttonsRecyclerView.setBackgroundColor(getThemedColor(Theme.key_dialogBackground));
         buttonsRecyclerView.setImportantForAccessibility(View.IMPORTANT_FOR_ACCESSIBILITY_YES);
         containerView.addView(buttonsRecyclerView, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, 84, Gravity.BOTTOM | Gravity.LEFT));
+        buttonsRecyclerView.setVisibility(View.GONE);
         buttonsRecyclerView.setOnItemClickListener((view, position) -> {
             BaseFragment lastFragment = baseFragment;
             if (lastFragment == null) {
@@ -4201,11 +4203,11 @@ public class ChatAttachAlert extends BottomSheet implements NotificationCenter.N
                 frameLayout2.setVisibility(View.VISIBLE);
             }
             writeButtonContainer.setVisibility(View.VISIBLE);
-            if (!typeButtonsAvailable && !isSoundPicker) {
-                shadow.setVisibility(View.VISIBLE);
-            }
+//            if (!typeButtonsAvailable && !isSoundPicker) {
+//                shadow.setVisibility(View.VISIBLE);
+//            }
         } else if (typeButtonsAvailable) {
-            buttonsRecyclerView.setVisibility(View.VISIBLE);
+//            buttonsRecyclerView.setVisibility(View.VISIBLE);
         }
         final boolean allowAbove = (currentAttachLayout == photoLayout || currentAttachLayout == photoPreviewLayout);
         final boolean above = allowAbove && captionAbove;
@@ -4265,9 +4267,9 @@ public class ChatAttachAlert extends BottomSheet implements NotificationCenter.N
                                 shadow.setVisibility(View.INVISIBLE);
                             }
                         } else if (typeButtonsAvailable) {
-                            if (currentAttachLayout == null || currentAttachLayout.shouldHideBottomButtons()) {
-                                buttonsRecyclerView.setVisibility(View.INVISIBLE);
-                            }
+//                            if (currentAttachLayout == null || currentAttachLayout.shouldHideBottomButtons()) {
+//                                buttonsRecyclerView.setVisibility(View.INVISIBLE);
+//                            }
                         }
                         moveCaptionButton.setTranslationY(bottomPannelTranslation - commentTextView.getHeight() + captionContainer.getTranslationY());
                         if (above) {
@@ -4803,7 +4805,7 @@ public class ChatAttachAlert extends BottomSheet implements NotificationCenter.N
                     selectedMenuItem.setClickable(true);
                 }
             } else if (typeButtonsAvailable && frameLayout2.getTag() == null) {
-                buttonsRecyclerView.setVisibility(View.VISIBLE);
+//                buttonsRecyclerView.setVisibility(View.VISIBLE);
             }
 
             if (getWindow() != null && baseFragment != null) {
@@ -4833,9 +4835,9 @@ public class ChatAttachAlert extends BottomSheet implements NotificationCenter.N
                     public void onAnimationEnd(Animator animation) {
                         if (actionBarAnimation != null) {
                             if (show) {
-                                if (typeButtonsAvailable && (currentAttachLayout == null || currentAttachLayout.shouldHideBottomButtons())) {
-                                    buttonsRecyclerView.setVisibility(View.INVISIBLE);
-                                }
+//                                if (typeButtonsAvailable && (currentAttachLayout == null || currentAttachLayout.shouldHideBottomButtons())) {
+//                                    buttonsRecyclerView.setVisibility(View.INVISIBLE);
+//                                }
                             } else {
                                 if (searchItem != null) {
                                     searchItem.setVisibility(View.INVISIBLE);
@@ -4856,11 +4858,11 @@ public class ChatAttachAlert extends BottomSheet implements NotificationCenter.N
                 actionBarAnimation.setDuration(380);
                 actionBarAnimation.start();
             } else {
-                if (show) {
-                    if (typeButtonsAvailable && (currentAttachLayout == null || currentAttachLayout.shouldHideBottomButtons())) {
-                        buttonsRecyclerView.setVisibility(View.INVISIBLE);
-                    }
-                }
+//                if (show) {
+//                    if (typeButtonsAvailable && (currentAttachLayout == null || currentAttachLayout.shouldHideBottomButtons())) {
+//                        buttonsRecyclerView.setVisibility(View.INVISIBLE);
+//                    }
+//                }
                 actionBar.setAlpha(show ? 1.0f : 0.0f);
                 actionBarShadow.setAlpha(show ? 1.0f : 0.0f);
                 if (needsSearchItem) {
@@ -5131,8 +5133,10 @@ public class ChatAttachAlert extends BottomSheet implements NotificationCenter.N
             typeButtonsAvailable = avatarPicker == 0 && !storyMediaPicker;
             selectedId = 1;
         }
-        buttonsRecyclerView.setVisibility(typeButtonsAvailable ? View.VISIBLE : View.GONE);
-        shadow.setVisibility(typeButtonsAvailable ? View.VISIBLE : View.INVISIBLE);
+//        buttonsRecyclerView.setVisibility(typeButtonsAvailable ? View.VISIBLE : View.GONE);
+        buttonsRecyclerView.setVisibility(View.GONE);
+//        shadow.setVisibility(typeButtonsAvailable ? View.VISIBLE : View.INVISIBLE);
+        shadow.setVisibility(View.GONE);
         if (currentAttachLayout != layoutToSet) {
             if (actionBar.isSearchFieldVisible()) {
                 actionBar.closeSearchField();
@@ -5281,8 +5285,8 @@ public class ChatAttachAlert extends BottomSheet implements NotificationCenter.N
 
     public void enableDefaultMode() {
         typeButtonsAvailable = true;
-        buttonsRecyclerView.setVisibility(View.VISIBLE);
-        shadow.setVisibility(View.VISIBLE);
+        buttonsRecyclerView.setVisibility(View.GONE);
+        shadow.setVisibility(View.GONE);
         avatarPicker = 0;
         isPhotoPicker = false;
         isStickerMode = false;
