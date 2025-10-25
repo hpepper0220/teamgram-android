@@ -2156,7 +2156,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         }
 
         @Override
-        public void didPressAttachButton() {
+        public void didPressAttachButton(int id) {
             if (chatAttachAlert != null) {
                 chatAttachAlert.setEditingMessageObject(0, null);
             }
@@ -7649,7 +7649,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                 public void onMessageEditEnd(boolean loading) {}
 
                 @Override
-                public void didPressAttachButton() {}
+                public void didPressAttachButton(int id) {}
 
                 @Override
                 public void needStartRecordVideo(int state, boolean notify, int scheduleDate, int ttl, long effectId, long stars) {}

@@ -390,7 +390,7 @@ public class PopupNotificationActivity extends Activity implements NotificationC
             }
 
             @Override
-            public void didPressAttachButton() {
+            public void didPressAttachButton(int id) {
 
             }
 

@@ -2756,7 +2756,7 @@ public class PeerStoriesView extends SizeNotifierFrameLayout implements Notifica
             }
 
             @Override
-            public void didPressAttachButton() {
+            public void didPressAttachButton(int id) {
                 openAttachMenu();
             }
 

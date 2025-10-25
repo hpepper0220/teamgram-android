@@ -112,6 +112,7 @@ import androidx.interpolator.view.animation.FastOutSlowInInterpolator;
 import androidx.recyclerview.widget.ChatListItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import org.telegram.ext.widgets.ChatMenuPanel;
 import org.telegram.messenger.AccountInstance;
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.AnimationNotificationsLocker;
@@ -224,6 +225,41 @@ public class ChatActivityEnterView extends BlurredFrameLayout implements Notific
     public boolean voiceOnce;
     public boolean onceVisible;
 
+    private LinearLayout linearLayout;
+    private ChatMenuPanel mChatMenuPanel;
+    private boolean menuPanelVisible;
+
+    private void createMenuPanel() {
+        if (menuPanelVisible) {
+            return;
+        }
+        mChatMenuPanel = new ChatMenuPanel(getContext(), parentFragment);
+        if (null != mChatMenuPanel.getAdapter()) {
+            mChatMenuPanel.setOnItemClickListener((view, position) -> delegate.didPressAttachButton(mChatMenuPanel.menuItems.get(position).getId()));
+        }
+        FrameLayout.LayoutParams layoutParams = new LayoutParams(LayoutParams.MATCH_PARENT, keyboardHeight);
+        mChatMenuPanel.setLayoutParams(layoutParams);
+        mChatMenuPanel.setTranslationY(keyboardHeight);
+        if (!AndroidUtilities.isInMultiwindow) {
+            AndroidUtilities.hideKeyboard(messageEditText);
+        }
+        linearLayout.addView(mChatMenuPanel);
+        mChatMenuPanel.animate().translationY(0).setDuration(200).start();
+        menuPanelVisible = true;
+    }
+
+    public boolean isMenuPanelShowing() {
+        return menuPanelVisible;
+    }
+
+    public void hideMenuPanel() {
+        menuPanelVisible = false;
+        if (null != parentFragment) {
+            linearLayout.removeView(mChatMenuPanel);
+            mChatMenuPanel = null;
+        }
+    }
+
     public void drawRecordedPannel(Canvas canvas) {
         if (getAlpha() == 0 || recordedAudioPanel == null || recordedAudioPanel.getParent() == null || recordedAudioPanel.getVisibility() != View.VISIBLE) {
             return;
@@ -265,7 +301,7 @@ public class ChatActivityEnterView extends BlurredFrameLayout implements Notific
 
         void onMessageEditEnd(boolean loading);
 
-        void didPressAttachButton();
+        void didPressAttachButton(int id);
 
         void needStartRecordVideo(int state, boolean notify, int scheduleDate, int ttl, long effectId, long stars);
 
@@ -2492,6 +2528,10 @@ public class ChatActivityEnterView extends BlurredFrameLayout implements Notific
         SharedPreferences preferences = MessagesController.getGlobalMainSettings();
         sendByEnter = preferences.getBoolean("send_by_enter", false);
 
+        linearLayout = new LinearLayout(context);
+        linearLayout.setOrientation(LinearLayout.VERTICAL);
+        addView(linearLayout, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT));
+
         textFieldContainer = new FrameLayout(context) {
             @Override
             public boolean dispatchTouchEvent(MotionEvent ev) {
@@ -2504,7 +2544,8 @@ public class ChatActivityEnterView extends BlurredFrameLayout implements Notific
         textFieldContainer.setClipChildren(false);
         textFieldContainer.setClipToPadding(false);
         textFieldContainer.setPadding(0, dp(1), 0, 0);
-        addView(textFieldContainer, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, Gravity.LEFT | Gravity.BOTTOM, 0, 1, 0, 0));
+//        addView(textFieldContainer, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, Gravity.LEFT | Gravity.BOTTOM, 0, 1, 0, 0));
+        linearLayout.addView(textFieldContainer, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, Gravity.LEFT | Gravity.BOTTOM, 0, 1, 0, 0));
 
         FrameLayout frameLayout = messageEditTextContainer = new FrameLayout(context) {
             @Override
@@ -2571,6 +2612,9 @@ public class ChatActivityEnterView extends BlurredFrameLayout implements Notific
             emojiButton.setBackground(Theme.createSelectorDrawable(getThemedColor(Theme.key_listSelector)));
         }
         emojiButton.setOnClickListener(v -> {
+            if (menuPanelVisible) {
+                hideMenuPanel();
+            }
             if (adjustPanLayoutHelper != null && adjustPanLayoutHelper.animationInProgress()) {
                 return;
             }
@@ -2656,7 +2700,8 @@ public class ChatActivityEnterView extends BlurredFrameLayout implements Notific
             attachButton = new ImageView(context);
             attachButton.setScaleType(ImageView.ScaleType.CENTER);
             attachButton.setColorFilter(new PorterDuffColorFilter(getThemedColor(Theme.key_chat_messagePanelIcons), PorterDuff.Mode.MULTIPLY));
-            attachButton.setImageResource(R.drawable.msg_input_attach2);
+//            attachButton.setImageResource(R.drawable.msg_input_attach2);
+            attachButton.setImageResource(R.drawable.plus);
             if (Build.VERSION.SDK_INT >= 21) {
                 attachButton.setBackground(Theme.createSelectorDrawable(getThemedColor(Theme.key_listSelector)));
             }
@@ -2665,7 +2710,9 @@ public class ChatActivityEnterView extends BlurredFrameLayout implements Notific
                 if (adjustPanLayoutHelper != null && adjustPanLayoutHelper.animationInProgress() || attachLayoutPaddingAlpha == 0f) {
                     return;
                 }
-                delegate.didPressAttachButton();
+//                delegate.didPressAttachButton();
+                hidePopup(false);
+                createMenuPanel();
             });
             attachButton.setContentDescription(getString("AccDescrAttachButton", R.string.AccDescrAttachButton));
             updateFieldRight(1);
@@ -4871,6 +4918,9 @@ public class ChatActivityEnterView extends BlurredFrameLayout implements Notific
 
         @Override
         public boolean onTouchEvent(MotionEvent event) {
+            if (menuPanelVisible) {
+                hideMenuPanel();
+            }
             if (stickersDragging || stickersExpansionAnim != null) {
                 return false;
             }

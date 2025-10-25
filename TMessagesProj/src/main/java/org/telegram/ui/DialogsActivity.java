@@ -5158,7 +5158,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                 }
 
                 @Override
-                public void didPressAttachButton() {
+                public void didPressAttachButton(int id) {
 
                 }
 
