@@ -34,6 +34,7 @@ import android.widget.ImageView;
 
 import androidx.core.content.ContextCompat;
 
+import org.telegram.ext.UserProfileActivity;
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.ApplicationLoader;
 import org.telegram.messenger.ChatObject;
@@ -57,6 +58,7 @@ import org.telegram.ui.ActionBar.SimpleTextView;
 import org.telegram.ui.ActionBar.Theme;
 import org.telegram.ui.Business.BusinessLinksController;
 import org.telegram.ui.ChatActivity;
+import org.telegram.ui.LaunchActivity;
 import org.telegram.ui.ProfileActivity;
 import org.telegram.ui.Stories.StoriesUtilities;
 import org.telegram.ui.TopicsFragment;
@@ -543,27 +545,31 @@ public class ChatAvatarContainer extends FrameLayout implements NotificationCent
                 fragment.setChatInfo(parentFragment.getCurrentChatInfo());
                 parentFragment.presentFragment(fragment, removeLast);
             } else {
-                if (parentFragment.getChatMode() == ChatActivity.MODE_SAVED) {
-                    long dialogId = parentFragment.getSavedDialogId();
-                    args.putBoolean("saved", true);
-                    if (dialogId >= 0) {
-                        args.putLong("user_id", dialogId);
-                    } else {
-                        args.putLong("chat_id", -dialogId);
-                    }
-                } else {
-                    args.putLong("user_id", user.id);
-                    if (timeItem != null) {
-                        args.putLong("dialog_id", parentFragment.getDialogId());
-                    }
-                }
-                args.putBoolean("reportSpam", parentFragment.hasReportSpam());
-                args.putInt("actionBarColor", getThemedColor(Theme.key_actionBarDefault));
-                ProfileActivity fragment = new ProfileActivity(args, sharedMediaPreloader);
-                fragment.setUserInfo(parentFragment.getCurrentUserInfo(), parentFragment.profileChannelMessageFetcher, parentFragment.birthdayAssetsFetcher);
-                if (fromChatAnimation) {
-                    fragment.setPlayProfileAnimation(byAvatar ? 2 : 1);
-                }
+//                if (parentFragment.getChatMode() == ChatActivity.MODE_SAVED) {
+//                    long dialogId = parentFragment.getSavedDialogId();
+//                    args.putBoolean("saved", true);
+//                    if (dialogId >= 0) {
+//                        args.putLong("user_id", dialogId);
+//                    } else {
+//                        args.putLong("chat_id", -dialogId);
+//                    }
+//                } else {
+//                    args.putLong("user_id", user.id);
+//                    if (timeItem != null) {
+//                        args.putLong("dialog_id", parentFragment.getDialogId());
+//                    }
+//                }
+//                args.putBoolean("reportSpam", parentFragment.hasReportSpam());
+//                args.putInt("actionBarColor", getThemedColor(Theme.key_actionBarDefault));
+//                ProfileActivity fragment = new ProfileActivity(args, sharedMediaPreloader);
+//                fragment.setUserInfo(parentFragment.getCurrentUserInfo(), parentFragment.profileChannelMessageFetcher, parentFragment.birthdayAssetsFetcher);
+//                if (fromChatAnimation) {
+//                    fragment.setPlayProfileAnimation(byAvatar ? 2 : 1);
+//                }
+//                parentFragment.presentFragment(fragment, removeLast);
+                UserProfileActivity fragment = new UserProfileActivity();
+                fragment.setParentActivity((LaunchActivity) parentFragment.getParentActivity());
+                fragment.setUserInfo(user.id, parentFragment.getCurrentUserInfo());
                 parentFragment.presentFragment(fragment, removeLast);
             }
         } else if (chat != null) {
