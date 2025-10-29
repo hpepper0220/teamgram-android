@@ -64,4 +64,5 @@
     <item name="dialog_button_positive" type="id" />
     <item name="dialog_hide" type="id" />
     <item name="dialog_refresh" type="id" />
+    <item name="popup_profile_edit_nick" type="id" />
 </resources>

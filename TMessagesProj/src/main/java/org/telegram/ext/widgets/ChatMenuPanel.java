@@ -50,7 +50,7 @@ public class ChatMenuPanel extends FrameLayout {
             menuItems.add(new MenuItem(CAMERA, "相机", R.drawable.calls_video));
             menuItems.add(new MenuItem(GALLERY, "相册", R.drawable.files_gallery));
 //            menuItems.add(new MenuItem(2, "文件", R.drawable.files_internal));
-            menuItems.add(new MenuItem(CONTACT, "联系人", R.drawable.msg_groups));
+//            menuItems.add(new MenuItem(CONTACT, "联系人", R.drawable.msg_groups));
 //            menuItems.add(new MenuItem(RED_PACKET, LocaleController.getString("RedEnvelope", R.string.RedEnvelope), R.drawable.msg_groups));
         } else {
             menuItems.add(new MenuItem(CAMERA, "相机", R.drawable.calls_video));

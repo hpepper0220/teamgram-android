@@ -132,6 +132,7 @@ import com.google.zxing.common.detector.MathUtils;
 
 import org.checkerframework.checker.units.qual.A;
 import org.telegram.PhoneFormat.PhoneFormat;
+import org.telegram.ext.UserProfileActivity;
 import org.telegram.messenger.AccountInstance;
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.ApplicationLoader;
@@ -37364,12 +37365,19 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                 if (user.photo == null || user.photo instanceof TLRPC.TL_userProfilePhotoEmpty) {
                     expandPhoto = false;
                 }
+//                Bundle args = new Bundle();
+//                args.putLong("user_id", user.id);
+//                args.putBoolean("expandPhoto", expandPhoto);
+//                ProfileActivity fragment = new ProfileActivity(args);
+//                fragment.setPlayProfileAnimation(currentUser != null && currentUser.id == user.id ? 1 : 0);
+//                AndroidUtilities.setAdjustResizeToNothing(getParentActivity(), classGuid);
+//                presentFragment(fragment);
                 Bundle args = new Bundle();
                 args.putLong("user_id", user.id);
-                args.putBoolean("expandPhoto", expandPhoto);
-                ProfileActivity fragment = new ProfileActivity(args);
-                fragment.setPlayProfileAnimation(currentUser != null && currentUser.id == user.id ? 1 : 0);
-                AndroidUtilities.setAdjustResizeToNothing(getParentActivity(), classGuid);
+                args.putInt("type", 1);
+                UserProfileActivity fragment = new UserProfileActivity(args);
+                fragment.setParentActivity((LaunchActivity) getParentActivity());
+                fragment.setUserInfo(user.id, getCurrentUserInfo());
                 presentFragment(fragment);
             }
         }

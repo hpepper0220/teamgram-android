@@ -1,9 +1,11 @@
 package org.telegram.ext;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,16 +19,23 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import net.csdn.roundview.RoundLinearLayout;
+import net.csdn.roundview.RoundTextView;
 
+import org.telegram.ext.components.PopupCreator;
+import org.telegram.ext.config.SkMenuAction;
 import org.telegram.ext.model.ContactModel;
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.LocaleController;
 import org.telegram.messenger.MessagesController;
 import org.telegram.messenger.NotificationCenter;
 import org.telegram.messenger.R;
+import org.telegram.messenger.UserConfig;
+import org.telegram.messenger.UserObject;
 import org.telegram.tgnet.ConnectionsManager;
 import org.telegram.tgnet.TLRPC;
 import org.telegram.ui.ActionBar.ActionBar;
+import org.telegram.ui.ActionBar.ActionBarMenu;
+import org.telegram.ui.ActionBar.ActionBarMenuItem;
 import org.telegram.ui.ActionBar.BaseFragment;
 import org.telegram.ui.ActionBar.Theme;
 import org.telegram.ui.Cells.ProfileSearchCell;
@@ -47,10 +56,21 @@ public class UserProfileActivity extends BaseFragment {
     private TLRPC.UserFull userInfo;
     private TLRPC.User currentUser;
     private AppCompatTextView tv_remark_content;
+    private AppCompatTextView tv_user_name;
     private ArrayList<TLRPC.Chat> chats = new ArrayList<>();
     private RecyclerView listview;
     private CommonGroupListAdapter listAdapter;
     private SwipeRefreshLayout refreshLayout;
+    private int type;
+    private TLRPC.User latestUser;
+
+    public UserProfileActivity() {
+    }
+
+    public UserProfileActivity(Bundle args) {
+        super(args);
+        type = args.getInt("type");
+    }
 
     public void setParentActivity(LaunchActivity parentActivity) {
         this.mParentActivity = parentActivity;
@@ -79,6 +99,21 @@ public class UserProfileActivity extends BaseFragment {
             }
         });
 
+//        ActionBarMenu menu = actionBar.createMenu();
+//        ActionBarMenuItem moreItem = menu.addItem(SkMenuAction.more, R.mipmap.ic_more);
+//        actionBar.setActionBarMenuOnItemClick(new ActionBar.ActionBarMenuOnItemClick() {
+//            @Override
+//            public void onItemClick(int id) {
+//                if (id == SkMenuAction.more) {
+//                    PopupCreator.createProfileMorePopup(getParentActivity(), menu, v -> {
+//
+//                    });
+//                }
+//            }
+//        });
+
+        latestUser = getMessagesController().getUser(getUserConfig().getClientUserId());
+
         contentView = new LinearLayout(context);
         contentView.setOrientation(LinearLayout.VERTICAL);
         contentView.setBackgroundColor(Color.parseColor("#F4F4F4"));
@@ -102,7 +137,25 @@ public class UserProfileActivity extends BaseFragment {
         bottomLayout.setRadius(4f);
         bottomLayout.setBackgroundColor(Color.WHITE);
         bottomLayout.setOrientation(LinearLayout.VERTICAL);
-        contentView.addView(bottomLayout, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, 12, 16, 12, 0));
+        contentView.addView(bottomLayout, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, 12, 12, 12, 0));
+
+        LinearLayout ll_user_name = new LinearLayout(context);
+        ll_user_name.setOrientation(LinearLayout.HORIZONTAL);
+        bottomLayout.addView(ll_user_name, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, AndroidUtilities.dp(16)));
+
+        AppCompatTextView tv_user_name_title = new AppCompatTextView(context);
+        tv_user_name_title.setText("用户名");
+        tv_user_name_title.setGravity(Gravity.CENTER_VERTICAL);
+        tv_user_name_title.setPadding(12, 0, 12, 0);
+        ll_user_name.addView(tv_user_name_title, LayoutHelper.createLinear(LayoutHelper.WRAP_CONTENT, LayoutHelper.MATCH_PARENT, 8, 0, 8, 0));
+
+        tv_user_name = new AppCompatTextView(context);
+        tv_user_name.setMaxLines(1);
+        tv_user_name.setTextColor(Color.BLACK);
+        tv_user_name.setEllipsize(TextUtils.TruncateAt.END);
+        tv_user_name.setGravity(Gravity.CENTER_VERTICAL | Gravity.END);
+        tv_user_name.setPadding(0, 0, 12, 0);
+        ll_user_name.addView(tv_user_name, LayoutHelper.createLinear(LayoutHelper.WRAP_CONTENT, LayoutHelper.MATCH_PARENT, 1f, 0, 0, 8, 0));
 
         LinearLayout remarkLayout = new LinearLayout(context);
         remarkLayout.setOrientation(LinearLayout.HORIZONTAL);
@@ -122,10 +175,6 @@ public class UserProfileActivity extends BaseFragment {
         tv_remark_content.setPadding(0, 0, 12, 0);
         remarkLayout.addView(tv_remark_content, LayoutHelper.createLinear(LayoutHelper.WRAP_CONTENT, LayoutHelper.MATCH_PARENT, 1f, 0, 0, 8, 0));
 
-        View viewLine = new View(context);
-        viewLine.setBackgroundColor(Color.parseColor("#F4F4F4"));
-        bottomLayout.addView(viewLine, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, 1));
-
         LinearLayout ll_common_group = new LinearLayout(context);
         contentView.addView(ll_common_group, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT));
 
@@ -134,11 +183,12 @@ public class UserProfileActivity extends BaseFragment {
         atv_common_group.setPadding(34, 0, 12, 0);
         atv_common_group.setBackgroundColor(Color.WHITE);
         atv_common_group.setGravity(Gravity.CENTER_VERTICAL);
-        ll_common_group.addView(atv_common_group, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, AndroidUtilities.dp(16),12, 12, 12, 0));
+        ll_common_group.addView(atv_common_group, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, AndroidUtilities.dp(16), 12, 12, 12, 0));
 
         refreshLayout = new SwipeRefreshLayout(context);
         refreshLayout.setOnRefreshListener(this::getCommonChats);
-        contentView.addView(refreshLayout, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT, Gravity.TOP, 12, 0, 12, 0));
+        refreshLayout.setPadding(0, 0, 0, 12);
+        contentView.addView(refreshLayout, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, 0, 1, Gravity.TOP, 12, 0, 12, 0));
 
         listview = new RecyclerView(context);
         listview.setLayoutManager(new LinearLayoutManager(context));
@@ -147,6 +197,27 @@ public class UserProfileActivity extends BaseFragment {
         listview.setAdapter(listAdapter);
 
         refreshLayout.addView(listview, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT));
+
+        if (latestUser.premium && currentUser.id != latestUser.id) {
+            RoundTextView button = new RoundTextView(context);
+            button.setGravity(Gravity.CENTER);
+            button.setText("开始聊天");
+            button.setTextColor(Color.WHITE);
+            button.setRadius(6);
+            button.setTextSize(15);
+            button.setBackgroundColor(Theme.getColor(Theme.key_chats_actionBackground));
+            contentView.addView(button, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, 48, 12, 12, 12, 12));
+            button.setOnClickListener(view -> {
+                if (type == 0) {
+                    finishFragment();
+                } else {
+                    Bundle bundle = new Bundle();
+                    bundle.putLong("user_id", user_id);
+                    ChatActivity chatActivity = new ChatActivity(bundle);
+                    mParentActivity.presentFragment(chatActivity);
+                }
+            });
+        }
 
         loadUserFullInfo();
         getCommonChats();
@@ -173,12 +244,19 @@ public class UserProfileActivity extends BaseFragment {
         }));
     }
 
+    @SuppressLint("SetTextI18n")
     private void loadUserFullInfo() {
         getMessagesController().loadFullUser(currentUser, classGuid, true, arg -> AndroidUtilities.runOnUIThread(() -> {
             if (null == arg || null == arg.about || TextUtils.isEmpty(arg.about)) {
                 tv_remark_content.setText("补充几句话介绍一下你自己");
             } else {
                 tv_remark_content.setText(arg.about);
+            }
+            if (null != arg) {
+                String username = UserObject.getPublicUsername(arg.user);
+                if (null != username && !username.isEmpty()) {
+                    tv_user_name.setText("@" + username);
+                }
             }
         }));
     }
@@ -210,14 +288,6 @@ public class UserProfileActivity extends BaseFragment {
                 Bundle args = new Bundle();
                 args.putLong("chat_id", chat.id);
                 mParentActivity.presentFragment(new ChatActivity(args));
-//                    if (!profileActivity.getMessagesController().checkCanOpenChat(args, profileActivity)) {
-//                        return;
-//                    }
-//                    if (chat.forum) {
-//                        profileActivity.presentFragment(TopicsFragment.getTopicsOrChat(profileActivity, args));
-//                    } else {
-//                        profileActivity.presentFragment(new ChatActivity(args));
-//                    }
             });
         }
 

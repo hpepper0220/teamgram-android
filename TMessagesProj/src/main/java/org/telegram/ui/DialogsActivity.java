@@ -11592,6 +11592,8 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
     private ArrayList<TLRPC.Dialog> botShareDialogs;
 
     /// 杭椒 获取会话列表
+    /// 0：首页会话列表
+    /// 3：分享列表
     @NonNull
     public ArrayList<TLRPC.Dialog> getDialogsArray(int currentAccount, int dialogsType, int folderId, boolean frozen) {
         Log.e("DialogsActivity", "dialogsType ===========> " + dialogsType);
