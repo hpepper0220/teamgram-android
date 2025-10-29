@@ -34,6 +34,7 @@ import android.widget.ImageView;
 
 import androidx.core.content.ContextCompat;
 
+import org.telegram.ext.GroupProfileActivity;
 import org.telegram.ext.UserProfileActivity;
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.ApplicationLoader;
@@ -567,24 +568,31 @@ public class ChatAvatarContainer extends FrameLayout implements NotificationCent
 //                    fragment.setPlayProfileAnimation(byAvatar ? 2 : 1);
 //                }
 //                parentFragment.presentFragment(fragment, removeLast);
+                // 杭椒 打开用户主页
                 UserProfileActivity fragment = new UserProfileActivity();
                 fragment.setParentActivity((LaunchActivity) parentFragment.getParentActivity());
                 fragment.setUserInfo(user.id, parentFragment.getCurrentUserInfo());
                 parentFragment.presentFragment(fragment, removeLast);
             }
         } else if (chat != null) {
+//            Bundle args = new Bundle();
+//            args.putLong("chat_id", chat.id);
+//            if (parentFragment.getChatMode() == ChatActivity.MODE_SAVED) {
+//                args.putLong("topic_id", parentFragment.getSavedDialogId());
+//            } else if (parentFragment.isTopic) {
+//                args.putLong("topic_id", parentFragment.getThreadMessage().getId());
+//            }
+//            ProfileActivity fragment = new ProfileActivity(args, sharedMediaPreloader);
+//            fragment.setChatInfo(parentFragment.getCurrentChatInfo());
+//            if (fromChatAnimation) {
+//                fragment.setPlayProfileAnimation(byAvatar ? 2 : 1);
+//            }
+//            parentFragment.presentFragment(fragment, removeLast);
             Bundle args = new Bundle();
             args.putLong("chat_id", chat.id);
-            if (parentFragment.getChatMode() == ChatActivity.MODE_SAVED) {
-                args.putLong("topic_id", parentFragment.getSavedDialogId());
-            } else if (parentFragment.isTopic) {
-                args.putLong("topic_id", parentFragment.getThreadMessage().getId());
-            }
-            ProfileActivity fragment = new ProfileActivity(args, sharedMediaPreloader);
+            GroupProfileActivity fragment = new GroupProfileActivity(args);
+            fragment.setParentActivity((LaunchActivity) parentFragment.getParentActivity());
             fragment.setChatInfo(parentFragment.getCurrentChatInfo());
-            if (fromChatAnimation) {
-                fragment.setPlayProfileAnimation(byAvatar ? 2 : 1);
-            }
             parentFragment.presentFragment(fragment, removeLast);
         }
     }

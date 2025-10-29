@@ -76,6 +76,7 @@ import android.text.style.ClickableSpan;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.URLSpan;
 import android.text.util.Linkify;
+import android.util.Log;
 import android.util.Property;
 import android.util.SparseArray;
 import android.util.SparseIntArray;
@@ -2749,6 +2750,8 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
         } else {
             did = -chatId;
         }
+
+        Log.e("ProfileActivity", "dialogId: " + dialogId + " - userId: " + userId + " - chatId: " + chatId + " - did: " + did);
 
         fragmentView = new NestedFrameLayout(context) {
 
