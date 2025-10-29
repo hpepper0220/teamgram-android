@@ -24,7 +24,9 @@ import net.csdn.roundview.RoundLinearLayout;
 
 import org.telegram.ext.components.DialogCreator;
 import org.telegram.ext.components.dialog.SkBottomDialog;
+import org.telegram.ext.widgets.FloatingView;
 import org.telegram.messenger.AndroidUtilities;
+import org.telegram.messenger.ApplicationLoader;
 import org.telegram.messenger.R;
 import org.telegram.ui.ActionBar.BaseFragment;
 import org.telegram.ui.Components.LayoutHelper;
@@ -36,13 +38,19 @@ public class WebFragment extends BaseFragment {
 
     private AgentWeb mAgentWeb;
     private String web_url;
+    private long web_id;
+    private String web_title;
+    private String web_img_url;
 
     public WebFragment() {
     }
 
     public WebFragment(Bundle args) {
         super(args);
+        web_id = args.getLong("web_id");
         web_url = args.getString("web_url");
+        web_title = args.getString("web_title");
+        web_img_url = args.getString("web_img_url");
     }
 
     private LaunchActivity mParentActivity;
@@ -75,6 +83,7 @@ public class WebFragment extends BaseFragment {
         aiv_more.setOnClickListener(view -> {
             DialogCreator.createBottomDialog(context, "", view1 -> {
                 if (view1.getId() == R.id.dialog_hide) {
+                    FloatingView.show(ApplicationLoader.applicationContext, currentAccount, web_id, web_title, web_img_url, web_url);
                     finishFragment();
                 } else if (view1.getId() == R.id.dialog_refresh) {
                     reload();

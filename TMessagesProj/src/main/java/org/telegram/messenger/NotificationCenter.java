@@ -352,6 +352,7 @@ public class NotificationCenter {
     public static final int storiesReadUpdated = totalEvents++;
     public static final int nearEarEvent = totalEvents++;
     public static final int refreshApplyList = totalEvents++;
+    public static final int openWebView = totalEvents++;
 
     public static boolean alreadyLogged;
 

@@ -36,6 +36,7 @@ import org.telegram.ext.model.DiscoveryModel;
 import org.telegram.ext.respository.SimpleCallback;
 import org.telegram.ext.respository.SkRepository;
 import org.telegram.messenger.AndroidUtilities;
+import org.telegram.messenger.NotificationCenter;
 import org.telegram.messenger.R;
 import org.telegram.tgnet.TLRPC;
 import org.telegram.ui.ActionBar.BaseFragment;
@@ -205,7 +206,10 @@ public class SkDiscoveryFragment extends BaseFragment {
                 holder.containerView.setBackground(Theme.createSimpleSelectorRoundRectDrawable(0, 0xFFFFFFFF, 0xFFF0F0F0));
                 holder.containerView.setOnClickListener(v -> {
                     Bundle bundle = new Bundle();
+                    bundle.putLong("web_id", itemData.id);
                     bundle.putString("web_url", itemData.url);
+                    bundle.putString("web_title", itemData.title);
+                    bundle.putString("web_img_url", itemData.logo);
 
                     WebFragment webFragment = new WebFragment(bundle);
                     webFragment.setParentActivity(mParentActivity);

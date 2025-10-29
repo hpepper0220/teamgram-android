@@ -178,12 +178,10 @@ public class SearchFriendFragment extends BaseFragment {
 
         class ViewHolder extends RecyclerView.ViewHolder {
             LinearLayout ll_container;
-            AppCompatTextView btn_add_friend;
 
             public ViewHolder(@NonNull View itemView) {
                 super(itemView);
                 ll_container = itemView.findViewById(R.id.ll_container);
-                btn_add_friend = itemView.findViewById(R.id.btn_add_friend);
             }
         }
     }

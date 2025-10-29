@@ -9,6 +9,7 @@ import android.net.Uri;
 import androidx.annotation.RawRes;
 import androidx.fragment.app.FragmentActivity;
 
+import org.telegram.ext.widgets.FloatingView;
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.ApplicationLoader;
 import org.telegram.messenger.ContactsController;
@@ -122,5 +123,25 @@ public class BasePermissionsActivity extends FragmentActivity {
 
     private void showPermissionErrorAlert(@RawRes int animationId, String message) {
         createPermissionErrorAlert(animationId, message).show();
+    }
+
+    protected boolean showFloatingWindow() {
+        return true;
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (showFloatingWindow()) {
+            FloatingView.get().attach(this);
+        }
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if (showFloatingWindow()) {
+            FloatingView.get().detach(this);
+        }
     }
 }

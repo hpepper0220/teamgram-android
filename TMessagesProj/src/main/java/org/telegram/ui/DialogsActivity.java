@@ -107,11 +107,13 @@ import org.telegram.ext.ExploreFragment;
 import org.telegram.ext.SkContactsFragment;
 import org.telegram.ext.SkDiscoveryFragment;
 import org.telegram.ext.SkMineFragment;
+import org.telegram.ext.WebFragment;
 import org.telegram.ext.components.PopupCreator;
 import org.telegram.ext.config.SkMenuAction;
 import org.telegram.ext.respository.SimpleCallback;
 import org.telegram.ext.respository.SkRepository;
 import org.telegram.ext.utils.TgUtils;
+import org.telegram.ext.widgets.FloatingView;
 import org.telegram.ext.widgets.SimpleDialogCell;
 import org.telegram.messenger.AccountInstance;
 import org.telegram.messenger.AndroidUtilities;
@@ -2836,6 +2838,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         getNotificationCenter().addObserver(this, NotificationCenter.unconfirmedAuthUpdate);
         getNotificationCenter().addObserver(this, NotificationCenter.premiumPromoUpdated);
         getNotificationCenter().addObserver(this, NotificationCenter.refreshApplyList);
+        getNotificationCenter().addObserver(this, NotificationCenter.openWebView);
 
         if (initialDialogsType == DIALOGS_TYPE_DEFAULT) {
             getNotificationCenter().addObserver(this, NotificationCenter.chatlistFolderUpdate);
@@ -3008,6 +3011,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         getNotificationCenter().removeObserver(this, NotificationCenter.unconfirmedAuthUpdate);
         getNotificationCenter().removeObserver(this, NotificationCenter.premiumPromoUpdated);
         getNotificationCenter().removeObserver(this, NotificationCenter.refreshApplyList);
+        getNotificationCenter().removeObserver(this, NotificationCenter.openWebView);
 
         if (initialDialogsType == DIALOGS_TYPE_DEFAULT) {
             getNotificationCenter().removeObserver(this, NotificationCenter.chatlistFolderUpdate);
@@ -11430,6 +11434,17 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
             updateDialogsHint();
         } else if (id == NotificationCenter.refreshApplyList) {
             refreshApplyCount();
+        } else if (id == NotificationCenter.openWebView) {
+            FloatingView.clear();
+            Bundle bundle = new Bundle();
+            bundle.putLong("web_id", (Long) args[0]);
+            bundle.putString("web_url", (String) args[1]);
+            bundle.putString("web_title", (String) args[2]);
+            bundle.putString("web_img_url", (String) args[3]);
+
+            WebFragment webFragment = new WebFragment(bundle);
+            webFragment.setParentActivity((LaunchActivity) getParentActivity());
+            presentFragment(webFragment);
         }
     }
 

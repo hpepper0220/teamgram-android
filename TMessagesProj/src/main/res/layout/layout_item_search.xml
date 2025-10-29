@@ -21,13 +21,6 @@
             android:gravity="center_vertical"
             android:orientation="horizontal" />
 
-        <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/btn_add_friend"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:padding="10dp"
-            android:text="添加好友" />
-
     </LinearLayout>
 
     <View
