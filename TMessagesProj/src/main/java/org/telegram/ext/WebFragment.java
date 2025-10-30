@@ -83,7 +83,8 @@ public class WebFragment extends BaseFragment {
         aiv_more.setOnClickListener(view -> {
             DialogCreator.createBottomDialog(context, "", view1 -> {
                 if (view1.getId() == R.id.dialog_hide) {
-                    FloatingView.show(ApplicationLoader.applicationContext, currentAccount, web_id, web_title, web_img_url, web_url);
+                    Log.e("WebFragment", "web_id " + web_id + " web_title " + web_title + " web_img_url " + web_img_url + " web_url " + web_url);
+                    FloatingView.show(mParentActivity, currentAccount, web_id, web_title, web_img_url, web_url);
                     finishFragment();
                 } else if (view1.getId() == R.id.dialog_refresh) {
                     reload();

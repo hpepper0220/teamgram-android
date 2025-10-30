@@ -3161,6 +3161,10 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
             updateProxyButton(false, false);
         }
         mPlusMenuItem = menu.addItem(SkMenuAction.plus, R.mipmap.ic_add_circle);
+        Log.e("ChatActivity", "initialDialogsType ------> " + initialDialogsType);
+        if (initialDialogsType == 3) {
+            mPlusMenuItem.setVisibility(View.GONE);
+        }
         refreshItem = menu.addItem(SkMenuAction.refresh, R.mipmap.editor_rotate);
         refreshItem.setVisibility(View.GONE);
         searchItem = menu.addItem(1000, R.drawable.ic_ab_search).setIsSearchField(true, false).setActionBarMenuItemSearchListener(new ActionBarMenuItem.ActionBarMenuItemSearchListener() {
@@ -11113,7 +11117,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
     @SuppressWarnings("unchecked")
     @Override
     public void didReceivedNotification(int id, int account, Object... args) {
-        Log.e("DialogsActivity", "didReceivedNotification -------> " + id);
+        Log.e("DialogsActivity", "didReceivedNotification -------> " + id + " - needReload: " + NotificationCenter.dialogsNeedReload);
         if (id == NotificationCenter.dialogsNeedReload) {
             if (viewPages == null || dialogsListFrozen) {
                 return;
@@ -11135,6 +11139,12 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                     }, 160);
                 } else {
                     reloadViewPageDialogs(viewPage, args.length > 0);
+                    AndroidUtilities.runOnUIThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            viewPage.dialogsAdapter.notifyDataSetChanged();
+                        }
+                    }, 500);
                 }
             }
             if (filterTabsView != null && filterTabsView.getVisibility() == View.VISIBLE) {
@@ -11438,9 +11448,10 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
             FloatingView.clear();
             Bundle bundle = new Bundle();
             bundle.putLong("web_id", (Long) args[0]);
-            bundle.putString("web_url", (String) args[1]);
-            bundle.putString("web_title", (String) args[2]);
-            bundle.putString("web_img_url", (String) args[3]);
+            bundle.putString("web_title", (String) args[1]);
+            bundle.putString("web_img_url", (String) args[2]);
+            bundle.putString("web_url", (String) args[3]);
+//            bundle.putString("web_url", "https://www.baidu.com/");
 
             WebFragment webFragment = new WebFragment(bundle);
             webFragment.setParentActivity((LaunchActivity) getParentActivity());

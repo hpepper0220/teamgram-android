@@ -208,6 +208,7 @@ public class SkDiscoveryFragment extends BaseFragment {
                     Bundle bundle = new Bundle();
                     bundle.putLong("web_id", itemData.id);
                     bundle.putString("web_url", itemData.url);
+//                    bundle.putString("web_url", "https://www.baidu.com/");
                     bundle.putString("web_title", itemData.title);
                     bundle.putString("web_img_url", itemData.logo);
 

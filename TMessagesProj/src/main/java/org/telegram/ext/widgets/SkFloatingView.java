@@ -29,6 +29,7 @@ public class SkFloatingView extends FrameLayout {
 
     public static final int MARGIN_EDGE = 13;
     private static final int TOUCH_TIME_THRESHOLD = 150;
+    private static final int TOUCH_SLOP = 20; // 拖动阈值（像素）
     private long mLastTouchDownTime;
     protected MoveAnimator mMoveAnimator;
     protected int mScreenWidth;
@@ -36,6 +37,9 @@ public class SkFloatingView extends FrameLayout {
     private int mStatusBarHeight;
     private boolean isNearestLeft = true;
     private float mPortraitY;
+    private boolean mIsDragging = false; // 是否正在拖动
+    private float mDownX; // 按下时的X坐标
+    private float mDownY; // 按下时的Y坐标
 
     private OnMagnetViewListener mOnMagnetViewListener;
 
@@ -75,6 +79,51 @@ public class SkFloatingView extends FrameLayout {
     }
 
     @Override
+    public boolean onInterceptTouchEvent(MotionEvent ev) {
+        if (ev == null) {
+            return false;
+        }
+        
+        switch (ev.getAction()) {
+            case MotionEvent.ACTION_DOWN:
+                mDownX = ev.getRawX();
+                mDownY = ev.getRawY();
+                mIsDragging = false;
+                // 初始化拖动参数，以防事件被拦截后需要用到
+                changeOriginalTouchParams(ev);
+                updateSize();
+                mMoveAnimator.stop();
+                return false; // 不拦截 ACTION_DOWN，让子控件有机会处理点击
+                
+            case MotionEvent.ACTION_MOVE:
+                if (!mIsDragging) {
+                    float deltaX = Math.abs(ev.getRawX() - mDownX);
+                    float deltaY = Math.abs(ev.getRawY() - mDownY);
+                    // 如果移动距离超过阈值，则拦截事件，开始拖动
+                    if (deltaX > TOUCH_SLOP || deltaY > TOUCH_SLOP) {
+                        mIsDragging = true;
+                        // 返回 true 拦截事件，系统会自动向子控件发送 ACTION_CANCEL
+                        // 后续事件将传递到 onTouchEvent 处理拖动
+                        return true;
+                    }
+                } else {
+                    // 已经在拖动中，继续拦截
+                    return true;
+                }
+                break;
+                
+            case MotionEvent.ACTION_UP:
+            case MotionEvent.ACTION_CANCEL:
+                boolean wasDragging = mIsDragging;
+                // 如果之前是拖动状态，需要继续拦截，让 onTouchEvent 处理抬起事件
+                // 否则让子控件处理点击
+                return wasDragging;
+        }
+        
+        return false; // 不拦截，让子控件处理
+    }
+
+    @Override
     public boolean onTouchEvent(MotionEvent event) {
         if (event == null) {
             return false;
@@ -91,9 +140,12 @@ public class SkFloatingView extends FrameLayout {
             case MotionEvent.ACTION_UP:
                 clearPortraitY();
                 moveToEdge();
-                if (isOnClickEvent()) {
+                // 如果事件被拦截（即发生了拖动），则不处理点击事件
+                // 子控件的点击事件会在事件未被拦截时正常触发
+                if (!mIsDragging && isOnClickEvent()) {
                     dealClickEvent();
                 }
+                mIsDragging = false;
                 break;
         }
         return true;

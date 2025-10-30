@@ -133,6 +133,7 @@ import com.google.zxing.common.detector.MathUtils;
 import org.checkerframework.checker.units.qual.A;
 import org.telegram.PhoneFormat.PhoneFormat;
 import org.telegram.ext.UserProfileActivity;
+import org.telegram.ext.widgets.ChatMenuPanel;
 import org.telegram.messenger.AccountInstance;
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.ApplicationLoader;
@@ -542,6 +543,8 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
     private TLRPC.Chat searchingChatMessages;
     public static boolean scrolling;
     public ReactionsLayoutInBubble.VisibleReaction searchingReaction;
+    public boolean showAudioCall;
+
     public ReactionsLayoutInBubble.VisibleReaction getFilterTag() {
         return chatAdapter != null && chatAdapter.isFiltered ? searchingReaction : null;
     }
@@ -1222,7 +1225,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                     attachItem.setVisibility(View.GONE);
                 }
                 if (headerItem != null) {
-                    headerItem.setVisibility(View.VISIBLE);
+                    headerItem.setVisibility(View.GONE);
                 }
             }
         } else {
@@ -1896,7 +1899,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         public void onUpdateSlowModeButton(View button, boolean show, CharSequence time) {
             showSlowModeHint(button, show, time);
             if (headerItem != null && headerItem.getVisibility() != View.VISIBLE) {
-                headerItem.setVisibility(View.VISIBLE);
+                headerItem.setVisibility(View.GONE);
                 if (attachItem != null) {
                     attachItem.setVisibility(View.GONE);
                 }
@@ -1972,7 +1975,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                                 }
                             } else {
                                 if (headerItem != null) {
-                                    headerItem.setVisibility(View.VISIBLE);
+                                    headerItem.setVisibility(View.GONE);
                                 }
                                 if (attachItem != null) {
                                     attachItem.setVisibility(View.GONE);
@@ -2082,7 +2085,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                 return;
             }
             if (headerItem != null) {
-                headerItem.setVisibility(View.VISIBLE);
+                headerItem.setVisibility(View.GONE);
             }
             if (editTextItem != null && !isEditTextItemVisibilitySuppressed) {
                 editTextItem.setVisibility(View.GONE);
@@ -2158,10 +2161,16 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
 
         @Override
         public void didPressAttachButton(int id) {
-            if (chatAttachAlert != null) {
-                chatAttachAlert.setEditingMessageObject(0, null);
+            if (id == ChatMenuPanel.CALL) {
+                if (currentUser != null && getParentActivity() != null) {
+                    VoIPHelper.startCall(currentUser, id == video_call, userInfo != null && userInfo.video_calls_available, getParentActivity(), getMessagesController().getUserFull(currentUser.id), getAccountInstance());
+                }
+            } else {
+                if (chatAttachAlert != null) {
+                    chatAttachAlert.setEditingMessageObject(0, null);
+                }
+                openAttachMenu();
             }
-            openAttachMenu();
         }
 
         @Override
@@ -3866,6 +3875,8 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
             searchItemVisible = false;
         }
 
+        showAudioCall = chatMode == 0 && (threadMessageId == 0 || isTopic) && !UserObject.isReplyUser(currentUser) && !isReport() && !UserObject.isService(dialog_id) && null != currentUser;
+
         // 杭椒 标题栏 audioCall
         if (chatMode == 0 && (threadMessageId == 0 || isTopic) && !UserObject.isReplyUser(currentUser) && !isReport() && !UserObject.isService(dialog_id)) {
             TLRPC.UserFull userFull = null;
@@ -3875,7 +3886,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                 userFull = getMessagesController().getUserFull(currentUser.id);
                 if (userFull != null && userFull.phone_calls_available) {
                     showAudioCallAsIcon = !inPreviewMode;
-                    audioCallIconItem.setVisibility(View.VISIBLE);
+                    audioCallIconItem.setVisibility(View.GONE);
                 } else {
                     showAudioCallAsIcon = false;
                     audioCallIconItem.setVisibility(View.GONE);
@@ -3898,6 +3909,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
             }
             headerItem = menu.addItem(chat_menu_options, R.drawable.ic_ab_other, themeDelegate);
             headerItem.setContentDescription(LocaleController.getString(R.string.AccDescrMoreOptions));
+            headerItem.setVisibility(View.GONE);
 
             if (currentUser != null && currentUser.self && chatMode != MODE_SAVED) {
                 savedChatsItem = headerItem.lazilyAddSubItem(view_as_topics, R.drawable.msg_topics, LocaleController.getString(R.string.SavedViewAsChats));
@@ -4056,6 +4068,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         } else if (chatMode == MODE_EDIT_BUSINESS_LINK) {
             headerItem = menu.addItem(chat_menu_options, R.drawable.ic_ab_other, themeDelegate);
             headerItem.setContentDescription(LocaleController.getString(R.string.AccDescrMoreOptions));
+            headerItem.setVisibility(View.GONE);
 
             headerItem.lazilyAddSubItem(copy_business_link, R.drawable.msg_copy, getString(R.string.Copy));
             headerItem.lazilyAddSubItem(share_business_link, R.drawable.msg_share, getString(R.string.LinkActionShare));
@@ -17096,7 +17109,8 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                     }
                 }
                 if (!actionBar.isSearchFieldVisible() && audioCallIconItem != null) {
-                    audioCallIconItem.setVisibility((showAudioCallAsIcon && !showSearchAsIcon) ? View.VISIBLE : View.GONE);
+//                    audioCallIconItem.setVisibility((showAudioCallAsIcon && !showSearchAsIcon) ? View.VISIBLE : View.GONE);
+                    audioCallIconItem.setVisibility(View.GONE);
                 }
                 if (headerItem != null) {
                     TLRPC.UserFull userInfo = getCurrentUserInfo();
@@ -22475,7 +22489,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                                     item.setAlpha(0f);
                                     item.animate().alpha(1f).setDuration(160).setInterpolator(CubicBezierInterpolator.EASE_IN).setStartDelay(50).start();
                                 }
-                                audioCallIconItem.setVisibility(View.VISIBLE);
+                                audioCallIconItem.setVisibility(View.GONE);
                             }
                         } else {
                             headerItem.showSubItem(call, true);
@@ -26106,7 +26120,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                     editTextItem.setVisibility(View.GONE);
                 }
                 if (headerItem != null) {
-                    headerItem.setVisibility(View.VISIBLE);
+                    headerItem.setVisibility(View.GONE);
                 }
             } else {
                 if (botUser != null && currentUser.bot || currentUser != null && currentUser.id == UserObject.VERIFY || chatMode == MODE_SAVED && getSavedDialogId() != getUserConfig().getClientUserId()) {
@@ -28076,7 +28090,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
             TLRPC.UserFull userFull = getMessagesController().getUserFull(currentUser.id);
             if (userFull != null && userFull.phone_calls_available) {
                 showAudioCallAsIcon = !inPreviewMode;
-                audioCallIconItem.setVisibility(View.VISIBLE);
+                audioCallIconItem.setVisibility(View.GONE);
             } else {
                 showAudioCallAsIcon = false;
                 audioCallIconItem.setVisibility(View.GONE);
@@ -29184,6 +29198,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
             allowPin = false;
         }
         allowPin = allowPin && message.getId() > 0 && (message.messageOwner.action == null || message.messageOwner.action instanceof TLRPC.TL_messageActionEmpty) && !message.isExpiredStory() && message.type != MessageObject.TYPE_STORY_MENTION;
+        allowPin = false;
         boolean noforwards = getMessagesController().isChatNoForwards(currentChat) || message.messageOwner.noforwards || getDialogId() == UserObject.VERIFY;
         boolean noforwardsOrPaidMedia = noforwards || message.type == MessageObject.TYPE_PAID_MEDIA;
         boolean allowUnpin = message.getDialogId() != mergeDialogId && allowPin && (pinnedMessageObjects.containsKey(message.getId()) || groupedMessages != null && !groupedMessages.messages.isEmpty() && pinnedMessageObjects.containsKey(groupedMessages.messages.get(0).getId())) && !message.isExpiredStory();
@@ -29339,8 +29354,8 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                     options.add(OPTION_RETRY);
                     icons.add(R.drawable.msg_retry);
                     items.add(LocaleController.getString(chatMode == MODE_SAVED && threadMessageId != getUserConfig().getClientUserId() ? R.string.Remove : R.string.Delete));
-                    options.add(OPTION_DELETE);
-                    icons.add(selectedObject.messageOwner.ttl_period != 0 ? R.drawable.msg_delete_auto : R.drawable.msg_delete);
+//                    options.add(OPTION_DELETE);
+//                    icons.add(selectedObject.messageOwner.ttl_period != 0 ? R.drawable.msg_delete_auto : R.drawable.msg_delete);
                 } else if (type == 1) {
                     if (currentChat != null) {
                         if (allowChatActions && !isInsideContainer) {
@@ -29399,11 +29414,11 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                         options.add(OPTION_GIFT);
                         icons.add(R.drawable.menu_gift);
                     }
-                    if (message.canDeleteMessage(chatMode == MODE_SCHEDULED, currentChat) && (threadMessageObjects == null || !threadMessageObjects.contains(message)) && !(message != null && message.messageOwner != null && message.messageOwner.action instanceof TLRPC.TL_messageActionTopicCreate)) {
-                        items.add(LocaleController.getString(chatMode == MODE_SAVED && threadMessageId != getUserConfig().getClientUserId() ? R.string.Remove : R.string.Delete));
-                        options.add(OPTION_DELETE);
-                        icons.add(selectedObject.messageOwner.ttl_period != 0 ? R.drawable.msg_delete_auto : R.drawable.msg_delete);
-                    }
+//                    if (message.canDeleteMessage(chatMode == MODE_SCHEDULED, currentChat) && (threadMessageObjects == null || !threadMessageObjects.contains(message)) && !(message != null && message.messageOwner != null && message.messageOwner.action instanceof TLRPC.TL_messageActionTopicCreate)) {
+//                        items.add(LocaleController.getString(chatMode == MODE_SAVED && threadMessageId != getUserConfig().getClientUserId() ? R.string.Remove : R.string.Delete));
+//                        options.add(OPTION_DELETE);
+//                        icons.add(selectedObject.messageOwner.ttl_period != 0 ? R.drawable.msg_delete_auto : R.drawable.msg_delete);
+//                    }
                 } else if (type == 20) {
                     items.add(LocaleController.getString(R.string.Retry));
                     options.add(OPTION_RETRY);
@@ -29414,8 +29429,8 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                         icons.add(R.drawable.msg_copy);
                     }
                     items.add(LocaleController.getString(chatMode == MODE_SAVED && threadMessageId != getUserConfig().getClientUserId() ? R.string.Remove : R.string.Delete));
-                    options.add(OPTION_DELETE);
-                    icons.add(selectedObject.messageOwner.ttl_period != 0 ? R.drawable.msg_delete_auto : R.drawable.msg_delete);
+//                    options.add(OPTION_DELETE);
+//                    icons.add(selectedObject.messageOwner.ttl_period != 0 ? R.drawable.msg_delete_auto : R.drawable.msg_delete);
                 } else {
                     if (currentEncryptedChat == null) {
                         if (chatMode == MODE_SCHEDULED) {
@@ -29589,9 +29604,9 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                                         icons.add(R.drawable.msg_fave);
                                     }
                                 } else {
-                                    items.add(LocaleController.getString(R.string.DeleteFromFavorites));
-                                    options.add(OPTION_DELETE_STICKER_FROM_FAVORITES);
-                                    icons.add(R.drawable.msg_unfave);
+//                                    items.add(LocaleController.getString(R.string.DeleteFromFavorites));
+//                                    options.add(OPTION_DELETE_STICKER_FROM_FAVORITES);
+//                                    icons.add(R.drawable.msg_unfave);
                                 }
                             }
                         } else if (type == 8) {
@@ -29624,9 +29639,9 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                                     icons.add(R.drawable.msg_fave);
                                 }
                             } else {
-                                items.add(LocaleController.getString(R.string.DeleteFromFavorites));
-                                options.add(OPTION_DELETE_STICKER_FROM_FAVORITES);
-                                icons.add(R.drawable.msg_unfave);
+//                                items.add(LocaleController.getString(R.string.DeleteFromFavorites));
+//                                options.add(OPTION_DELETE_STICKER_FROM_FAVORITES);
+//                                icons.add(R.drawable.msg_unfave);
                             }
                         }
                         if (!selectedObject.isSponsored() && chatMode != MODE_QUICK_REPLIES && chatMode != MODE_SCHEDULED && (!selectedObject.needDrawBluredPreview() || selectedObject.hasExtendedMediaPreview()) &&
@@ -29683,11 +29698,11 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                                 icons.add(R.drawable.msg_report);
                             }
                         }
-                        if (message.canDeleteMessage(chatMode == MODE_SCHEDULED, currentChat) && (threadMessageObjects == null || !threadMessageObjects.contains(message))) {
-                            items.add(LocaleController.getString(chatMode == MODE_SAVED && threadMessageId != getUserConfig().getClientUserId() ? R.string.Remove : R.string.Delete));
-                            options.add(OPTION_DELETE);
-                            icons.add(selectedObject.messageOwner.ttl_period != 0 ? R.drawable.msg_delete_auto : R.drawable.msg_delete);
-                        }
+//                        if (message.canDeleteMessage(chatMode == MODE_SCHEDULED, currentChat) && (threadMessageObjects == null || !threadMessageObjects.contains(message))) {
+//                            items.add(LocaleController.getString(chatMode == MODE_SAVED && threadMessageId != getUserConfig().getClientUserId() ? R.string.Remove : R.string.Delete));
+//                            options.add(OPTION_DELETE);
+//                            icons.add(selectedObject.messageOwner.ttl_period != 0 ? R.drawable.msg_delete_auto : R.drawable.msg_delete);
+//                        }
                     } else {
                         if (allowChatActions && !isInsideContainer) {
                             items.add(LocaleController.getString(R.string.Reply));
@@ -29774,9 +29789,9 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                                 icons.add(R.drawable.msg_callback);
                             }
                         }
-                        items.add(LocaleController.getString(chatMode == MODE_SAVED && threadMessageId != getUserConfig().getClientUserId() ? R.string.Remove : R.string.Delete));
-                        options.add(OPTION_DELETE);
-                        icons.add(selectedObject.messageOwner.ttl_period != 0 ? R.drawable.msg_delete_auto : R.drawable.msg_delete);
+//                        items.add(LocaleController.getString(chatMode == MODE_SAVED && threadMessageId != getUserConfig().getClientUserId() ? R.string.Remove : R.string.Delete));
+//                        options.add(OPTION_DELETE);
+//                        icons.add(selectedObject.messageOwner.ttl_period != 0 ? R.drawable.msg_delete_auto : R.drawable.msg_delete);
                     }
                 }
             }
@@ -36337,10 +36352,10 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                 }
             } else {
                 if (headerItem != null) {
-                    headerItem.setVisibility(View.VISIBLE);
+                    headerItem.setVisibility(View.GONE);
                 }
                 if (audioCallIconItem != null && showAudioCallAsIcon) {
-                    audioCallIconItem.setVisibility(View.VISIBLE);
+                    audioCallIconItem.setVisibility(View.GONE);
                 }
                 if (searchIconItem != null && showSearchAsIcon) {
                     searchIconItem.setVisibility(View.VISIBLE);

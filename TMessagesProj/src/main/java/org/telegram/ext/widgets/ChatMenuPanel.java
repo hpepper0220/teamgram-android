@@ -31,6 +31,7 @@ public class ChatMenuPanel extends FrameLayout {
     public static final int GALLERY = 0x002;
     public static final int CONTACT = 0x003;
     public static final int RED_PACKET = 0x004;
+    public static final int CALL = 0x005;
 
     private Adapter mAdapter;
     private RecyclerView recyclerView;
@@ -46,16 +47,10 @@ public class ChatMenuPanel extends FrameLayout {
     public ChatMenuPanel(@NonNull Context context, ChatActivity parentFragment) {
         super(context);
         setBackgroundColor(0xFFEDEDED);
-        if ((null != parentFragment && null != parentFragment.getCurrentChat() && ChatObject.hasAdminRights(parentFragment.getCurrentChat())) || (null != parentFragment && null != parentFragment.getCurrentUser() && parentFragment.getCurrentUser().premium == true)) {
-            menuItems.add(new MenuItem(CAMERA, "相机", R.drawable.calls_video));
-            menuItems.add(new MenuItem(GALLERY, "相册", R.drawable.files_gallery));
-//            menuItems.add(new MenuItem(2, "文件", R.drawable.files_internal));
-//            menuItems.add(new MenuItem(CONTACT, "联系人", R.drawable.msg_groups));
-//            menuItems.add(new MenuItem(RED_PACKET, LocaleController.getString("RedEnvelope", R.string.RedEnvelope), R.drawable.msg_groups));
-        } else {
-            menuItems.add(new MenuItem(CAMERA, "相机", R.drawable.calls_video));
-            menuItems.add(new MenuItem(GALLERY, "相册", R.drawable.files_gallery));
-//            menuItems.add(new MenuItem(RED_PACKET, LocaleController.getString("RedEnvelope", R.string.RedEnvelope), R.drawable.msg_groups));
+        menuItems.add(new MenuItem(CAMERA, "相机", R.drawable.calls_video));
+        menuItems.add(new MenuItem(GALLERY, "相册", R.drawable.files_gallery));
+        if (parentFragment.showAudioCall) {
+            menuItems.add(new MenuItem(CALL, "语音聊天", R.drawable.ic_call));
         }
 
         recyclerView = new RecyclerView(context);
