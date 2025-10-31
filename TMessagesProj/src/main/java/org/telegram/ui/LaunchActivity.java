@@ -64,6 +64,8 @@ import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.view.Window;
 import android.view.WindowManager;
+import android.webkit.WebResourceRequest;
+import android.webkit.WebView;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -85,6 +87,10 @@ import com.google.common.primitives.Longs;
 import com.google.firebase.appindexing.Action;
 import com.google.firebase.appindexing.FirebaseUserActions;
 import com.google.firebase.appindexing.builders.AssistActionBuilder;
+import com.just.agentweb.AgentWeb;
+import com.just.agentweb.DefaultWebClient;
+import com.just.agentweb.WebChromeClient;
+import com.just.agentweb.WebViewClient;
 
 import org.telegram.PhoneFormat.PhoneFormat;
 import org.telegram.ext.utils.TgUtils;
@@ -989,6 +995,58 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
 
         TgUtils.setGlobalInfo(this, currentAccount);
     }
+
+    public long web_id;
+    public AgentWeb mAgentWeb;
+    private AgentWeb.AgentBuilder mAgentBuilder;
+    public LinearLayout webViewContainer;
+
+    public void createAgentWebView(long id, String url) {
+        web_id = id;
+        webViewContainer = new LinearLayout(this);
+        webViewContainer.setLayoutParams(LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT));
+        mAgentBuilder = AgentWeb.with(this);
+        mAgentWeb = mAgentBuilder.setAgentWebParent(webViewContainer, new LinearLayout.LayoutParams(-1, -1))
+                .useDefaultIndicator()
+                .setWebChromeClient(mWebChromeClient)
+                .setWebViewClient(mWebViewClient)
+                .setMainFrameErrorView(R.layout.agentweb_error_page, -1)
+                .setSecurityType(AgentWeb.SecurityType.STRICT_CHECK)
+                .setOpenOtherPageWays(DefaultWebClient.OpenOtherPageWays.ASK)
+                .interceptUnkownUrl()
+                .createAgentWeb().ready().go(url);
+    }
+
+    public void destroyAgent() {
+        webViewContainer.removeAllViews();
+        mAgentWeb.destroy();
+        mAgentWeb = null;
+        webViewContainer = null;
+    }
+
+    private com.just.agentweb.WebViewClient mWebViewClient = new WebViewClient() {
+        @Override
+        public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
+            return false;
+        }
+
+        @Override
+        public void onPageStarted(WebView view, String url, Bitmap favicon) {
+
+        }
+
+        @Override
+        public void onPageFinished(WebView view, String url) {
+            super.onPageFinished(view, url);
+        }
+    };
+
+    private com.just.agentweb.WebChromeClient mWebChromeClient = new WebChromeClient() {
+        @Override
+        public void onReceivedTitle(WebView view, String title) {
+            super.onReceivedTitle(view, title);
+        }
+    };
 
     private void showAttachMenuBot(TLRPC.TL_attachMenuBot attachMenuBot, String startApp, boolean sidemenu) {
         drawerLayoutContainer.closeDrawer();

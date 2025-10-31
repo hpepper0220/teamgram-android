@@ -35,6 +35,7 @@ import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import org.telegram.ext.model.DiscoveryModel;
 import org.telegram.ext.respository.SimpleCallback;
 import org.telegram.ext.respository.SkRepository;
+import org.telegram.ext.widgets.FloatingView;
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.NotificationCenter;
 import org.telegram.messenger.R;
@@ -205,6 +206,8 @@ public class SkDiscoveryFragment extends BaseFragment {
                 holder.atvContent.setTextColor(Theme.getColor(Theme.key_windowBackgroundWhiteBlackText));
                 holder.containerView.setBackground(Theme.createSimpleSelectorRoundRectDrawable(0, 0xFFFFFFFF, 0xFFF0F0F0));
                 holder.containerView.setOnClickListener(v -> {
+                    FloatingView.clear();
+
                     Bundle bundle = new Bundle();
                     bundle.putLong("web_id", itemData.id);
                     bundle.putString("web_url", itemData.url);

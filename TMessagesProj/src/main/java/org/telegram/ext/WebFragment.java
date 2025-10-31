@@ -1,32 +1,20 @@
 package org.telegram.ext;
 
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
-import android.webkit.WebResourceRequest;
-import android.webkit.WebView;
+import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 
 import androidx.appcompat.widget.AppCompatImageView;
 
-import com.google.android.material.bottomsheet.BottomSheetDialog;
-import com.just.agentweb.AgentWeb;
-import com.just.agentweb.DefaultWebClient;
-import com.just.agentweb.WebChromeClient;
-import com.just.agentweb.WebViewClient;
-
 import net.csdn.roundview.RoundLinearLayout;
 
 import org.telegram.ext.components.DialogCreator;
-import org.telegram.ext.components.dialog.SkBottomDialog;
 import org.telegram.ext.widgets.FloatingView;
-import org.telegram.messenger.AndroidUtilities;
-import org.telegram.messenger.ApplicationLoader;
 import org.telegram.messenger.R;
 import org.telegram.ui.ActionBar.BaseFragment;
 import org.telegram.ui.Components.LayoutHelper;
@@ -36,7 +24,6 @@ public class WebFragment extends BaseFragment {
 
     private FrameLayout contentView;
 
-    private AgentWeb mAgentWeb;
     private String web_url;
     private long web_id;
     private String web_title;
@@ -83,7 +70,6 @@ public class WebFragment extends BaseFragment {
         aiv_more.setOnClickListener(view -> {
             DialogCreator.createBottomDialog(context, "", view1 -> {
                 if (view1.getId() == R.id.dialog_hide) {
-                    Log.e("WebFragment", "web_id " + web_id + " web_title " + web_title + " web_img_url " + web_img_url + " web_url " + web_url);
                     FloatingView.show(mParentActivity, currentAccount, web_id, web_title, web_img_url, web_url);
                     finishFragment();
                 } else if (view1.getId() == R.id.dialog_refresh) {
@@ -95,48 +81,31 @@ public class WebFragment extends BaseFragment {
         AppCompatImageView aiv_menu = new AppCompatImageView(context);
         aiv_menu.setImageResource(R.mipmap.game_play_icon_show_menu);
         menuLayout.addView(aiv_menu, LayoutHelper.createLinear(16, 16, Gravity.CENTER, 6, 0, 12, 0));
-        aiv_menu.setOnClickListener(view -> finishFragment());
+        aiv_menu.setOnClickListener(view -> {
+            mParentActivity.destroyAgent();
+            finishFragment();
+        });
 
-        mAgentWeb = AgentWeb.with(mParentActivity)
-                .setAgentWebParent(contentView, new LinearLayout.LayoutParams(-1, -1))
-                .useDefaultIndicator()
-                .setWebChromeClient(mWebChromeClient)
-                .setWebViewClient(mWebViewClient)
-                .setMainFrameErrorView(R.layout.agentweb_error_page, -1)
-                .setSecurityType(AgentWeb.SecurityType.STRICT_CHECK)
-                .setOpenOtherPageWays(DefaultWebClient.OpenOtherPageWays.ASK)
-                .interceptUnkownUrl()
-                .createAgentWeb().ready().go(web_url);
+        if (null == mParentActivity.webViewContainer) {
+            mParentActivity.createAgentWebView(web_id, web_url);
+        } else {
+            if (web_id != mParentActivity.web_id) {
+                mParentActivity.destroyAgent();
+            } else {
+                contentView.removeAllViews();
+                // 如果 webViewContainer 已经有父视图，需要先从父视图移除
+                ViewGroup parent = (ViewGroup) mParentActivity.webViewContainer.getParent();
+                if (parent != null) {
+                    parent.removeView(mParentActivity.webViewContainer);
+                }
+            }
+        }
+        contentView.addView(mParentActivity.webViewContainer, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT));
 
         return contentView;
     }
 
     public void reload() {
-        mAgentWeb.getUrlLoader().reload();
+        mParentActivity.mAgentWeb.getUrlLoader().reload();
     }
-
-    private com.just.agentweb.WebViewClient mWebViewClient = new WebViewClient() {
-        @Override
-        public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
-            web_url = view.getUrl();
-            return false;
-        }
-
-        @Override
-        public void onPageStarted(WebView view, String url, Bitmap favicon) {
-
-        }
-
-        @Override
-        public void onPageFinished(WebView view, String url) {
-            super.onPageFinished(view, url);
-        }
-    };
-
-    private com.just.agentweb.WebChromeClient mWebChromeClient = new WebChromeClient() {
-        @Override
-        public void onReceivedTitle(WebView view, String title) {
-            super.onReceivedTitle(view, title);
-        }
-    };
 }
