@@ -591,7 +591,7 @@ public class DialogsAdapter extends RecyclerListView.SelectionAdapter implements
 
                     SimpleDialogCell simpleDialogCell = new SimpleDialogCell(mContext);
 
-                    simpleDialogCell.addDialog(dialogCell, currentAccount);
+                    simpleDialogCell.addDialog(dialogCell, currentAccount, parentFragment.isEditMode, false);
 
                     view = simpleDialogCell;
                 }
@@ -911,7 +911,9 @@ public class DialogsAdapter extends RecyclerListView.SelectionAdapter implements
 
                     int mute_type = preferences.getInt("notify2_" + NotificationsController.getSharedPrefKey(dialog.id, 0), -1);
 
-                    dialogCell.addDialog(cell, currentAccount);
+                    Log.e("DialogsAdapter", "isEditMode: " + parentFragment.isEditMode + " editDialogs: " + parentFragment.editDialogs);
+
+                    dialogCell.addDialog(cell, currentAccount, parentFragment.isEditMode, parentFragment.editDialogs.contains(dialog.id));
                 }
                 break;
             }

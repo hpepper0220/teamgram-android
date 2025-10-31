@@ -187,7 +187,7 @@ public class ActionBar extends FrameLayout {
         backButtonImageView = new ImageView(getContext());
         backButtonImageView.setScaleType(ImageView.ScaleType.CENTER);
         backButtonImageView.setBackgroundDrawable(Theme.createSelectorDrawable(itemsBackgroundColor));
-        backButtonImageView.setPadding(dp(1), 0, 0, 0);
+        backButtonImageView.setPadding(dp(7), dp(7), dp(7), dp(7));
         addView(backButtonImageView, LayoutHelper.createFrame(54, 54, Gravity.LEFT | Gravity.TOP));
 
         backButtonImageView.setOnClickListener(v -> {

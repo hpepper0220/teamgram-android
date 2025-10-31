@@ -80,11 +80,13 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
+import android.widget.Space;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.widget.AppCompatTextView;
 import androidx.core.content.ContextCompat;
 import androidx.core.graphics.ColorUtils;
 import androidx.recyclerview.widget.ItemTouchHelper;
@@ -316,6 +318,9 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
     private FrameLayout mineViewPage;
     private ViewPage conversationViewPage;
     private Map<Integer, ExploreFragment> exploreFragmentMap = new HashMap<>();
+    private LinearLayout editLayout;
+    private AppCompatTextView btn_clear_unread;
+    private AppCompatTextView btn_delete_dialog;
 
     public MessagesStorage.TopicKey getOpenedDialogId() {
         return openedDialogId;
@@ -3162,7 +3167,9 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         }
         mPlusMenuItem = menu.addItem(SkMenuAction.plus, R.mipmap.ic_add_circle);
         Log.e("ChatActivity", "initialDialogsType ------> " + initialDialogsType);
-        if (initialDialogsType == 3) {
+        if (initialDialogsType == 0) {
+
+        } else if (initialDialogsType == 3) {
             mPlusMenuItem.setVisibility(View.GONE);
         }
         refreshItem = menu.addItem(SkMenuAction.refresh, R.mipmap.editor_rotate);
@@ -3403,9 +3410,11 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                 actionBar.setBackButtonDrawable(backDrawable = new BackDrawable(false));
             } else {
                 // 杭椒 隐藏首页Actionbar
+                Drawable editDrawable = context.getDrawable(R.drawable.msg_edit);
 //                actionBar.setBackButtonDrawable(menuDrawable = new MenuDrawable());
+                actionBar.setBackButtonDrawable(editDrawable);
 //                menuDrawable.setRoundCap();
-//                actionBar.setBackButtonContentDescription(getString(R.string.AccDescrOpenMenu));
+                actionBar.setBackButtonContentDescription(getString(R.string.AccDescrOpenMenu));
             }
             if (folderId != 0) {
                 actionBar.setTitle(getString(R.string.ArchivedChats));
@@ -3816,7 +3825,24 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                     } else if (onlySelect || folderId != 0) {
                         finishFragment();
                     } else if (parentLayout != null && parentLayout.getDrawerLayoutContainer() != null) {
-                        parentLayout.getDrawerLayoutContainer().openDrawer(false);
+//                        parentLayout.getDrawerLayoutContainer().openDrawer(false);
+                        // 杭椒 编辑会话列表
+                        isEditMode = !isEditMode;
+                        if (!isEditMode) {
+                            selectedDialogs.clear();
+                        }
+                        if (initialDialogsType == 0) {
+                            viewPages[0].dialogsAdapter.notifyDataSetChanged();
+                        }
+                        if (isEditMode) {
+                            editLayout.setVisibility(View.VISIBLE);
+                            Drawable editDrawable = context.getDrawable(R.drawable.round_check2);
+                            actionBar.setBackButtonDrawable(editDrawable);
+                        } else {
+                            editLayout.setVisibility(View.GONE);
+                            Drawable editDrawable = context.getDrawable(R.drawable.msg_edit);
+                            actionBar.setBackButtonDrawable(editDrawable);
+                        }
                     }
                 } else if (id == 1) {
                     if (getParentActivity() == null) {
@@ -4311,19 +4337,34 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
 
                 conversationListPage = viewPage;
 
+                FrameLayout fl_bottom_bar = new FrameLayout(context);
+
                 pageNavigationView = new PageNavigationView(context);
                 pageNavigationView.setId(R.id.main_bottom_navigation_bar);
+
+                fl_bottom_bar.addView(pageNavigationView);
+
+                createEditLayout();
+
+                fl_bottom_bar.addView(editLayout);
+
+                editLayout.setVisibility(View.GONE);
 
                 createBottomNavigation();
 
                 mainViewContainer.addView(viewPagerLayout);
-                mainViewContainer.addView(pageNavigationView, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, 48, Gravity.BOTTOM, 2, 0, 2, 2));
+
+                View dividerView = new View(context);
+                dividerView.setBackgroundColor(Color.parseColor("#F4F4F4"));
+                mainViewContainer.addView(dividerView, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, 1));
+
+                mainViewContainer.addView(fl_bottom_bar, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, 48, Gravity.BOTTOM, 2, 0, 2, 2));
                 // 选择对话
                 if (initialDialogsType == 3) {
-                    pageNavigationView.setVisibility(View.GONE);
+                    fl_bottom_bar.setVisibility(View.GONE);
                     mainViewContainer.setPadding(0, 0, 0, 0);
                 } else {
-                    pageNavigationView.setVisibility(View.VISIBLE);
+                    fl_bottom_bar.setVisibility(View.VISIBLE);
                     mainViewContainer.setPadding(0, 0, 0, 0);
                 }
             }
@@ -4541,33 +4582,33 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                 }
                 onItemClick(view, position, viewPage.dialogsAdapter, x, y);
             });
-//            viewPage.listView.setOnItemLongClickListener(new RecyclerListView.OnItemLongClickListenerExtended() {
-//                @Override
-//                public boolean onItemClick(View view, int position, float x, float y) {
-//                    if (view instanceof DialogCell && ((DialogCell) view).isBlocked()) {
-//                        showPremiumBlockedToast(view, ((DialogCell) view).getDialogId());
-//                        return true;
-//                    }
-//                    if (filterTabsView != null && filterTabsView.getVisibility() == View.VISIBLE && filterTabsView.isEditing()) {
-//                        return false;
-//                    }
-//                    return onItemLongClick(viewPage.listView, view, position, x, y, viewPage.dialogsType, viewPage.dialogsAdapter);
-//                }
-//
-//                @Override
-//                public void onMove(float dx, float dy) {
-//                    if (AndroidUtilities.displaySize.x > AndroidUtilities.displaySize.y) {
-//                        movePreviewFragment(dy);
-//                    }
-//                }
-//
-//                @Override
-//                public void onLongClickRelease() {
-//                    if (AndroidUtilities.displaySize.x > AndroidUtilities.displaySize.y) {
-//                        finishPreviewFragment();
-//                    }
-//                }
-//            });
+            viewPage.listView.setOnItemLongClickListener(new RecyclerListView.OnItemLongClickListenerExtended() {
+                @Override
+                public boolean onItemClick(View view, int position, float x, float y) {
+                    if (view instanceof DialogCell && ((DialogCell) view).isBlocked()) {
+                        showPremiumBlockedToast(view, ((DialogCell) view).getDialogId());
+                        return true;
+                    }
+                    if (filterTabsView != null && filterTabsView.getVisibility() == View.VISIBLE && filterTabsView.isEditing()) {
+                        return false;
+                    }
+                    return onItemLongClick(viewPage.listView, view, position, x, y, viewPage.dialogsType, viewPage.dialogsAdapter);
+                }
+
+                @Override
+                public void onMove(float dx, float dy) {
+                    if (AndroidUtilities.displaySize.x > AndroidUtilities.displaySize.y) {
+                        movePreviewFragment(dy);
+                    }
+                }
+
+                @Override
+                public void onLongClickRelease() {
+                    if (AndroidUtilities.displaySize.x > AndroidUtilities.displaySize.y) {
+                        finishPreviewFragment();
+                    }
+                }
+            });
             viewPage.swipeController = new SwipeController(viewPage);
             viewPage.recyclerItemsEnterAnimator = new RecyclerItemsEnterAnimator(viewPage.listView, false);
 
@@ -5773,6 +5814,43 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         });
     }
 
+    private LinearLayout createEditLayout() {
+        editLayout = new LinearLayout(mContext);
+        editLayout.setBackgroundColor(Color.WHITE);
+        editLayout.setOrientation(LinearLayout.HORIZONTAL);
+        editLayout.setPadding(AndroidUtilities.dp(12), 0, AndroidUtilities.dp(12), 0);
+
+        btn_clear_unread = new AppCompatTextView(mContext);
+        btn_clear_unread.setText("全部已读");
+        btn_clear_unread.setTextSize(16f);
+        btn_clear_unread.setTextColor(Color.RED);
+        btn_clear_unread.setGravity(Gravity.CENTER);
+        editLayout.addView(btn_clear_unread, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT));
+        btn_clear_unread.setOnClickListener(view -> {
+            isEditMode = false;
+            for (int i = 0; i < editDialogs.size(); i++) {
+                markAsRead(editDialogs.get(i));
+            }
+            viewPages[0].dialogsAdapter.notifyDataSetChanged();
+        });
+
+//        editLayout.addView(new Space(mContext), LayoutHelper.createLinear(0, LayoutHelper.MATCH_PARENT, 1f));
+//
+//        btn_delete_dialog = new AppCompatTextView(mContext);
+//        btn_delete_dialog.setText("删除");
+//        btn_delete_dialog.setTextColor(Color.RED);
+//        btn_delete_dialog.setGravity(Gravity.CENTER);
+//        editLayout.addView(btn_delete_dialog, LayoutHelper.createLinear(LayoutHelper.WRAP_CONTENT, LayoutHelper.MATCH_PARENT));
+//        btn_delete_dialog.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//
+//            }
+//        });
+
+        return editLayout;
+    }
+
     private void createBottomNavigation() {
         int topPadding = ActionBar.getCurrentActionBarHeight() + AndroidUtilities.statusBarHeight;
         pageNavigationView.removeAllViews();
@@ -5947,6 +6025,9 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
             }
         });
     }
+
+    public boolean isEditMode = false;
+    public List<Long> editDialogs = new ArrayList<>();
 
     private ViewPage createConversationList(Context context, int topPadding) {
         if (null == conversationViewPage) {
@@ -8660,6 +8741,18 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         }
 
         if (dialogId == 0) {
+            return;
+        }
+
+        if (isEditMode) {
+            if (editDialogs.contains(dialogId)) {
+                editDialogs.remove(dialogId);
+            } else {
+                editDialogs.add(dialogId);
+            }
+            if (initialDialogsType == 0) {
+                viewPages[0].dialogsAdapter.notifyDataSetChanged();
+            }
             return;
         }
 
