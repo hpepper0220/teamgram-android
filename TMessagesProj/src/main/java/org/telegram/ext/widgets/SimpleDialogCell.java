@@ -129,8 +129,6 @@ public class SimpleDialogCell extends FrameLayout {
             atv_pin.setText("置顶");
         }
 
-        dialog.getIsPinned();
-
         if (isEditModel) {
             smart_swipe_wrapper.enableDirection(SwipeConsumer.DIRECTION_LEFT, false);
             smart_swipe_wrapper.enableDirection(SwipeConsumer.DIRECTION_RIGHT, false);

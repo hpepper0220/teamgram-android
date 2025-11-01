@@ -3410,7 +3410,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                 actionBar.setBackButtonDrawable(backDrawable = new BackDrawable(false));
             } else {
                 // 杭椒 隐藏首页Actionbar
-                Drawable editDrawable = context.getDrawable(R.drawable.msg_edit);
+                Drawable editDrawable = context.getDrawable(R.drawable.fab_compose_small);
 //                actionBar.setBackButtonDrawable(menuDrawable = new MenuDrawable());
                 actionBar.setBackButtonDrawable(editDrawable);
 //                menuDrawable.setRoundCap();
@@ -3829,7 +3829,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                         // 杭椒 编辑会话列表
                         isEditMode = !isEditMode;
                         if (!isEditMode) {
-                            selectedDialogs.clear();
+                            editDialogs.clear();
                         }
                         if (initialDialogsType == 0) {
                             viewPages[0].dialogsAdapter.notifyDataSetChanged();
@@ -3840,7 +3840,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                             actionBar.setBackButtonDrawable(editDrawable);
                         } else {
                             editLayout.setVisibility(View.GONE);
-                            Drawable editDrawable = context.getDrawable(R.drawable.msg_edit);
+                            Drawable editDrawable = context.getDrawable(R.drawable.fab_compose_small);
                             actionBar.setBackButtonDrawable(editDrawable);
                         }
                     }
@@ -4486,7 +4486,12 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                                 if (null != dialogCell) {
                                     dialogCell.close(true);
                                 }
-                                viewPage.dialogsAdapter.notifyDataSetChanged();
+                                AndroidUtilities.runOnUIThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        viewPage.dialogsAdapter.notifyDataSetChanged();
+                                    }
+                                }, 300);
                             } else if (childView.getId() == R.id.btn_mute) {
                                 canMuteCount = MessagesController.getInstance(currentAccount).isDialogMuted(selectedDialog, 0) ? 0 : 1;
                                 canUnmuteCount = canMuteCount > 0 ? 0 : 1;
@@ -4503,7 +4508,12 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                                 if (null != dialogCell) {
                                     dialogCell.close(true);
                                 }
-                                viewPage.dialogsAdapter.notifyDataSetChanged();
+                                AndroidUtilities.runOnUIThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        viewPage.dialogsAdapter.notifyDataSetChanged();
+                                    }
+                                }, 300);
                             } else if (childView.getId() == R.id.btn_pin) {
                                 ArrayList<Long> selectedDialogs = new ArrayList<>();
                                 selectedDialogs.add(selectedDialog);
@@ -5831,7 +5841,20 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
             for (int i = 0; i < editDialogs.size(); i++) {
                 markAsRead(editDialogs.get(i));
             }
-            viewPages[0].dialogsAdapter.notifyDataSetChanged();
+
+            editDialogs.clear();
+
+            AndroidUtilities.runOnUIThread(() -> viewPages[0].dialogsAdapter.notifyDataSetChanged(), 300);
+
+            if (isEditMode) {
+                editLayout.setVisibility(View.VISIBLE);
+                Drawable editDrawable = mContext.getDrawable(R.drawable.round_check2);
+                actionBar.setBackButtonDrawable(editDrawable);
+            } else {
+                editLayout.setVisibility(View.GONE);
+                Drawable editDrawable = mContext.getDrawable(R.drawable.fab_compose_small);
+                actionBar.setBackButtonDrawable(editDrawable);
+            }
         });
 
 //        editLayout.addView(new Space(mContext), LayoutHelper.createLinear(0, LayoutHelper.MATCH_PARENT, 1f));
@@ -5923,8 +5946,10 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                 viewPager.setCurrentItem(index);
                 if (index == 0) {
                     mPlusMenuItem.setVisibility(View.VISIBLE);
+                    actionBar.getBackButton().setVisibility(View.VISIBLE);
                 } else {
                     mPlusMenuItem.setVisibility(View.GONE);
+                    actionBar.getBackButton().setVisibility(View.GONE);
                 }
                 if (index == 0) {
                     actionBar.setVisibility(View.VISIBLE);
@@ -6091,6 +6116,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
             }
             discoveryFragment.setCurrentAccount(currentAccount);
         }
+        discoveryFragment.fetchData(currentAccount, classGuid, false, true);
         discoveryViewPage.setPadding(0, topPadding, 0, 0);
         discoveryViewPage.addView(discoveryFragment.createView(getParentActivity()), LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT, Gravity.TOP, 0, 0, 0, 0));
         return discoveryViewPage;
