@@ -5910,7 +5910,7 @@ public class ChatActivityEnterView extends BlurredFrameLayout implements Notific
     }
 
     private void resizeForTopView(boolean show) {
-        LayoutParams layoutParams = (LayoutParams) textFieldContainer.getLayoutParams();
+        LinearLayout.LayoutParams layoutParams = (LinearLayout.LayoutParams) textFieldContainer.getLayoutParams();
         layoutParams.topMargin = dp(2) + (show ? topView.getLayoutParams().height : 0);
         textFieldContainer.setLayoutParams(layoutParams);
         setMinimumHeight(dp(51) + (show ? topView.getLayoutParams().height : 0));

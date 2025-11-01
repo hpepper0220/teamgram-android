@@ -954,6 +954,7 @@ public class MessagePreviewView extends FrameLayout {
                     resourcesProvider
                 );
                 menu.addView(sendersNameButton, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, 48));
+                sendersNameButton.setVisibility(View.GONE);
 
                 final ToggleButton captionButton;
                 if (messagePreviewParams.hasCaption) {
@@ -1009,6 +1010,8 @@ public class MessagePreviewView extends FrameLayout {
                     updateMessages();
                     updateSubtitle(true);
                 });
+                // 杭椒 默认隐藏转发者名称
+                messagePreviewParams.hideForwardSendersName = true;
 
                 if (captionButton != null) {
                     captionButton.setOnClickListener(view -> {

@@ -467,7 +467,9 @@ public class AlertsCreator {
                         break;
 
                 }
-                NotificationCenter.getGlobalInstance().postNotificationName(NotificationCenter.showBulletin, Bulletin.TYPE_ERROR, errorText);
+                if (!errorText.isEmpty()) {
+                    NotificationCenter.getGlobalInstance().postNotificationName(NotificationCenter.showBulletin, Bulletin.TYPE_ERROR, errorText);
+                }
             } else {
                 switch (error.text) {
                     case "PEER_FLOOD":

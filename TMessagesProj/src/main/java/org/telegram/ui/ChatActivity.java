@@ -12572,7 +12572,9 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         if (sendBtn.getAlpha() < audioVideoBtn.getAlpha()) {
             viewForTooltip = audioVideoBtn;
         }
-        mediaBanTooltip.showForView(viewForTooltip, true);
+        if (!mediaBanTooltip.textView.getText().toString().isEmpty()) {
+            mediaBanTooltip.showForView(viewForTooltip, true);
+        }
     }
 
     private void showNoSoundHint() {
@@ -29235,6 +29237,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
             }
             ArrayList<Integer> icons = new ArrayList<>();
             ArrayList<CharSequence> items = new ArrayList<>();
+            Log.e("ChatActivity", "type --------> " + type);
             final ArrayList<Integer> options = new ArrayList<>();
             View optionsView = null;
 
@@ -29353,7 +29356,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                     items.add(LocaleController.getString(R.string.Retry));
                     options.add(OPTION_RETRY);
                     icons.add(R.drawable.msg_retry);
-                    items.add(LocaleController.getString(chatMode == MODE_SAVED && threadMessageId != getUserConfig().getClientUserId() ? R.string.Remove : R.string.Delete));
+//                    items.add(LocaleController.getString(chatMode == MODE_SAVED && threadMessageId != getUserConfig().getClientUserId() ? R.string.Remove : R.string.Delete));
 //                    options.add(OPTION_DELETE);
 //                    icons.add(selectedObject.messageOwner.ttl_period != 0 ? R.drawable.msg_delete_auto : R.drawable.msg_delete);
                 } else if (type == 1) {
@@ -30496,6 +30499,14 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                         popupLayout.addView(new ActionBarPopupWindow.GapView(contentView.getContext(), themeDelegate), LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, 8));
                     }
                 }
+
+                Log.e("ChatActivity", "type: " + type + " items size: " + items.size());
+
+                for (int i = 0; i < items.size(); i++) {
+                    Log.e("ChatActivity", "type: " + type + " item value: " + items.get(i));
+                    Log.e("ChatActivity", "type: " + type + " icon value: " + icons.get(i));
+                }
+
                 scrimPopupWindowItems = new ActionBarMenuSubItem[items.size()];
                 for (int a = 0, N = items.size(); a < N; a++) {
                     ActionBarMenuSubItem cell = new ActionBarMenuSubItem(getParentActivity(), a == 0, a == N - 1, themeDelegate);

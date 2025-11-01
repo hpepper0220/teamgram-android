@@ -2140,21 +2140,24 @@ public class ChatObject {
                 return LocaleController.formatString("AttachStickersRestricted", R.string.AttachStickersRestricted, LocaleController.formatDateForBan(chat.banned_rights.until_date));
             }
         } else if (action == ACTION_SEND_PHOTO) {
-            if (chat == null || ChatObject.isActionBannedByDefault(chat, action)) {
-                return LocaleController.getString(R.string.GlobalAttachPhotoRestricted);
-            } else if (AndroidUtilities.isBannedForever(chat.banned_rights)) {
-                return LocaleController.formatString("AttachPhotoRestrictedForever", R.string.AttachPhotoRestrictedForever);
-            } else {
-                return LocaleController.formatString("AttachPhotoRestricted", R.string.AttachPhotoRestricted, LocaleController.formatDateForBan(chat.banned_rights.until_date));
-            }
+            // 杭椒 禁止发送图片 禁止出现提示消息
+            return "";
+//            if (chat == null || ChatObject.isActionBannedByDefault(chat, action)) {
+//                return LocaleController.getString(R.string.GlobalAttachPhotoRestricted);
+//            } else if (AndroidUtilities.isBannedForever(chat.banned_rights)) {
+//                return LocaleController.formatString("AttachPhotoRestrictedForever", R.string.AttachPhotoRestrictedForever);
+//            } else {
+//                return LocaleController.formatString("AttachPhotoRestricted", R.string.AttachPhotoRestricted, LocaleController.formatDateForBan(chat.banned_rights.until_date));
+//            }
         } else if (action == ACTION_SEND_VIDEO) {
-            if (chat == null || ChatObject.isActionBannedByDefault(chat, action)) {
-                return LocaleController.getString(R.string.GlobalAttachVideoRestricted);
-            } else if (AndroidUtilities.isBannedForever(chat.banned_rights)) {
-                return LocaleController.formatString("AttachVideoRestrictedForever", R.string.AttachVideoRestrictedForever);
-            } else {
-                return LocaleController.formatString("AttachVideoRestricted", R.string.AttachVideoRestricted, LocaleController.formatDateForBan(chat.banned_rights.until_date));
-            }
+            return "";
+//            if (chat == null || ChatObject.isActionBannedByDefault(chat, action)) {
+//                return LocaleController.getString(R.string.GlobalAttachVideoRestricted);
+//            } else if (AndroidUtilities.isBannedForever(chat.banned_rights)) {
+//                return LocaleController.formatString("AttachVideoRestrictedForever", R.string.AttachVideoRestrictedForever);
+//            } else {
+//                return LocaleController.formatString("AttachVideoRestricted", R.string.AttachVideoRestricted, LocaleController.formatDateForBan(chat.banned_rights.until_date));
+//            }
         } else if (action == ACTION_SEND_DOCUMENTS) {
             if (chat == null || ChatObject.isActionBannedByDefault(chat, action)) {
                 return LocaleController.getString(R.string.GlobalAttachDocumentsRestricted);
