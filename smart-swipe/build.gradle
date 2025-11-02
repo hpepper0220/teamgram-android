@@ -6,11 +6,11 @@ buildscript {
         mavenCentral()
     }
 }
-
-repositories {
-    google()
-    mavenCentral()
-}
+//
+//repositories {
+//    google()
+//    mavenCentral()
+//}
 
 android {
     namespace 'com.billy.android.swipe'
