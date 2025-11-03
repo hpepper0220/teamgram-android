@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
 import android.graphics.drawable.Drawable;
@@ -84,16 +85,16 @@ public class NotificationsSoundActivity extends BaseFragment implements ChatAtta
     Theme.ResourcesProvider resourcesProvider;
 
     int rowCount;
-    int serverTonesHeaderRow;
-    int serverTonesStartRow;
-    int serverTonesEndRow;
+//    int serverTonesHeaderRow;
+//    int serverTonesStartRow;
+//    int serverTonesEndRow;
 
-    int uploadRow;
+//    int uploadRow;
 
     int dividerRow;
     int dividerRow2;
 
-    int systemTonesHeaderRow;
+//    int systemTonesHeaderRow;
     int systemTonesStartRow;
     int systemTonesEndRow;
 
@@ -183,6 +184,8 @@ public class NotificationsSoundActivity extends BaseFragment implements ChatAtta
 
     @Override
     public View createView(final Context context) {
+        actionBar.setBackgroundColor(Color.WHITE);
+        actionBar.setTitleColor(Color.BLACK);
         actionBar.setItemsBackgroundColor(Theme.getColor(Theme.key_avatar_actionBarSelectorBlue, resourcesProvider), false);
         actionBar.setItemsColor(Theme.getColor(Theme.key_actionBarDefaultIcon, resourcesProvider), false);
         actionBar.setBackButtonDrawable(new BackDrawable(false));
@@ -352,12 +355,12 @@ public class NotificationsSoundActivity extends BaseFragment implements ChatAtta
         ((DefaultItemAnimator) listView.getItemAnimator()).setDelayAnimations(false);
         listView.setLayoutManager(new LinearLayoutManager(context));
         listView.setOnItemClickListener((view, position) -> {
-            if (position == uploadRow) {
-                chatAttachAlert = new ChatAttachAlert(context, NotificationsSoundActivity.this, false, false, true, resourcesProvider);
-                chatAttachAlert.setSoundPicker();
-                chatAttachAlert.init();
-                chatAttachAlert.show();
-            }
+//            if (position == uploadRow) {
+//                chatAttachAlert = new ChatAttachAlert(context, NotificationsSoundActivity.this, false, false, true, resourcesProvider);
+//                chatAttachAlert.setSoundPicker();
+//                chatAttachAlert.init();
+//                chatAttachAlert.show();
+//            }
             if (view instanceof ToneCell) {
                 ToneCell cell = (ToneCell) view;
                 if (actionBar.isActionModeShowed() || cell.tone == null) {
@@ -555,28 +558,28 @@ public class NotificationsSoundActivity extends BaseFragment implements ChatAtta
     }
 
     private void updateRows() {
-        serverTonesHeaderRow = -1;
-        serverTonesStartRow = -1;
-        serverTonesEndRow = -1;
-        uploadRow = -1;
-        dividerRow = -1;
-        systemTonesHeaderRow = -1;
+//        serverTonesHeaderRow = -1;
+//        serverTonesStartRow = -1;
+//        serverTonesEndRow = -1;
+//        uploadRow = -1;
+//        dividerRow = -1;
+//        systemTonesHeaderRow = -1;
         systemTonesStartRow = -1;
         systemTonesEndRow = -1;
 
         rowCount = 0;
 
-        serverTonesHeaderRow = rowCount++;
-        if (!serverTones.isEmpty()) {
-            serverTonesStartRow = rowCount;
-            rowCount += serverTones.size();
-            serverTonesEndRow = rowCount;
-        }
-        uploadRow = rowCount++;
-        dividerRow = rowCount++;
+//        serverTonesHeaderRow = rowCount++;
+//        if (!serverTones.isEmpty()) {
+//            serverTonesStartRow = rowCount;
+//            rowCount += serverTones.size();
+//            serverTonesEndRow = rowCount;
+//        }
+//        uploadRow = rowCount++;
+//        dividerRow = rowCount++;
 
         if (!systemTones.isEmpty()) {
-            systemTonesHeaderRow = rowCount++;
+//            systemTonesHeaderRow = rowCount++;
             systemTonesStartRow = rowCount;
             rowCount += systemTones.size();
             systemTonesEndRow = rowCount;
@@ -600,15 +603,19 @@ public class NotificationsSoundActivity extends BaseFragment implements ChatAtta
             if (tone != null) {
                 return tone.stableId;
             }
-            if (position == serverTonesHeaderRow) {
-                return 1;
-            } else if (position == systemTonesHeaderRow) {
-                return 2;
-            } else if (position == uploadRow) {
-                return 3;
-            } else if (position == dividerRow) {
-                return 4;
-            } else if (position == dividerRow2) {
+//            if (position == serverTonesHeaderRow) {
+//                return 1;
+//            }
+//            else if (position == systemTonesHeaderRow) {
+//                return 2;
+//            }
+//            else if (position == uploadRow) {
+//                return 3;
+//            }
+//            else if (position == dividerRow) {
+//                return 4;
+//            }
+            else if (position == dividerRow2) {
                 return 5;
             } else {
                 throw new RuntimeException();
@@ -619,9 +626,9 @@ public class NotificationsSoundActivity extends BaseFragment implements ChatAtta
             if (position >= systemTonesStartRow && position < systemTonesEndRow) {
                 return systemTones.get(position - systemTonesStartRow);
             }
-            if (position >= serverTonesStartRow && position < serverTonesEndRow) {
-                return serverTones.get(position - serverTonesStartRow);
-            }
+//            if (position >= serverTonesStartRow && position < serverTonesEndRow) {
+//                return serverTones.get(position - serverTonesStartRow);
+//            }
             return null;
         }
 
@@ -663,9 +670,9 @@ public class NotificationsSoundActivity extends BaseFragment implements ChatAtta
                     if (position >= systemTonesStartRow && position < systemTonesEndRow) {
                         tone = systemTones.get(position - systemTonesStartRow);
                     }
-                    if (position >= serverTonesStartRow && position < serverTonesEndRow) {
-                        tone = serverTones.get(position - serverTonesStartRow);
-                    }
+//                    if (position >= serverTonesStartRow && position < serverTonesEndRow) {
+//                        tone = serverTones.get(position - serverTonesStartRow);
+//                    }
 
                     if (tone != null) {
                         boolean animated = toneCell.tone == tone;
@@ -680,11 +687,12 @@ public class NotificationsSoundActivity extends BaseFragment implements ChatAtta
                     break;
                 case 1:
                     HeaderCell headerCell = (HeaderCell) holder.itemView;
-                    if (position == serverTonesHeaderRow) {
-                        headerCell.setText(LocaleController.getString(R.string.TelegramTones));
-                    } else if (position == systemTonesHeaderRow) {
-                        headerCell.setText(LocaleController.getString(R.string.SystemTones));
-                    }
+//                    if (position == serverTonesHeaderRow) {
+//                        headerCell.setText(LocaleController.getString(R.string.TelegramTones));
+//                    } else
+//                        if (position == systemTonesHeaderRow) {
+//                        headerCell.setText(LocaleController.getString(R.string.SystemTones));
+//                    }
                     break;
                 case 2:
                     CreationTextCell textCell = (CreationTextCell) holder.itemView;
@@ -702,11 +710,14 @@ public class NotificationsSoundActivity extends BaseFragment implements ChatAtta
         public int getItemViewType(int position) {
             if (position >= systemTonesStartRow && position < systemTonesEndRow) {
                 return 0;
-            } else if (position == serverTonesHeaderRow || position == systemTonesHeaderRow) {
-                return 1;
-            } else if (position == uploadRow) {
-                return 2;
-            } else if (position == dividerRow || position == dividerRow2) {
+            }
+//            else if (position == systemTonesHeaderRow) {
+//                return 1;
+//            }
+//            else if (position == uploadRow) {
+//                return 2;
+//            }
+            else if (position == dividerRow2) {
                 return 3;
             }
 

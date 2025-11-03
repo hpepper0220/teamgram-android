@@ -2123,4 +2123,9 @@
   <string name="RedEnvelopeAllTaken">已被领完</string>
   <string name="RedEnvelopeHasExpired">红包已过期</string>
   <string name="RedEnvelopeSpell">拼</string>
+  <string name="ResetNotificationsAlertTitle">重置所有通知</string>
+  <string name="ResetNotificationsAlert">您确定要将所有通知设置重置为默认值吗？</string>
+  <string name="NotificationsSoundPrivate">私人聊天声音</string>
+  <string name="NotificationsSoundGroup">群组聊天声音</string>
+  <string name="NotificationsSoundChannels">频道聊天声音</string>
 </resources>

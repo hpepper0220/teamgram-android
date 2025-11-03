@@ -35,6 +35,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.text.TextUtils;
+import android.util.Log;
 import android.util.LongSparseArray;
 import android.view.Gravity;
 import android.view.View;
@@ -817,6 +818,7 @@ public class NotificationsCustomSettingsActivity extends BaseFragment implements
                     getNotificationsController().setGlobalNotificationsEnabled(currentType, 0);
                     updateRows(true);
                 } else {
+                    Log.e("Notification", "currentType ------> " + currentType);
                     AlertsCreator.showCustomNotificationsDialog(NotificationsCustomSettingsActivity.this, 0, 0, currentType, exceptions, autoExceptions, currentAccount, param -> {
                         updateRows(true);
                     });

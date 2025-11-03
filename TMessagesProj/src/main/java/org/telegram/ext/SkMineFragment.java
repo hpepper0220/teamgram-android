@@ -384,18 +384,18 @@ public class SkMineFragment extends BaseFragment implements NotificationCenter.N
                         notificationRow.setColors(Theme.key_windowBackgroundWhiteGrayIcon, Theme.key_windowBackgroundWhiteBlackText);
                         notificationRow.setTextAndIcon(LocaleController.getString("NotificationsAndSounds", R.string.NotificationsAndSounds), R.drawable.msg_notifications, true);
                         notificationRow.setBackground(ContextCompat.getDrawable(context, isDark ? R.drawable.sk_ripple_dark : R.drawable.sk_ripple));
-                        notificationRow.setOnClickListener(v -> mParentActivity.presentFragment(new NotificationsSettingsActivity()));
+                        notificationRow.setOnClickListener(v -> mParentActivity.presentFragment(new NotificationAndSoundActivity()));
                         view = notificationRow;
                         break;
-                    case 5:
-                        filtersRow = new TextCell(context);
-                        filtersRow.setEnabled(true);
-                        filtersRow.setColors(Theme.key_windowBackgroundWhiteGrayIcon, Theme.key_windowBackgroundWhiteBlackText);
-                        filtersRow.setTextAndIcon(LocaleController.getString("Filters", R.string.Filters), R.drawable.msg_folders, true);
-                        filtersRow.setBackground(ContextCompat.getDrawable(context, isDark ? R.drawable.sk_ripple_dark : R.drawable.sk_ripple));
-                        filtersRow.setOnClickListener(v -> mParentActivity.presentFragment(new FiltersSetupActivity()));
-                        view = filtersRow;
-                        break;
+//                    case 5:
+//                        filtersRow = new TextCell(context);
+//                        filtersRow.setEnabled(true);
+//                        filtersRow.setColors(Theme.key_windowBackgroundWhiteGrayIcon, Theme.key_windowBackgroundWhiteBlackText);
+//                        filtersRow.setTextAndIcon(LocaleController.getString("Filters", R.string.Filters), R.drawable.msg_folders, true);
+//                        filtersRow.setBackground(ContextCompat.getDrawable(context, isDark ? R.drawable.sk_ripple_dark : R.drawable.sk_ripple));
+//                        filtersRow.setOnClickListener(v -> mParentActivity.presentFragment(new FiltersSetupActivity()));
+//                        view = filtersRow;
+//                        break;
 //                    case 5:
 //                        walletRow = new TextCell(context);
 //                        walletRow.setEnabled(true);
@@ -405,7 +405,7 @@ public class SkMineFragment extends BaseFragment implements NotificationCenter.N
 //                        walletRow.setOnClickListener(v -> mParentActivity.presentFragment(new MyWalletActivity()));
 //                        view = walletRow;
 //                        break;
-                    case 6:
+                    case 5:
                         FrameLayout frameLayout = new FrameLayout(context) {
                             @Override
                             protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
@@ -467,19 +467,19 @@ public class SkMineFragment extends BaseFragment implements NotificationCenter.N
                         notificationRow.setTextAndIcon(LocaleController.getString("NotificationsAndSounds", R.string.NotificationsAndSounds), R.drawable.msg_notifications, true);
 //                    menuItemsLayout.addView(notificationRow);
                         notificationRow.setBackground(ContextCompat.getDrawable(context, isDark ? R.drawable.sk_ripple_dark : R.drawable.sk_ripple));
-                        notificationRow.setOnClickListener(v -> mParentActivity.presentFragment(new NotificationsSettingsActivity()));
+                        notificationRow.setOnClickListener(v -> mParentActivity.presentFragment(new NotificationAndSoundActivity()));
                         view = notificationRow;
                         break;
-                    case 4:
-                        filtersRow = new TextCell(context);
-                        filtersRow.setEnabled(true);
-                        filtersRow.setColors(Theme.key_windowBackgroundWhiteGrayIcon, Theme.key_windowBackgroundWhiteBlackText);
-                        filtersRow.setTextAndIcon(LocaleController.getString("Filters", R.string.Filters), R.drawable.msg_folders, true);
-//                    menuItemsLayout.addView(filtersRow);
-                        filtersRow.setBackground(ContextCompat.getDrawable(context, isDark ? R.drawable.sk_ripple_dark : R.drawable.sk_ripple));
-                        filtersRow.setOnClickListener(v -> mParentActivity.presentFragment(new FiltersSetupActivity()));
-                        view = filtersRow;
-                        break;
+//                    case 4:
+//                        filtersRow = new TextCell(context);
+//                        filtersRow.setEnabled(true);
+//                        filtersRow.setColors(Theme.key_windowBackgroundWhiteGrayIcon, Theme.key_windowBackgroundWhiteBlackText);
+//                        filtersRow.setTextAndIcon(LocaleController.getString("Filters", R.string.Filters), R.drawable.msg_folders, true);
+////                    menuItemsLayout.addView(filtersRow);
+//                        filtersRow.setBackground(ContextCompat.getDrawable(context, isDark ? R.drawable.sk_ripple_dark : R.drawable.sk_ripple));
+//                        filtersRow.setOnClickListener(v -> mParentActivity.presentFragment(new FiltersSetupActivity()));
+//                        view = filtersRow;
+//                        break;
 //                    case 6:
 //                        walletRow = new TextCell(context);
 //                        walletRow.setEnabled(true);
@@ -489,7 +489,7 @@ public class SkMineFragment extends BaseFragment implements NotificationCenter.N
 //                        walletRow.setOnClickListener(v -> mParentActivity.presentFragment(new MyWalletActivity()));
 //                        view = walletRow;
 //                        break;
-                    case 5:
+                    case 4:
                         FrameLayout frameLayout = new FrameLayout(context) {
                             @Override
                             protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
@@ -528,7 +528,7 @@ public class SkMineFragment extends BaseFragment implements NotificationCenter.N
 
         @Override
         public int getItemCount() {
-            return autoRegister ? 7 : 6;
+            return autoRegister ? 6 : 5;
         }
 
         class SKViewHolder extends RecyclerView.ViewHolder {
