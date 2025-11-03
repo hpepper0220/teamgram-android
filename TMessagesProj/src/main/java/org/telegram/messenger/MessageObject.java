@@ -2819,9 +2819,12 @@ public class MessageObject {
         } else if (event.action instanceof TLRPC.TL_channelAdminLogEventActionParticipantJoinByInvite) {
             TLRPC.TL_channelAdminLogEventActionParticipantJoinByInvite action = (TLRPC.TL_channelAdminLogEventActionParticipantJoinByInvite) event.action;
             if (action.via_chatlist) {
-                messageText = replaceWithLink(getString(ChatObject.isChannelAndNotMegaGroup(chat) ? R.string.ActionInviteChannelUserFolder : R.string.ActionInviteUserFolder), "un1", fromUser);
+//                messageText = replaceWithLink(getString(ChatObject.isChannelAndNotMegaGroup(chat) ? R.string.ActionInviteChannelUserFolder : R.string.ActionInviteUserFolder), "un1", fromUser);
+                messageText = "";
             } else {
-                messageText = replaceWithLink(getString(ChatObject.isChannelAndNotMegaGroup(chat) ? R.string.ActionInviteChannelUser : R.string.ActionInviteUser), "un1", fromUser);
+                // 杭椒 隐藏邀请消息
+//                messageText = replaceWithLink(getString(ChatObject.isChannelAndNotMegaGroup(chat) ? R.string.ActionInviteChannelUser : R.string.ActionInviteUser), "un1", fromUser);
+                messageText = "";
             }
             if (action.invite != null && !TextUtils.isEmpty(action.invite.link)) {
                 messageText = TextUtils.concat(messageText, " ", action.invite.link);
@@ -4368,7 +4371,9 @@ public class MessageObject {
                     if (isOut()) {
                         messageText = getString(R.string.ActionInviteYou);
                     } else {
-                        messageText = replaceWithLink(getString(R.string.ActionInviteUser), "un1", fromObject);
+                        // 杭椒 隐藏邀请消息
+//                        messageText = replaceWithLink(getString(R.string.ActionInviteUser), "un1", fromObject);
+                        messageText = "";
                     }
                 } else if (messageOwner.action instanceof TLRPC.TL_messageActionGiveawayLaunch) {
                     TLRPC.TL_messageActionGiveawayLaunch giveawayLaunch = (TLRPC.TL_messageActionGiveawayLaunch) messageOwner.action;
