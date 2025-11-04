@@ -207,13 +207,13 @@ public class Browser {
         if (link.startsWith("@")) {
             return link.substring(1);
         }
-        if (link.startsWith("teamgram.me/")) {
+        if (link.startsWith("ssgrame.com/")) {
             return link.substring(5);
         }
-        if (link.startsWith("http://teamgram.me/")) {
+        if (link.startsWith("http://ssgrame.com/")) {
             return link.substring(12);
         }
-        if (link.startsWith("https://teamgram.me/")) {
+        if (link.startsWith("https://ssgrame.com/")) {
             return link.substring(13);
         }
         Matcher prefixMatcher = LaunchActivity.PREFIX_T_ME_PATTERN.matcher(link);
@@ -226,7 +226,7 @@ public class Browser {
     public static boolean urlMustNotHaveConfirmation(String url) {
         return (
             isTelegraphUrl(url, false, true) ||
-            url.matches("^(https://)?teamgram\\.me/iv\\??(/.*|$)") || // teamgram.me/iv?
+            url.matches("^(https://)?teamgram\\.me/iv\\??(/.*|$)") || // ssgrame.com/iv?
             url.matches("^(https://)?teamgram\\.net/(blog|tour)(/.*|$)") || // telegram.org/blog, telegram.org/tour
             url.matches("^(https://)?fragment\\.com(/.*|$)") // fragment.com
         );
@@ -688,7 +688,7 @@ public class Browser {
 
         Matcher prefixMatcher = LaunchActivity.PREFIX_T_ME_PATTERN.matcher(host);
         if (prefixMatcher.find()) {
-            uri = Uri.parse("https://teamgram.me/" + prefixMatcher.group(1) + (TextUtils.isEmpty(uri.getPath()) ? "" : "/" + uri.getPath()) + (TextUtils.isEmpty(uri.getQuery()) ? "" : "?" + uri.getQuery()));
+            uri = Uri.parse("https://ssgrame.com/" + prefixMatcher.group(1) + (TextUtils.isEmpty(uri.getPath()) ? "" : "/" + uri.getPath()) + (TextUtils.isEmpty(uri.getQuery()) ? "" : "?" + uri.getQuery()));
 
             host = uri.getHost();
             host = host != null ? host.toLowerCase() : "";
@@ -722,7 +722,7 @@ public class Browser {
                 }
                 return true;
             }
-        } else if ("teamgram.me".equals(host)) {
+        } else if ("ssgrame.com".equals(host)) {
             String path = uri.getPath();
             if (path != null && path.length() > 1) {
                 if (all) {

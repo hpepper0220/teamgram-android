@@ -21812,6 +21812,15 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                 } else {
                     messages = ChatActivity.this.messages;
                 }
+
+                Iterator<MessageObject> iterator = messages.iterator();
+                while (iterator.hasNext()) {
+                    MessageObject nextObject = iterator.next();
+                    if (nextObject.messageOwner.action instanceof TLRPC.TL_messageActionChatJoinedByLink) {
+                        iterator.remove();
+                    }
+                }
+
                 if (messages != null && !messages.contains(messageObject) && args.length > 1 && args[1] != null) {
                     for (int a = 0; a < messages.size(); ++a) {
                         if (messages.get(a) != null && messages.get(a).messageOwner != null && (messages.get(a).messageOwner.voiceTranscriptionId == transcriptionId || messageObject != null && messageObject.getId() == messages.get(a).getId() && messageObject.getDialogId() == messages.get(a).getDialogId())) {
@@ -21867,6 +21876,15 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                     } else {
                         messages = ChatActivity.this.messages;
                     }
+
+                    Iterator<MessageObject> iterator = messages.iterator();
+                    while (iterator.hasNext()) {
+                        MessageObject nextObject = iterator.next();
+                        if (nextObject.messageOwner.action instanceof TLRPC.TL_messageActionChatJoinedByLink) {
+                            iterator.remove();
+                        }
+                    }
+
                     int index = messages.indexOf(messageObject);
                     if (index >= 0 && index < messages.size()) {
                         int position = index + chatAdapter.messagesStartRow;
@@ -34293,13 +34311,13 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                                 TLRPC.Chat currentChat = MessagesController.getInstance(currentAccount).getChat(-dialogId);
                                 String username = ChatObject.getPublicUsername(currentChat);
                                 if (currentChat != null && username != null) {
-                                    link = "https://teamgram.me/" + username + "/" + messageId + "?t=" + AndroidUtilities.formatTimestamp(finalTimestamp);
+                                    link = "https://ssgrame.com/" + username + "/" + messageId + "?t=" + AndroidUtilities.formatTimestamp(finalTimestamp);
                                 }
                             } else {
                                 TLRPC.User user = MessagesController.getInstance(currentAccount).getUser(dialogId);
                                 String username = UserObject.getPublicUsername(user);
                                 if (user != null && username != null) {
-                                    link = "https://teamgram.me/" + username + "/" + messageId + "?t=" + AndroidUtilities.formatTimestamp(finalTimestamp);
+                                    link = "https://ssgrame.com/" + username + "/" + messageId + "?t=" + AndroidUtilities.formatTimestamp(finalTimestamp);
                                 }
                             }
                             if (link == null) {
@@ -34672,7 +34690,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                     if (messageObject != null && messageObject.messageOwner.media instanceof TLRPC.TL_messageMediaWebPage && messageObject.messageOwner.media.webpage != null && messageObject.messageOwner.media.webpage.cached_page != null) {
                         String lowerUrl = urlFinal.toLowerCase();
                         String lowerUrl2 = messageObject.messageOwner.media.webpage.url.toLowerCase();
-                        if ((lowerUrl.contains("teamgram.net/blog") || Browser.isTelegraphUrl(lowerUrl, false) || lowerUrl.contains("teamgram.me/iv")) && (lowerUrl.contains(lowerUrl2) || lowerUrl2.contains(lowerUrl))) {
+                        if ((lowerUrl.contains("teamgram.net/blog") || Browser.isTelegraphUrl(lowerUrl, false) || lowerUrl.contains("ssgrame.com/iv")) && (lowerUrl.contains(lowerUrl2) || lowerUrl2.contains(lowerUrl))) {
                             if (LaunchActivity.instance != null && LaunchActivity.instance.getBottomSheetTabs() != null && LaunchActivity.instance.getBottomSheetTabs().tryReopenTab(messageObject) != null) {
                                 return;
                             }
@@ -34806,13 +34824,25 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         private int messagesEndRow;
 
         public ArrayList<MessageObject> getMessages() {
+            ArrayList<MessageObject> messages = new ArrayList<>();
+
             if (isFrozen) {
-                return frozenMessages;
+                messages = frozenMessages;
             } else if (isFiltered) {
-                return filteredMessages;
+                messages = filteredMessages;
             } else {
-                return ChatActivity.this.messages;
+                messages = ChatActivity.this.messages;
             }
+
+            Iterator<MessageObject> iterator = messages.iterator();
+            while (iterator.hasNext()) {
+                MessageObject nextObject = iterator.next();
+                if (nextObject.messageOwner.action instanceof TLRPC.TL_messageActionChatJoinedByLink) {
+                    iterator.remove();
+                }
+            }
+
+            return messages;
         }
 
         public boolean isFrozen;
@@ -34861,6 +34891,16 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
             } else {
                 messages = ChatActivity.this.messages;
             }
+
+            // 杭椒 屏蔽TLRPC.TL_messageActionChatJoinedByLink消息
+            Iterator<MessageObject> iterator = messages.iterator();
+            while (iterator.hasNext()) {
+                MessageObject nextObject = iterator.next();
+                if (nextObject.messageOwner.action instanceof TLRPC.TL_messageActionChatJoinedByLink) {
+                    iterator.remove();
+                }
+            }
+
             if (chatMode == MODE_SAVED && isInsideContainer) {
                 hintRow = rowCount++;
             } else {
@@ -34953,6 +34993,14 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                 messages = filteredMessages;
             } else {
                 messages = ChatActivity.this.messages;
+            }
+
+            Iterator<MessageObject> iterator = messages.iterator();
+            while (iterator.hasNext()) {
+                MessageObject nextObject = iterator.next();
+                if (nextObject.messageOwner.action instanceof TLRPC.TL_messageActionChatJoinedByLink) {
+                    iterator.remove();
+                }
             }
 
             if (position >= messagesStartRow && position < messagesEndRow) {
@@ -35376,6 +35424,14 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                     messages = filteredMessages;
                 } else {
                     messages = ChatActivity.this.messages;
+                }
+
+                Iterator<MessageObject> iterator = messages.iterator();
+                while (iterator.hasNext()) {
+                    MessageObject nextObject = iterator.next();
+                    if (nextObject.messageOwner.action instanceof TLRPC.TL_messageActionChatJoinedByLink) {
+                        iterator.remove();
+                    }
                 }
 
                 MessageObject message = messages.get(position - messagesStartRow);
@@ -35827,6 +35883,12 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                     actionCell.setMessageObject(message);
                     actionCell.setAlpha(1.0f);
                     actionCell.setSpoilersSuppressed(chatListView.getScrollState() != RecyclerView.SCROLL_STATE_IDLE);
+                    if (message.messageOwner.action instanceof TLRPC.TL_messageActionChatJoinedByLink) {
+                        actionCell.setVisibility(View.VISIBLE);
+//                        actionCell.setBackgroundColor(Color.RED);
+                    } else {
+                        actionCell.setVisibility(View.VISIBLE);
+                    }
                 } else if (view instanceof ChatUnreadCell) {
                     ChatUnreadCell unreadCell = (ChatUnreadCell) view;
                     unreadCell.setText(LocaleController.getString(R.string.UnreadMessages));
@@ -35856,6 +35918,15 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                 } else {
                     messages = ChatActivity.this.messages;
                 }
+
+                Iterator<MessageObject> iterator = messages.iterator();
+                while (iterator.hasNext()) {
+                    MessageObject nextObject = iterator.next();
+                    if (nextObject.messageOwner.action instanceof TLRPC.TL_messageActionChatJoinedByLink) {
+                        iterator.remove();
+                    }
+                }
+
                 return messages.get(position - messagesStartRow).contentType;
             } else if (position == botInfoRow) {
                 return 3;
@@ -35960,6 +36031,14 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                     messages = ChatActivity.this.messages;
                 }
 
+                Iterator<MessageObject> iterator = messages.iterator();
+                while (iterator.hasNext()) {
+                    MessageObject nextObject = iterator.next();
+                    if (nextObject.messageOwner.action instanceof TLRPC.TL_messageActionChatJoinedByLink) {
+                        iterator.remove();
+                    }
+                }
+
                 MessageObject message = messages.get(position - messagesStartRow);
                 View view = holder.itemView;
                 if (message != null && message.messageOwner != null && message.messageOwner.media_unread && message.messageOwner.mentioned) {
@@ -36051,6 +36130,14 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                 messages = filteredMessages;
             } else {
                 messages = ChatActivity.this.messages;
+            }
+
+            Iterator<MessageObject> iterator = messages.iterator();
+            while (iterator.hasNext()) {
+                MessageObject nextObject = iterator.next();
+                if (nextObject.messageOwner.action instanceof TLRPC.TL_messageActionChatJoinedByLink) {
+                    iterator.remove();
+                }
             }
 
             int index = messages.indexOf(messageObject);
@@ -38908,8 +38995,8 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         } else if (ChatObject.getPublicUsername(currentChat) != null) {
             try {
                 if (publicMsgUrlPattern == null) {
-                    publicMsgUrlPattern = Pattern.compile("(https://)?teamgram.me/([0-9a-zA-Z_]+)/([0-9]+)/?([0-9]+)?");
-                    voiceChatUrlPattern = Pattern.compile("(https://)?teamgram.me/([0-9a-zA-Z_]+)\\?(voicechat+)");
+                    publicMsgUrlPattern = Pattern.compile("(https://)?ssgrame.com/([0-9a-zA-Z_]+)/([0-9]+)/?([0-9]+)?");
+                    voiceChatUrlPattern = Pattern.compile("(https://)?ssgrame.com/([0-9a-zA-Z_]+)\\?(voicechat+)");
                 }
                 Matcher matcher = publicMsgUrlPattern.matcher(urlFinal);
                 if (matcher.find(2) && matcher.find(3) && ChatObject.hasPublicLink(currentChat, matcher.group(2))) {
@@ -38985,7 +39072,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         } else {
             try {
                 if (privateMsgUrlPattern == null) {
-                    privateMsgUrlPattern = Pattern.compile("(https://)?teamgram.me/c/([0-9]+)/([0-9]+)/?([0-9]+)?");
+                    privateMsgUrlPattern = Pattern.compile("(https://)?ssgrame.com/c/([0-9]+)/([0-9]+)/?([0-9]+)?");
                 }
                 Matcher matcher = privateMsgUrlPattern.matcher(urlFinal);
                 if (matcher.find(2) && matcher.find(3) && matcher.group(4) == null) {
@@ -41186,13 +41273,13 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                     TLRPC.Chat currentChat = MessagesController.getInstance(currentAccount).getChat(-dialogId);
                     String username = ChatObject.getPublicUsername(currentChat);
                     if (currentChat != null && username != null) {
-                        link = "https://teamgram.me/" + username + "/" + messageId + "?t=" + AndroidUtilities.formatTimestamp(timestamp);
+                        link = "https://ssgrame.com/" + username + "/" + messageId + "?t=" + AndroidUtilities.formatTimestamp(timestamp);
                     }
                 } else {
                     TLRPC.User user = MessagesController.getInstance(currentAccount).getUser(dialogId);
                     String username = UserObject.getPublicUsername(user);
                     if (user != null && username != null) {
-                        link = "https://teamgram.me/" + username + "/" + messageId + "?t=" + AndroidUtilities.formatTimestamp(timestamp);
+                        link = "https://ssgrame.com/" + username + "/" + messageId + "?t=" + AndroidUtilities.formatTimestamp(timestamp);
                     }
                 }
                 if (link == null) {

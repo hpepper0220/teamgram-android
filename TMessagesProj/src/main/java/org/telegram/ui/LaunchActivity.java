@@ -2280,9 +2280,9 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
                                     String host = data.getHost().toLowerCase();
                                     Matcher prefixMatcher = PREFIX_T_ME_PATTERN.matcher(host);
                                     boolean isPrefix = prefixMatcher.find();
-                                    if (host.equals("teamgram.me") || isPrefix) {
+                                    if (host.equals("ssgrame.com") || isPrefix) {
                                         if (isPrefix) {
-                                            data = Uri.parse("https://teamgram.me/" + prefixMatcher.group(1) + (TextUtils.isEmpty(data.getPath()) ? "" : data.getPath()) + (TextUtils.isEmpty(data.getQuery()) ? "" : "?" + data.getQuery()));
+                                            data = Uri.parse("https://ssgrame.com/" + prefixMatcher.group(1) + (TextUtils.isEmpty(data.getPath()) ? "" : data.getPath()) + (TextUtils.isEmpty(data.getQuery()) ? "" : "?" + data.getQuery()));
                                         }
                                         String path = data.getPath();
                                         if (path != null && path.length() > 1) {

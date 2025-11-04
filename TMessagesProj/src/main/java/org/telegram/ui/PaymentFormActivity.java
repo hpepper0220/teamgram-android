@@ -1207,7 +1207,7 @@ public class PaymentFormActivity extends BaseFragment implements NotificationCen
                         shouldNavigateBack = !url.equals(webViewUrl);
                         try {
                             Uri uri = Uri.parse(url);
-                            if ("teamgram.me".equals(uri.getHost())) {
+                            if ("ssgrame.com".equals(uri.getHost())) {
                                 goToNextStep();
                                 return true;
                             }
@@ -2467,7 +2467,7 @@ public class PaymentFormActivity extends BaseFragment implements NotificationCen
                     public boolean shouldOverrideUrlLoading(WebView view, String url) {
                         try {
                             Uri uri = Uri.parse(url);
-                            if ("teamgram.me".equals(uri.getHost())) {
+                            if ("ssgrame.com".equals(uri.getHost())) {
                                 goToNextStep();
                                 return true;
                             }

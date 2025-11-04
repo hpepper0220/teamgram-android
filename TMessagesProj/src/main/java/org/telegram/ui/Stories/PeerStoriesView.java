@@ -6012,13 +6012,13 @@ public class PeerStoriesView extends SizeNotifierFrameLayout implements Notifica
                 if (UserObject.getPublicUsername(user) == null) {
                     return null;
                 }
-                return String.format(Locale.US, "https://teamgram.me/%1$s/s/%2$s", UserObject.getPublicUsername(user), currentStory.storyItem.id);
+                return String.format(Locale.US, "https://ssgrame.com/%1$s/s/%2$s", UserObject.getPublicUsername(user), currentStory.storyItem.id);
             } else {
                 TLRPC.Chat chat = MessagesController.getInstance(currentAccount).getChat(-dialogId);
                 if (ChatObject.getPublicUsername(chat) == null) {
                     return null;
                 }
-                return String.format(Locale.US, "https://teamgram.me/%1$s/s/%2$s", ChatObject.getPublicUsername(chat), currentStory.storyItem.id);
+                return String.format(Locale.US, "https://ssgrame.com/%1$s/s/%2$s", ChatObject.getPublicUsername(chat), currentStory.storyItem.id);
             }
         }
 

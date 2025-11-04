@@ -2899,7 +2899,7 @@ public class MessageObject {
             }
         } else if (event.action instanceof TLRPC.TL_channelAdminLogEventActionParticipantJoinByRequest) {
             TLRPC.TL_channelAdminLogEventActionParticipantJoinByRequest action = (TLRPC.TL_channelAdminLogEventActionParticipantJoinByRequest) event.action;
-            if (action.invite instanceof TLRPC.TL_chatInviteExported && "https://teamgram.me/+PublicChat".equals(((TLRPC.TL_chatInviteExported) action.invite).link) ||
+            if (action.invite instanceof TLRPC.TL_chatInviteExported && "https://ssgrame.com/+PublicChat".equals(((TLRPC.TL_chatInviteExported) action.invite).link) ||
                     action.invite instanceof TLRPC.TL_chatInvitePublicJoinRequests) {
                 messageText = replaceWithLink(getString(R.string.JoinedViaRequestApproved), "un1", fromUser);
                 messageText = replaceWithLink(messageText, "un2", MessagesController.getInstance(currentAccount).getUser(action.approved_by));
@@ -4369,7 +4369,8 @@ public class MessageObject {
                     }
                 } else if (messageOwner.action instanceof TLRPC.TL_messageActionChatJoinedByLink) {
                     if (isOut()) {
-                        messageText = getString(R.string.ActionInviteYou);
+//                        messageText = getString(R.string.ActionInviteYou);
+                        messageText = "您通过邀请链接加入了此群组。";
                     } else {
                         // 杭椒 隐藏邀请消息
 //                        messageText = replaceWithLink(getString(R.string.ActionInviteUser), "un1", fromObject);

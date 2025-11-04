@@ -2128,4 +2128,5 @@
   <string name="NotificationsSoundPrivate">私人聊天声音</string>
   <string name="NotificationsSoundGroup">群组聊天声音</string>
   <string name="NotificationsSoundChannels">频道聊天声音</string>
+  <string name="PlainTextRestrictedHint">不允许输入文字</string>
 </resources>

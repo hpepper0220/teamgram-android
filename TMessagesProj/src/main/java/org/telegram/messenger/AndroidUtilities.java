@@ -4451,7 +4451,7 @@ public class AndroidUtilities {
                 if (scheme != null) {
                     if ((scheme.equals("http") || scheme.equals("https"))) {
                         String host = data.getHost().toLowerCase();
-                        if (host.equals("teamgram.me")) {
+                        if (host.equals("ssgrame.com")) {
                             String path = data.getPath();
                             if (path != null) {
                                 if (path.startsWith("/socks") || path.startsWith("/proxy")) {
@@ -6357,7 +6357,7 @@ public class AndroidUtilities {
                     String host = uri.getHost().toLowerCase();
                     Matcher prefixMatcher = LaunchActivity.PREFIX_T_ME_PATTERN.matcher(host);
                     boolean isPrefix = prefixMatcher.find();
-                    if (host.equals("teamgram.me") || isPrefix) {
+                    if (host.equals("ssgrame.com") || isPrefix) {
                         ArrayList<String> segments = new ArrayList<>(uri.getPathSegments());
                         if (segments.size() > 0 && segments.get(0).equals("s")) {
                             segments.remove(0);
