@@ -1215,7 +1215,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         if (show) {
             if (chatActivityEnterView.hasText() && TextUtils.isEmpty(chatActivityEnterView.getSlowModeTimer())) {
                 if (attachItem != null) {
-                    attachItem.setVisibility(View.VISIBLE);
+                    attachItem.setVisibility(View.GONE);
                 }
                 if (headerItem != null) {
                     headerItem.setVisibility(View.GONE);
@@ -1971,7 +1971,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                                     headerItem.setVisibility(View.GONE);
                                 }
                                 if (attachItem != null) {
-                                    attachItem.setVisibility(View.VISIBLE);
+                                    attachItem.setVisibility(View.GONE);
                                 }
                             } else {
                                 if (headerItem != null) {
@@ -2074,7 +2074,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                     headerItem.setVisibility(View.GONE);
                 }
                 if (attachItem != null) {
-                    attachItem.setVisibility(View.VISIBLE);
+                    attachItem.setVisibility(View.GONE);
                 }
             }
         }
@@ -9882,9 +9882,9 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
         }
     }
 
-    public ActionBarMenuItem getHeaderItem() {
-        return headerItem;
-    }
+//    public ActionBarMenuItem getHeaderItem() {
+//        return headerItem;
+//    }
 
     private void playReactionAnimation(Integer messageId) {
         if (fragmentView == null) {
@@ -36361,7 +36361,7 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                     editTextItem.setVisibility(View.GONE);
                 }
                 if (attachItem != null) {
-                    attachItem.setVisibility(View.VISIBLE);
+                    attachItem.setVisibility(View.GONE);
                 }
                 if (searchIconItem != null && showSearchAsIcon) {
                     searchIconItem.setVisibility(View.GONE);
