@@ -25,6 +25,7 @@ import org.telegram.ext.components.PopupCreator;
 import org.telegram.ext.config.SkMenuAction;
 import org.telegram.ext.model.ContactModel;
 import org.telegram.messenger.AndroidUtilities;
+import org.telegram.messenger.ContactsController;
 import org.telegram.messenger.LocaleController;
 import org.telegram.messenger.MessagesController;
 import org.telegram.messenger.NotificationCenter;
@@ -45,6 +46,8 @@ import org.telegram.ui.Components.LayoutHelper;
 import org.telegram.ui.LaunchActivity;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class UserProfileActivity extends BaseFragment {
 
@@ -63,6 +66,11 @@ public class UserProfileActivity extends BaseFragment {
     private SwipeRefreshLayout refreshLayout;
     private int type;
     private TLRPC.User latestUser;
+    private boolean enableChat;
+
+    private ArrayList<TLRPC.TL_contact> contacts = ContactsController.getInstance(currentAccount).contacts;
+
+    private Map<Long, TLRPC.TL_contact> contactMap = new HashMap<>();
 
     public UserProfileActivity() {
     }
@@ -82,6 +90,10 @@ public class UserProfileActivity extends BaseFragment {
         currentUser = getMessagesController().getUser(user_id);
     }
 
+    public void setEnableChat(boolean enableChat) {
+        this.enableChat = enableChat;
+    }
+
     @Override
     public View createView(Context context) {
         actionBar.setBackButtonImage(R.drawable.ic_ab_back);
@@ -98,6 +110,10 @@ public class UserProfileActivity extends BaseFragment {
                 }
             }
         });
+
+        for (int i = 0; i < contacts.size(); i++) {
+            contactMap.put(contacts.get(i).user_id, contacts.get(i));
+        }
 
 //        ActionBarMenu menu = actionBar.createMenu();
 //        ActionBarMenuItem moreItem = menu.addItem(SkMenuAction.more, R.mipmap.ic_more);
@@ -200,7 +216,7 @@ public class UserProfileActivity extends BaseFragment {
 
         refreshLayout.addView(listview, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT));
 
-        if (latestUser.premium && currentUser.id != latestUser.id) {
+        if ((latestUser.premium && currentUser.id != latestUser.id) || enableChat || contactMap.containsKey(user_id)) {
             RoundTextView button = new RoundTextView(context);
             button.setGravity(Gravity.CENTER);
             button.setText("开始聊天");

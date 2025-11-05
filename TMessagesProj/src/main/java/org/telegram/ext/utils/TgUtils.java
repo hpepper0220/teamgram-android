@@ -56,6 +56,7 @@ public class TgUtils {
     }
 
     public static void setDefBackground(Context context, int currentAccount, int themeColor) {
+        FileOutputStream stream = null;
         try {
             int dialogId = 0;
 
@@ -67,7 +68,7 @@ public class TgUtils {
             File currentWallpaperPath = new File(FileLoader.getDirectory(FileLoader.MEDIA_DIR_CACHE), Utilities.random.nextInt() + ".jpg");
             Point screenSize = AndroidUtilities.getRealScreenSize();
             Bitmap bitmap = ImageLoader.loadBitmap(info.path, null, screenSize.x, screenSize.y, true);
-            FileOutputStream stream = new FileOutputStream(currentWallpaperPath);
+            stream = new FileOutputStream(currentWallpaperPath);
             bitmap.compress(Bitmap.CompressFormat.JPEG, 87, stream);
 
             WallpapersListActivity.FileWallpaper wallpaper = new WallpapersListActivity.FileWallpaper("", currentWallpaperPath, currentWallpaperPath);
@@ -124,6 +125,14 @@ public class TgUtils {
             Log.e("TgUtils", "set background success");
         } catch (IOException e) {
             Log.e("TgUtils", "set background error -------> " + e.getMessage());
+        } finally {
+            if (stream != null) {
+                try {
+                    stream.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
         }
     }
 

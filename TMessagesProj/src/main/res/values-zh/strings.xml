@@ -1923,7 +1923,6 @@
   <string name="ContactSupportInfo">告诉我们任何问题；注销通常没有帮助。</string>
   <string name="AllowReadCallAndLog">请允许Skgram接听电话并阅读通话记录，以便我们为您自动输入您的代码。</string>
   <string name="AllowReadCallLog">请允许Skgram读取通话记录，以便我们可以为您自动输入您的代码。</string>
-  <string name="PermissionXiaomiLockscreen">请允许Skgram显示在锁定屏幕上，以便通话可以正常进行。</string>
   <string name="RegistrationProfileInfo">资料信息</string>
   <string name="ChooseTakePhoto">拍照</string>
   <string name="ChooseFromGallery">相册上传</string>
@@ -2129,4 +2128,6 @@
   <string name="NotificationsSoundGroup">群组聊天声音</string>
   <string name="NotificationsSoundChannels">频道聊天声音</string>
   <string name="PlainTextRestrictedHint">不允许输入文字</string>
+  <string name="PermissionXiaomiLockscreen">请允许在锁屏界面显示 Skgram，以便通话功能正常运作。</string>
+  <string name="PermissionFSILockscreen">请允许在锁屏界面显示 Skgram，以便通话功能正常运作。</string>
 </resources>

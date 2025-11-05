@@ -22,6 +22,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import org.telegram.ext.model.DiscoveryModel;
+import org.telegram.ext.model.SearchModel;
 import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.LocaleController;
 import org.telegram.messenger.MessagesController;
@@ -47,7 +48,7 @@ public class SearchFriendFragment extends BaseFragment {
     private LinearLayout contentView;
     private RecyclerView listView;
     private LaunchActivity mParentActivity;
-    private ArrayList<TLRPC.User> searchResult = new ArrayList<>();
+    private ArrayList<SearchModel> searchResult = new ArrayList<>();
     private SearchListAdapter searchListAdapter;
 
     public void setParentActivity(LaunchActivity parentActivity) {
@@ -63,6 +64,8 @@ public class SearchFriendFragment extends BaseFragment {
         contentView.setOrientation(LinearLayout.VERTICAL);
         contentView.setPadding(AndroidUtilities.dp(12), AndroidUtilities.dp(10), AndroidUtilities.dp(12), AndroidUtilities.dp(0));
         contentView.setLayoutParams(LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT));
+
+        contentView.setFitsSystemWindows(true);
 
         LinearLayout searchLayout = new LinearLayout(context);
         searchLayout.setPadding(AndroidUtilities.dp(12), 0, AndroidUtilities.dp(12), 0);
@@ -113,8 +116,8 @@ public class SearchFriendFragment extends BaseFragment {
         TLRPC.TL_contacts_search req = new TLRPC.TL_contacts_search();
         req.q = text;
         req.limit = 20;
-        ConnectionsManager.getInstance(currentAccount).sendRequest(req, (res, error) -> AndroidUtilities.runOnUIThread(() -> {
-            TLRPC.TL_contacts_found response = null;
+        int reqId = ConnectionsManager.getInstance(currentAccount).sendRequest(req, (res, error) -> AndroidUtilities.runOnUIThread(() -> {
+            TLRPC.TL_contacts_found response;
             if (res instanceof TLRPC.TL_contacts_found) {
                 response = (TLRPC.TL_contacts_found) res;
                 MessagesStorage.getInstance(currentAccount).putUsersAndChats(response.users, response.chats, true, true);
@@ -122,14 +125,22 @@ public class SearchFriendFragment extends BaseFragment {
                 MessagesController.getInstance(currentAccount).putChats(response.chats, false);
 
                 searchResult.clear();
+
                 for (int i = 0; i < response.users.size(); i++) {
-                    if (UserConfig.getInstance(currentAccount).getClientUserId() != response.users.get(i).id) {
-                        searchResult.add(response.users.get(i));
-                    }
+                    SearchModel model = new SearchModel();
+                    model.setUser(response.users.get(i));
+                    model.setItemType(SearchModel.typeData);
+                    searchResult.add(model);
                 }
+
+                if (searchResult.isEmpty()) {
+                    searchResult.add(SearchModel.empty());
+                }
+
                 searchListAdapter.notifyDataSetChanged();
             }
         }));
+        ConnectionsManager.getInstance(currentAccount).bindRequestToGuid(reqId, classGuid);
     }
 
     private class SearchListAdapter extends RecyclerView.Adapter<SearchListAdapter.ViewHolder> {
@@ -153,22 +164,29 @@ public class SearchFriendFragment extends BaseFragment {
 
         @Override
         public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-            UserCell userCell = new UserCell(context, 1, 1, false);
-            holder.ll_container.removeAllViews();
-            TLRPC.User itemData = searchResult.get(position);
-            userCell.setData(itemData, itemData.first_name, LocaleController.formatUserStatus(currentAccount, itemData), 0);
-            holder.ll_container.addView(userCell, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT));
+            SearchModel model = searchResult.get(position);
+            if (model.getItemType() == SearchModel.typeData) {
+                UserCell userCell = new UserCell(context, 1, 1, false);
+                holder.ll_container_search.removeAllViews();
 
-            holder.ll_container.setOnClickListener(view -> {
-                Bundle bundle = new Bundle();
-                bundle.putLong("user_id", itemData.id);
+                TLRPC.User itemData = model.getUser();
 
-                FriendInfoFragment friendInfoFragment = new FriendInfoFragment(bundle);
-                if (mParentActivity != null) {
-                    friendInfoFragment.setParentActivity(mParentActivity);
-                    mParentActivity.presentFragment(friendInfoFragment);
-                }
-            });
+                Log.e("SearchFriend", "first_name -----> " + itemData.first_name);
+
+                userCell.setData(itemData, itemData.first_name, LocaleController.formatUserStatus(currentAccount, itemData), 0);
+                holder.ll_container_search.addView(userCell, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT));
+
+                holder.ll_container_search.setOnClickListener(view -> {
+                    Bundle bundle = new Bundle();
+                    bundle.putLong("user_id", itemData.id);
+
+                    FriendInfoFragment friendInfoFragment = new FriendInfoFragment(bundle);
+                    if (mParentActivity != null) {
+                        friendInfoFragment.setParentActivity(mParentActivity);
+                        mParentActivity.presentFragment(friendInfoFragment);
+                    }
+                });
+            }
         }
 
         @Override
@@ -176,12 +194,17 @@ public class SearchFriendFragment extends BaseFragment {
             return searchResult.size();
         }
 
+        @Override
+        public int getItemViewType(int position) {
+            return searchResult.get(position).getItemType();
+        }
+
         class ViewHolder extends RecyclerView.ViewHolder {
-            LinearLayout ll_container;
+            LinearLayout ll_container_search;
 
             public ViewHolder(@NonNull View itemView) {
                 super(itemView);
-                ll_container = itemView.findViewById(R.id.ll_container);
+                ll_container_search = itemView.findViewById(R.id.ll_container_search);
             }
         }
     }

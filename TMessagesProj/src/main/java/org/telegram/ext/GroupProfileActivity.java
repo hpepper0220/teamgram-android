@@ -25,6 +25,8 @@ import org.telegram.messenger.AndroidUtilities;
 import org.telegram.messenger.ChatObject;
 import org.telegram.messenger.FileLog;
 import org.telegram.messenger.MessageObject;
+import org.telegram.messenger.MessagesController;
+import org.telegram.messenger.NotificationCenter;
 import org.telegram.messenger.R;
 import org.telegram.tgnet.TLRPC;
 import org.telegram.ui.ActionBar.ActionBar;
@@ -32,15 +34,14 @@ import org.telegram.ui.ActionBar.BaseFragment;
 import org.telegram.ui.ActionBar.Theme;
 import org.telegram.ui.Cells.ProfileSearchCell;
 import org.telegram.ui.Cells.UserCell;
-import org.telegram.ui.ChatActivity;
 import org.telegram.ui.Components.LayoutHelper;
 import org.telegram.ui.LaunchActivity;
 
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.atomic.AtomicBoolean;
 
-public class GroupProfileActivity extends BaseFragment {
+public class GroupProfileActivity extends BaseFragment implements NotificationCenter.NotificationCenterDelegate {
 
     private LinearLayout contentView;
     private LaunchActivity mParentActivity;
@@ -73,6 +74,8 @@ public class GroupProfileActivity extends BaseFragment {
 
     @Override
     public boolean onFragmentCreate() {
+        getNotificationCenter().addObserver(this, NotificationCenter.updateInterfaces);
+        getNotificationCenter().addObserver(this, NotificationCenter.channelRightsUpdated);
         currentChat = getMessagesController().getChat(chat_id);
 
         if (null != chatInfo && null != chatInfo.participants) {
@@ -289,6 +292,32 @@ public class GroupProfileActivity extends BaseFragment {
         }
     }
 
+    @Override
+    public void didReceivedNotification(int id, int account, Object... args) {
+        if (id == NotificationCenter.updateInterfaces) {
+            int updateMask = (Integer) args[0];
+            if ((updateMask & MessagesController.UPDATE_MASK_NAME) != 0 || (updateMask & MessagesController.UPDATE_MASK_CHAT_NAME) != 0 || (updateMask & MessagesController.UPDATE_MASK_EMOJI_STATUS) != 0) {
+                if (currentChat != null) {
+                    TLRPC.Chat chat = getMessagesController().getChat(currentChat.id);
+                    if (chat != null) {
+                        currentChat = chat;
+                    }
+                }
+            }
+        } else if (id == NotificationCenter.channelRightsUpdated) {
+            TLRPC.Chat chat = (TLRPC.Chat) args[0];
+            if (currentChat != null && chat.id == currentChat.id) {
+                currentChat = chat;
+            }
+        }
+    }
+
+    @Override
+    public void onFragmentDestroy() {
+        getNotificationCenter().removeObserver(this, NotificationCenter.updateInterfaces);
+        getNotificationCenter().removeObserver(this, NotificationCenter.channelRightsUpdated);
+        super.onFragmentDestroy();
+    }
 
     private class GroupMemberListAdapter extends RecyclerView.Adapter<GroupMemberListAdapter.ViewHolder> {
         public GroupMemberListAdapter(Context context) {
@@ -311,37 +340,57 @@ public class GroupProfileActivity extends BaseFragment {
             TLRPC.ChatParticipant part = chatInfo.participants.participants.get(position);
             if (part != null) {
                 String role;
+                AtomicBoolean enableChat = new AtomicBoolean(false);
                 if (part instanceof TLRPC.TL_chatChannelParticipant) {
                     TLRPC.ChannelParticipant channelParticipant = ((TLRPC.TL_chatChannelParticipant) part).channelParticipant;
                     if (!TextUtils.isEmpty(channelParticipant.rank)) {
+                        enableChat.set(false);
                         role = channelParticipant.rank;
                     } else {
                         if (channelParticipant instanceof TLRPC.TL_channelParticipantCreator) {
                             role = getString("ChannelCreator", R.string.ChannelCreator);
+                            enableChat.set(true);
                         } else if (channelParticipant instanceof TLRPC.TL_channelParticipantAdmin) {
                             role = getString("ChannelAdmin", R.string.ChannelAdmin);
+                            enableChat.set(true);
                         } else {
                             role = null;
+                            enableChat.set(false);
                         }
                     }
                 } else {
                     if (part instanceof TLRPC.TL_chatParticipantCreator) {
                         role = getString("ChannelCreator", R.string.ChannelCreator);
+                        enableChat.set(true);
                     } else if (part instanceof TLRPC.TL_chatParticipantAdmin) {
                         role = getString("ChannelAdmin", R.string.ChannelAdmin);
+                        enableChat.set(true);
                     } else {
                         role = null;
+                        enableChat.set(false);
                     }
                 }
                 userCell.setAdminRole(role);
                 userCell.setData(getMessagesController().getUser(part.user_id), null, null, 0, position != chatInfo.participants.participants.size() - 1);
                 userCell.setOnClickListener(view -> {
                     Log.e("GroupProfile", "chat_id ------> "+ part.user_id);
-                    if (latestUser.premium) {
-                        Bundle args = new Bundle();
-                        args.putLong("user_id", part.user_id);
-                        mParentActivity.presentFragment(new ChatActivity(args));
-                    }
+//                    if (latestUser.premium || enableChat || currentChat.default_banned_rights.group_member_chat) {
+//                        Bundle args = new Bundle();
+//                        args.putLong("user_id", part.user_id);
+//                        mParentActivity.presentFragment(new ChatActivity(args));
+//                    }
+
+                    enableChat.set(latestUser.premium || enableChat.get() || currentChat.default_banned_rights.group_member_chat || getMessagesController().getUser(part.user_id).premium);
+
+                    Bundle args = new Bundle();
+                    args.putLong("user_id", part.user_id);
+                    args.putInt("type", 2);
+                    UserProfileActivity fragment = new UserProfileActivity(args);
+                    fragment.setParentActivity(mParentActivity);
+                    fragment.setUserInfo(part.user_id, getMessagesController().getUserFull(part.user_id));
+                    fragment.setEnableChat(enableChat.get());
+                    presentFragment(fragment);
+
                 });
             }
             holder.ll_container.addView(userCell, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT));

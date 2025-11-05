@@ -7,21 +7,12 @@
     android:orientation="vertical">
 
     <LinearLayout
+        android:id="@+id/ll_container_search"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginEnd="20dip"
         android:gravity="center_vertical"
-        android:orientation="horizontal">
-
-        <LinearLayout
-            android:id="@+id/ll_container"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="20dip"
-            android:layout_weight="1"
-            android:gravity="center_vertical"
-            android:orientation="horizontal" />
-
-    </LinearLayout>
+        android:orientation="horizontal" />
 
     <View
         android:layout_width="match_parent"
