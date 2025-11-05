@@ -27,7 +27,7 @@ public class SkActionDialog {
         private static final int contentTextColor = 0xFF666666;
         private static final int negativeStateColor = 0xFFEEEEEE;
         private static final int negativeTextColor = 0xFF999999;
-        private static final int positiveStateColor = 0xFF36A99E;
+        private static final int positiveStateColor = 0xff65a9e0;
         private static final int positiveTextColor = 0xFFFFFFFF;
         private static final int actionTextSize = 14;
 

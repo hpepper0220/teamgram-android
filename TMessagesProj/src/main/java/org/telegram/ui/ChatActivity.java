@@ -2045,7 +2045,8 @@ public class ChatActivity extends BaseFragment implements NotificationCenter.Not
                         || (scheduledHint != null && scheduledHint.getVisibility() == View.VISIBLE)) {
                     hideSendButtonHints();
                 } else {
-                    showScheduledHint();
+                    // 杭椒 隐藏 scheduledHint Long tap to send your message later.
+//                    showScheduledHint();
                 }
             }
         }

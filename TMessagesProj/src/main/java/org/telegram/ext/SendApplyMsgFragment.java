@@ -103,6 +103,10 @@ public class SendApplyMsgFragment extends BaseFragment {
     }
 
     private void sendApplyRequest(Context context, TLRPC.User target) {
+        if (!latestUser.premium && !target.premium) {
+            return;
+        }
+
         button.showLoading();
 
         TLRPC.TL_contacts_addContact req = new TLRPC.TL_contacts_addContact();
@@ -122,6 +126,9 @@ public class SendApplyMsgFragment extends BaseFragment {
         ConnectionsManager.getInstance(currentAccount).sendRequest(req, (response, error) -> {
             AndroidUtilities.runOnUIThread(() -> {
                 button.hideLoading();
+                if (!latestUser.premium && !target.premium) {
+                    return;
+                }
                 if (error != null) {
                     needShowAlert(getString(R.string.RestorePasswordNoEmailTitle), error.text);
                     return;

@@ -93,6 +93,7 @@ import com.just.agentweb.WebChromeClient;
 import com.just.agentweb.WebViewClient;
 
 import org.telegram.PhoneFormat.PhoneFormat;
+import org.telegram.ext.components.DialogCreator;
 import org.telegram.ext.utils.TgUtils;
 import org.telegram.messenger.AccountInstance;
 import org.telegram.messenger.AndroidUtilities;
@@ -971,7 +972,8 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
             ActivityManager am = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
             if (am.isBackgroundRestricted() && System.currentTimeMillis() - SharedConfig.BackgroundActivityPrefs.getLastCheckedBackgroundActivity() >= 86400000L && SharedConfig.BackgroundActivityPrefs.getDismissedCount() < 3) {
-                AlertsCreator.createBackgroundActivityDialog(this).show();
+//                AlertsCreator.createBackgroundActivityDialog(this).show();
+                DialogCreator.createBackgroundActivityDialog(this);
                 SharedConfig.BackgroundActivityPrefs.setLastCheckedBackgroundActivity(System.currentTimeMillis());
             }
         }

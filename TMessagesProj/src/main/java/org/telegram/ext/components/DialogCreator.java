@@ -1,7 +1,10 @@
 package org.telegram.ext.components;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
+import android.net.Uri;
+import android.os.Build;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
@@ -16,7 +19,10 @@ import org.checkerframework.checker.units.qual.A;
 import org.telegram.ext.components.dialog.SkActionDialog;
 import org.telegram.ext.components.dialog.SkBottomDialog;
 import org.telegram.messenger.AndroidUtilities;
+import org.telegram.messenger.ApplicationLoader;
+import org.telegram.messenger.FileLog;
 import org.telegram.messenger.LocaleController;
+import org.telegram.messenger.OneUIUtilities;
 import org.telegram.messenger.R;
 import org.telegram.ui.ActionBar.Theme;
 import org.telegram.ui.Components.LayoutHelper;
@@ -110,6 +116,22 @@ public class DialogCreator {
 
         builder.getCustomView().addView(layout2, LayoutHelper.createLinear(LayoutHelper.WRAP_CONTENT, LayoutHelper.WRAP_CONTENT));
         builder.show();
+    }
+
+    public static void createBackgroundActivityDialog(Context context) {
+        SkActionDialog.Builder builder = new SkActionDialog.Builder(context);
+        builder.setTitle(context.getResources().getString(R.string.AllowBackgroundActivity)).setContent(AndroidUtilities.replaceTags(context.getResources().getString(OneUIUtilities.isOneUI() ? Build.VERSION.SDK_INT >= Build.VERSION_CODES.S ? R.string.AllowBackgroundActivityInfoOneUIAboveS : R.string.AllowBackgroundActivityInfoOneUIBelowS : R.string.AllowBackgroundActivityInfo))).setNegativeButton(context.getResources().getString(R.string.ContactsPermissionAlertNotNow)).setPositiveButton(context.getResources().getString(R.string.PermissionOpenSettings), v -> {
+            try {
+                Intent intent = new Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+                intent.setData(Uri.parse("package:" + ApplicationLoader.applicationContext.getPackageName()));
+                context.startActivity(intent);
+            } catch (Exception e) {
+                FileLog.e(e);
+            }
+        });
+        builder.show();
+        builder.getContentView().setLineSpacing(20, 1);
+        builder.getContentView().setGravity(Gravity.START | Gravity.TOP);
     }
 
 }

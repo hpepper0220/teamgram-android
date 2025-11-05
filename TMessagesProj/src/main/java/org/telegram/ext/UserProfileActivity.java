@@ -157,6 +157,8 @@ public class UserProfileActivity extends BaseFragment {
         tv_user_name.setPadding(0, 0, 12, 0);
         ll_user_name.addView(tv_user_name, LayoutHelper.createLinear(LayoutHelper.WRAP_CONTENT, LayoutHelper.MATCH_PARENT, 1f, 0, 0, 8, 0));
 
+        ll_user_name.setVisibility(View.GONE);
+
         LinearLayout remarkLayout = new LinearLayout(context);
         remarkLayout.setOrientation(LinearLayout.HORIZONTAL);
         bottomLayout.addView(remarkLayout, LayoutHelper.createLinear(LayoutHelper.MATCH_PARENT, AndroidUtilities.dp(16)));

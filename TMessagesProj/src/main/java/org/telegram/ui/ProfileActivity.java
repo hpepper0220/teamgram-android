@@ -7840,52 +7840,52 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                 }
             }
         } else if (id == NotificationCenter.chatInfoDidLoad) {
-            final TLRPC.ChatFull chatFull = (TLRPC.ChatFull) args[0];
-            if (chatFull.id == chatId) {
-                final boolean byChannelUsers = (Boolean) args[2];
-                if (chatInfo instanceof TLRPC.TL_channelFull) {
-                    if (chatFull.participants == null) {
-                        chatFull.participants = chatInfo.participants;
-                    }
-                }
-                final boolean loadChannelParticipants = chatInfo == null && chatFull instanceof TLRPC.TL_channelFull;
-                chatInfo = chatFull;
-                if (mergeDialogId == 0 && chatInfo.migrated_from_chat_id != 0) {
-                    mergeDialogId = -chatInfo.migrated_from_chat_id;
-                    getMediaDataController().getMediaCount(mergeDialogId, topicId, MediaDataController.MEDIA_PHOTOVIDEO, classGuid, true);
-                }
-                fetchUsersFromChannelInfo();
-                if (avatarsViewPager != null && !isTopic) {
-                    avatarsViewPager.setChatInfo(chatInfo);
-                }
-                updateListAnimated(true);
-                TLRPC.Chat newChat = getMessagesController().getChat(chatId);
-                if (newChat != null) {
-                    currentChat = newChat;
-                    createActionBarMenu(true);
-                }
-                if (flagSecure != null) {
-                    flagSecure.invalidate();
-                }
-                if (currentChat.megagroup && (loadChannelParticipants || !byChannelUsers)) {
-                    getChannelParticipants(true);
-                }
-
-                updateAutoDeleteItem();
-                updateTtlIcon();
-                if (storyView != null && chatInfo != null) {
-                    storyView.setStories(chatInfo.stories);
-                }
-                if (giftsView != null) {
-                    giftsView.update();
-                }
-                if (avatarImage != null) {
-                    avatarImage.setHasStories(needInsetForStories());
-                }
-                if (sharedMediaLayout != null) {
-                    sharedMediaLayout.setChatInfo(chatInfo);
-                }
-            }
+//            final TLRPC.ChatFull chatFull = (TLRPC.ChatFull) args[0];
+//            if (chatFull.id == chatId) {
+//                final boolean byChannelUsers = (Boolean) args[2];
+//                if (chatInfo instanceof TLRPC.TL_channelFull) {
+//                    if (chatFull.participants == null) {
+//                        chatFull.participants = chatInfo.participants;
+//                    }
+//                }
+//                final boolean loadChannelParticipants = chatInfo == null && chatFull instanceof TLRPC.TL_channelFull;
+//                chatInfo = chatFull;
+//                if (mergeDialogId == 0 && chatInfo.migrated_from_chat_id != 0) {
+//                    mergeDialogId = -chatInfo.migrated_from_chat_id;
+//                    getMediaDataController().getMediaCount(mergeDialogId, topicId, MediaDataController.MEDIA_PHOTOVIDEO, classGuid, true);
+//                }
+//                fetchUsersFromChannelInfo();
+//                if (avatarsViewPager != null && !isTopic) {
+//                    avatarsViewPager.setChatInfo(chatInfo);
+//                }
+//                updateListAnimated(true);
+//                TLRPC.Chat newChat = getMessagesController().getChat(chatId);
+//                if (newChat != null) {
+//                    currentChat = newChat;
+//                    createActionBarMenu(true);
+//                }
+//                if (flagSecure != null) {
+//                    flagSecure.invalidate();
+//                }
+//                if (currentChat.megagroup && (loadChannelParticipants || !byChannelUsers)) {
+//                    getChannelParticipants(true);
+//                }
+//
+//                updateAutoDeleteItem();
+//                updateTtlIcon();
+//                if (storyView != null && chatInfo != null) {
+//                    storyView.setStories(chatInfo.stories);
+//                }
+//                if (giftsView != null) {
+//                    giftsView.update();
+//                }
+//                if (avatarImage != null) {
+//                    avatarImage.setHasStories(needInsetForStories());
+//                }
+//                if (sharedMediaLayout != null) {
+//                    sharedMediaLayout.setChatInfo(chatInfo);
+//                }
+//            }
         } else if (id == NotificationCenter.closeChats) {
             removeSelfFromStack(true);
         } else if (id == NotificationCenter.botInfoDidLoad) {
