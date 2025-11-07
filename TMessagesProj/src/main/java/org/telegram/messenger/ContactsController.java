@@ -26,6 +26,7 @@ import android.os.Build;
 import android.provider.BaseColumns;
 import android.provider.ContactsContract;
 import android.text.TextUtils;
+import android.util.Log;
 import android.util.SparseArray;
 
 import androidx.annotation.NonNull;
@@ -549,6 +550,7 @@ public class ContactsController extends BaseController {
                     contactsByPhone.clear();
                     contactsByShortPhone.clear();
                     getNotificationCenter().postNotificationName(NotificationCenter.contactsDidLoad);
+                    Log.e("ContactsController", "loadContacts1");
                     loadContacts(false, 0);
                     runnable.run();
                 });
@@ -608,6 +610,7 @@ public class ContactsController extends BaseController {
                 }
                 return;
             }
+            Log.e("ContactsController", "loadContacts2");
             loadContacts(true, 0);
         });
     }
@@ -1584,6 +1587,7 @@ public class ContactsController extends BaseController {
                     FileLog.d("done loading contacts");
                 }
                 if (from == 1 && (contactsArr.isEmpty() || Math.abs(System.currentTimeMillis() / 1000 - getUserConfig().lastContactsSyncTime) >= 24 * 60 * 60)) {
+                    Log.e("ContactsController", "loadContacts3");
                     loadContacts(false, getContactsHash(contactsArr));
                     if (contactsArr.isEmpty()) {
                         AndroidUtilities.runOnUIThread(() -> {
@@ -1735,9 +1739,10 @@ public class ContactsController extends BaseController {
                     } else {
                         reloadContactsStatusesMaybe(false);
                     }
-                    if (finalReloadContacts) {
-                        loadContacts(false, 0);
-                    }
+//                    if (finalReloadContacts) {
+//                        Log.e("ContactsController", "loadContacts4");
+//                        loadContacts(false, 0);
+//                    }
                 });
 
                 if (!delayedContactsUpdate.isEmpty() && contactsLoaded && contactsBookLoaded) {
@@ -2163,6 +2168,7 @@ public class ContactsController extends BaseController {
         }
 
         if (reloadContacts) {
+            Log.e("ContactsController", "loadContacts5");
             Utilities.stageQueue.postRunnable(() -> loadContacts(false, 0));
         } else {
             final ArrayList<TLRPC.TL_contact> newContacts = newC;

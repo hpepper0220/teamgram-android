@@ -2130,4 +2130,7 @@
   <string name="PlainTextRestrictedHint">不允许输入文字</string>
   <string name="PermissionXiaomiLockscreen">请允许在锁屏界面显示 Skgram，以便通话功能正常运作。</string>
   <string name="PermissionFSILockscreen">请允许在锁屏界面显示 Skgram，以便通话功能正常运作。</string>
+  <string name="StopLoadingTitle">停止加载？</string>
+  <string name="StopLoading">您要取消加载吗？</string>
+  <string name="WaitMore">再等等</string>
 </resources>

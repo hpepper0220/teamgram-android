@@ -2,6 +2,7 @@ package org.telegram.ui.Components.Premium.boosts;
 
 import android.os.Build;
 import android.text.TextUtils;
+import android.util.Log;
 import android.util.Pair;
 
 import com.android.billingclient.api.BillingClient;
@@ -677,6 +678,7 @@ public class BoostRepository {
         final ArrayList<TLRPC.User> users = new ArrayList<>();
         final ArrayList<TLRPC.TL_contact> contacts = ContactsController.getInstance(currentAccount).contacts;
         if (contacts == null || contacts.isEmpty()) {
+            Log.e("ContactsController", "loadContacts6");
             ContactsController.getInstance(currentAccount).loadContacts(false, 0);
         }
         final MessagesController messagesController = MessagesController.getInstance(currentAccount);

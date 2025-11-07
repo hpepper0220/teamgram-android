@@ -5958,6 +5958,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                     actionBar.setVisibility(View.VISIBLE);
                     searchItem.setVisibility(View.GONE);
                     refreshItem.setVisibility(View.GONE);
+                    Log.e("ContactsController", "loadContacts7");
                     ContactsController.getInstance(currentAccount).loadContacts(false, 0);
                 } else {
                     if (exploreList.isEmpty()) {
@@ -7931,7 +7932,8 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
             blurredView.setBackground(null);
         }
         super.onBecomeFullyHidden();
-        canShowStoryHint = true;
+        // 杭椒 隐藏 StoryHint Tap on %s to post a story for your contacts
+        canShowStoryHint = false;
     }
 
     @Override

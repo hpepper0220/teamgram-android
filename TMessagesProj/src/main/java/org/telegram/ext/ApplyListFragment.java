@@ -8,6 +8,7 @@ import android.animation.AnimatorSet;
 import android.animation.ValueAnimator;
 import android.content.Context;
 import android.graphics.Color;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -159,18 +160,27 @@ public class ApplyListFragment extends BaseFragment {
             if (refreshLayout.isRefreshing()) {
                 refreshLayout.setRefreshing(false);
             }
+
             dataList.clear();
+            Log.e("ApplyListFragment", "list length ------> " + result.list.size() + " users length ------> " + result.users.size() + " -------> count: " + result.count);
             if (result.list.isEmpty()) {
                 dataList.add(ApplyModel.empty());
             } else {
                 for (int i = 0; i < result.list.size(); i++) {
-                    ApplyModel model = new ApplyModel();
-                    model.setItemType(ApplyModel.typeData);
-                    model.setApply(result.list.get(i));
-                    model.setUser(result.users.get(i));
-                    dataList.add(model);
+                    if (i < result.users.size() && result.list.get(i).user_id != getUserConfig().getClientUserId() && result.users.get(i).id != getUserConfig().getClientUserId()) {
+                        ApplyModel model = new ApplyModel();
+                        model.setItemType(ApplyModel.typeData);
+                        model.setApply(result.list.get(i));
+                        model.setUser(result.users.get(i));
+                        dataList.add(model);
+                    }
                 }
             }
+
+            if (dataList.isEmpty()) {
+                dataList.add(ApplyModel.empty());
+            }
+
             listAdapter.notifyDataSetChanged();
         });
     }
